@@ -3,6 +3,7 @@
 import { Box } from '@mui/material';
 import { FC, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import { Home, Settings, Event } from '@mui/icons-material';
 
 import { useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
@@ -34,16 +35,19 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
             href: `/my/home`,
             label: messages.tabs.home(),
             value: 'home',
+            icon: Home,
           },
           {
             href: `/my/feed`,
             label: messages.tabs.feed(),
             value: 'feed',
+            icon: Event,
           },
           {
             href: `/my/settings`,
             label: messages.tabs.settings(),
             value: 'settings',
+            icon: Settings,
           },
         ]}
         title={title || messages.title()}
