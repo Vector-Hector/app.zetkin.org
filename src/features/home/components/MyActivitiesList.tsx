@@ -124,6 +124,7 @@ const MyActivitiesList: FC = () => {
                 />,
               ]}
               description={activity.data.instructions}
+              href={href}
               info={[
                 {
                   Icon: GroupWorkOutlined,
