@@ -35,7 +35,6 @@ const Page: FC<{
         flexDirection: 'column',
       }}
     >
-      <Divider />
       <Box
         sx={{
           overflowY: 'auto',

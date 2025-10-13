@@ -15,6 +15,7 @@ import { removeOffset } from 'utils/dateUtils';
 import useMyAreaAssignments from '../../canvass/hooks/useMyAreaAssignments';
 import useOrganization from '../hooks/useOrganization';
 import ZUIFutures from 'zui/ZUIFutures';
+import ZUILink from '../../../zui/components/ZUILink';
 
 type Props = PropsWithChildren<{
   areaAssId: number;
@@ -32,6 +33,32 @@ export const PublicCanvassLayout: FC<Props> = ({ children, areaAssId }) => {
   const messages = useMessages(messageIds);
   const isMobile = useIsMobile();
 
+  const subtitle = useMemo(() => {
+    if (!assignment.start_date || !assignment.end_date) {
+      return undefined;
+    }
+
+    return (
+      <Box
+        sx={{
+          alignItems: isMobile ? 'flex-start' : 'center',
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: 1,
+        }}
+      >
+        <ZUIText>
+          {
+            <ZUITimeSpan
+              end={new Date(removeOffset(assignment.end_date))}
+              start={new Date(removeOffset(assignment.start_date))}
+            />
+          }
+        </ZUIText>
+      </Box>
+    );
+  }, [assignment]);
+
   return (
     <ZUIFutures futures={{ org: orgFuture }}>
       {({ data: { org } }) => (
@@ -48,42 +75,26 @@ export const PublicCanvassLayout: FC<Props> = ({ children, areaAssId }) => {
           >
             <Box bgcolor="white">
               <ActivistPortalHeader
-                subtitle={
+                subtitle={subtitle}
+                title={assignment.title || messages.eventPage.defaultTitle()}
+                topLeftComponent={
                   <Box
                     sx={{
-                      alignItems: isMobile ? 'flex-start' : 'center',
-                      display: 'flex',
-                      flexDirection: isMobile ? 'column' : 'row',
+                      alignItems: 'center',
+                      display: 'inline-flex',
                       gap: 1,
                     }}
                   >
-                    <ZUIText>
-                      {assignment.start_date && assignment.end_date && (
-                        <ZUITimeSpan
-                          end={new Date(removeOffset(assignment.end_date))}
-                          start={new Date(removeOffset(assignment.start_date))}
-                        />
-                      )}
-                    </ZUIText>
+                    <ZUIOrgLogoAvatar
+                      orgId={assignment.organization_id}
+                      size="small"
+                    />
+                    <ZUILink
+                      hoverUnderline={true}
+                      href={`/o/${assignment.organization_id}`}
+                      text={org.title ?? ''}
+                    />
                   </Box>
-                }
-                title={assignment.title || messages.eventPage.defaultTitle()}
-                topLeftComponent={
-                  <NextLink href={`/o/${assignment.organization_id}`} passHref>
-                    <Box
-                      sx={{
-                        alignItems: 'center',
-                        display: 'inline-flex',
-                        gap: 1,
-                      }}
-                    >
-                      <ZUIOrgLogoAvatar
-                        orgId={assignment.organization_id}
-                        size="small"
-                      />
-                      <ZUIText>{org.title ?? ''}</ZUIText>
-                    </Box>
-                  </NextLink>
                 }
               />
             </Box>
