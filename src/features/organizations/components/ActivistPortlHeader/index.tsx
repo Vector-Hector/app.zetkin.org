@@ -1,7 +1,14 @@
 import { Box, Button } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Home, Logout, Settings, Event } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
+import {
+  ChevronLeft,
+  Event,
+  Home,
+  Logout,
+  Settings,
+} from '@mui/icons-material';
+import NextLink from 'next/link';
 
 import messageIds from 'features/organizations/l10n/messageIds';
 import ZUIText from 'zui/components/ZUIText';
@@ -15,10 +22,11 @@ import ZUIMenu, { MenuItem } from 'zui/components/ZUIMenu';
 
 type Props = {
   button?: JSX.Element;
+  noHomeChevron?: boolean; // disable the arrow pointing left that brings users home
   selectedTab?: string;
   subtitle?: string | JSX.Element;
   tabs?: ZUITabbedNavBarProps['items'];
-  title: string | JSX.Element;
+  title?: string | JSX.Element;
   topLeftComponent?: JSX.Element;
 };
 
@@ -29,6 +37,7 @@ const ActivistPortalHeader: FC<Props> = ({
   subtitle,
   title,
   topLeftComponent,
+  noHomeChevron,
 }) => {
   const user = useUser();
   const messages = useMessages(messageIds);
@@ -80,7 +89,9 @@ const ActivistPortalHeader: FC<Props> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          padding: 2,
+          paddingBottom: title ? 2 : 0,
+          paddingTop: 2,
+          paddingX: 2,
           width: '100%',
         }}
       >
@@ -88,14 +99,28 @@ const ActivistPortalHeader: FC<Props> = ({
           sx={{
             alignItems: 'center',
             display: 'flex',
-            justifyContent: topLeftComponent ? 'space-between' : 'flex-end',
           }}
         >
+          {!noHomeChevron && (
+            <NextLink
+              href={'/my'}
+              style={{
+                alignItems: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <ChevronLeft />
+            </NextLink>
+          )}
           {topLeftComponent}
           {user && (
             <>
               <Button
                 onClick={(event) => setLogoutMenuAnchorEl(event.currentTarget)}
+                sx={{
+                  marginLeft: 'auto',
+                }}
               >
                 <ZUIPersonAvatar
                   firstName={user.first_name}
@@ -112,22 +137,24 @@ const ActivistPortalHeader: FC<Props> = ({
             </>
           )}
         </Box>
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box>
-            {typeof title == 'string' ? (
-              <ZUIText variant="headingLg">{title}</ZUIText>
-            ) : (
-              title
-            )}
+        {title && (
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box>
+              {typeof title == 'string' ? (
+                <ZUIText variant="headingLg">{title}</ZUIText>
+              ) : (
+                title
+              )}
+            </Box>
+            {button && button}
           </Box>
-          {button && button}
-        </Box>
+        )}
         {subtitle && (
           <Box sx={{ whiteSpace: 'pre-line' }}>
             {typeof subtitle == 'string' ? (
