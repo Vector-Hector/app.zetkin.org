@@ -1,4 +1,4 @@
-import { Fade } from '@mui/material';
+import { Box, Fade } from '@mui/material';
 
 import { Msg, useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
@@ -8,6 +8,8 @@ import ZUIText from 'zui/components/ZUIText';
 import ZUIButton from 'zui/components/ZUIButton';
 import ZUISignUpChip from 'zui/components/ZUISignUpChip';
 import useUser from 'core/hooks/useUser';
+import { InfoOutlined } from '@mui/icons-material';
+import ZUILink from 'zui/components/ZUILink';
 
 export const EventSignupButton = ({
   event,
@@ -25,12 +27,30 @@ export const EventSignupButton = ({
 
   if (event.status == 'booked') {
     return (
-      <ZUIText key="booked" variant="bodySmRegular">
-        <Msg
-          id={messageIds.activityList.eventStatus.booked}
-          values={{ org: event.organization.title }}
-        />
-      </ZUIText>
+      <Box
+        sx={{
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '5px',
+        }}
+      >
+        <InfoOutlined style={{ fontSize: '0.9rem' }} />
+        <ZUIText key="booked" variant="bodySmRegular">
+          <Msg
+            id={messageIds.activityList.eventStatus.booked}
+            values={{
+              org: (
+                <ZUILink
+                  hoverUnderline={true}
+                  href={`/o/${event.organization.id}`}
+                  text={event.organization.title}
+                />
+              ),
+            }}
+          />
+        </ZUIText>
+      </Box>
     );
   }
   if (event.status == 'signedUp') {
