@@ -14,6 +14,7 @@ import CanvassSidebar from './CanvassSidebar';
 import { ZetkinAreaAssignment } from 'features/areaAssignments/types';
 import useAssignmentAreas from 'features/areaAssignments/hooks/useAssignmentAreas';
 import GLCanvassMap from './GLCanvassMap';
+import ZUILink from '../../../zui/components/ZUILink';
 
 const Page: FC<{ areaId: number; assignment: ZetkinAreaAssignment }> = ({
   areaId,
@@ -63,7 +64,7 @@ const Page: FC<{ areaId: number; assignment: ZetkinAreaAssignment }> = ({
               <Box display="flex">
                 <ArrowLeftIcon
                   fontSize="large"
-                  onClick={() => router.push(`/canvass/${assignment.id}/areas`)}
+                  onClick={() => router.push(`/canvass/${assignment.id}`)}
                   sx={{ alignSelf: 'center', cursor: 'pointer', mr: 1 }}
                 />
                 <Box
@@ -77,7 +78,11 @@ const Page: FC<{ areaId: number; assignment: ZetkinAreaAssignment }> = ({
                       src={`/api/orgs/${org.id}/avatar`}
                       sx={{ height: 24, width: 24 }}
                     />
-                    <Typography variant="body2">{org.title}</Typography>
+                    <ZUILink
+                      hoverUnderline={true}
+                      href={`/o/${org.id}`}
+                      text={org.title}
+                    />
                   </Box>
                 </Box>
               </Box>
