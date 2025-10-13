@@ -14,6 +14,7 @@ import useIsMobile from 'utils/hooks/useIsMobile';
 import useEvent from 'features/events/hooks/useEvent';
 import { removeOffset } from 'utils/dateUtils';
 import ZUILink from '../../../zui/components/ZUILink';
+import { Typography } from '@mui/material';
 
 type Props = PropsWithChildren<{
   eventId: number;
@@ -57,6 +58,7 @@ export const PublicEventLayout: FC<Props> = ({ children, eventId, orgId }) => {
                       start={new Date(removeOffset(event.start_time))}
                     />
                   </ZUIText>
+                  <Typography component="span">·</Typography>
                   <ZUIText>
                     {event.location ? (
                       <ZUILink
