@@ -7,6 +7,7 @@ import {
   Home,
   Logout,
   Settings,
+  People,
 } from '@mui/icons-material';
 import NextLink from 'next/link';
 
@@ -57,9 +58,15 @@ const ActivistPortalHeader: FC<Props> = ({
       },
       {
         divider: true,
-        label: messages.home.menu.allEvents(),
+        label: messages.home.menu.events(),
         onClick: () => router.push('/my/feed'),
         startIcon: Event,
+      },
+      {
+        divider: true,
+        label: messages.home.menu.organizations(),
+        onClick: () => router.push('/my/organizations'),
+        startIcon: People,
       },
       {
         divider: true,

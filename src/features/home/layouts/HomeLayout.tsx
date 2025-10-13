@@ -3,7 +3,7 @@
 import { Box } from '@mui/material';
 import { FC, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { Home, Settings, Event } from '@mui/icons-material';
+import { Home, Settings, Event, People } from '@mui/icons-material';
 import NextLink from 'next/link';
 
 import { useMessages } from 'core/i18n';
@@ -37,21 +37,27 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
         tabs={[
           {
             href: `/my/home`,
+            icon: Home,
             label: messages.tabs.home(),
             value: 'home',
-            icon: Home,
           },
           {
             href: `/my/feed`,
+            icon: Event,
             label: messages.tabs.feed(),
             value: 'feed',
-            icon: Event,
+          },
+          {
+            href: `/my/organizations`,
+            icon: People,
+            label: messages.tabs.organizations(),
+            value: 'organizations',
           },
           {
             href: `/my/settings`,
+            icon: Settings,
             label: messages.tabs.settings(),
             value: 'settings',
-            icon: Settings,
           },
         ]}
         topLeftComponent={
