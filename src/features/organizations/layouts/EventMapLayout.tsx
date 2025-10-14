@@ -96,7 +96,7 @@ const EventMapLayout: FC<Props> = ({
           }
         >
           {!showMapMobile || !mobileMapVisible ? (
-            <Box display="flex" flexDirection="column">
+            <Box display="flex" flexDirection="column" minHeight="90dvh">
               {children}
               {showMapMobile && (
                 <Box

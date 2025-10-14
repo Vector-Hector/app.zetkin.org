@@ -25,9 +25,6 @@ const useStyles = makeStyles(() => ({
     right: oldTheme.spacing(-0.5),
   },
   logoContainer: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'center',
     position: 'relative',
   },
 }));
