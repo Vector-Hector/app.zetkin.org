@@ -138,6 +138,7 @@ const ActivistPortalHeader: FC<Props> = ({
               </Button>
               <ZUIMenu
                 anchorEl={logoutMenuAnchorEl}
+                invertHorizontalAnchor={true}
                 menuItems={menuItems}
                 onClose={() => setLogoutMenuAnchorEl(null)}
               />
