@@ -207,16 +207,22 @@ const rootReducer = combineReducers(reducer);
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = configureStore({
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
-  reducer: persistedReducer,
-});
-export const persistor = persistStore(store);
+export default function createStore(
+  preloadedState?: ConfigureStoreOptions<RootState>['preloadedState']
+) {
+  return configureStore({
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+    preloadedState: preloadedState,
+    reducer: persistedReducer,
+  });
+}
 
-export type Store = typeof store;
+export type Store = ReturnType<typeof createStore>;
 export type AppDispatch = Store['dispatch'];
+export const store = createStore();
+export const persistor = persistStore(store);
