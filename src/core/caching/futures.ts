@@ -121,9 +121,11 @@ export class RemoteListFuture<DataType>
 {
   constructor(list: RemoteList<DataType>) {
     super(
-      list.items
-        .filter((item) => item.data != null)
-        .map((item) => item.data) as DataType[],
+      list.isLoading || list.error
+        ? null
+        : (list.items
+            .filter((item) => item.data != null)
+            .map((item) => item.data) as DataType[]),
       list.error,
       list.isLoading
     );
