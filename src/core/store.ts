@@ -1,5 +1,7 @@
 import Router from 'next/router';
 import {
+  AnyAction,
+  combineReducers,
   configureStore,
   ConfigureStoreOptions,
   createListenerMiddleware,
@@ -56,6 +58,17 @@ import areaAssignmentSlice, {
 } from 'features/areaAssignments/store';
 import canvassSlice, { CanvassStoreSlice } from 'features/canvass/store';
 import callSlice, { CallStoreSlice } from 'features/call/store';
+import storage from 'redux-persist/lib/storage';
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistStore,
+  persistReducer,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from 'redux-persist';
 
 export interface RootState {
   areaAssignments: AreaAssignmentsStoreSlice;
@@ -185,17 +198,25 @@ listenerMiddleware.startListening({
   },
 });
 
-export default function createStore(
-  preloadedState?: ConfigureStoreOptions<RootState>['preloadedState']
-) {
-  return configureStore({
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().prepend(listenerMiddleware.middleware),
-    preloadedState: preloadedState,
-    reducer: reducer,
-  });
-}
+const persistConfig = {
+  key: 'root',
+  storage,
+};
 
-export type Store = ReturnType<typeof createStore>;
+const rootReducer = combineReducers(reducer);
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+  reducer: persistedReducer,
+});
+export const persistor = persistStore(store);
+
+export type Store = typeof store;
 export type AppDispatch = Store['dispatch'];
-export const store = createStore();

@@ -61,35 +61,35 @@ const Providers: FC<ProvidersProps> = ({
   const cache = createCache({ key: 'css', prepend: true });
 
   return (
-    <ReduxProvider store={store}>
-      <EnvProvider env={env}>
-        <UserProvider user={user}>
-          <StyledEngineProvider injectFirst>
-            <CacheProvider value={cache}>
-              <ThemeProvider theme={oldThemeWithLocale(lang)}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <IntlProvider
-                    defaultLocale="en"
-                    locale={lang}
-                    messages={messages}
-                  >
-                    <ZUISnackbarProvider>
-                      <ZUIConfirmDialogProvider>
-                        <EventPopperProvider>
-                          <DndProvider backend={HTML5Backend}>
-                            {children}
-                          </DndProvider>
-                        </EventPopperProvider>
-                      </ZUIConfirmDialogProvider>
-                    </ZUISnackbarProvider>
-                  </IntlProvider>
-                </LocalizationProvider>
-              </ThemeProvider>
-            </CacheProvider>
-          </StyledEngineProvider>
-        </UserProvider>
-      </EnvProvider>
-    </ReduxProvider>
+    // <ReduxProvider store={store}>
+    <EnvProvider env={env}>
+      <UserProvider user={user}>
+        <StyledEngineProvider injectFirst>
+          <CacheProvider value={cache}>
+            <ThemeProvider theme={oldThemeWithLocale(lang)}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <IntlProvider
+                  defaultLocale="en"
+                  locale={lang}
+                  messages={messages}
+                >
+                  <ZUISnackbarProvider>
+                    <ZUIConfirmDialogProvider>
+                      <EventPopperProvider>
+                        <DndProvider backend={HTML5Backend}>
+                          {children}
+                        </DndProvider>
+                      </EventPopperProvider>
+                    </ZUIConfirmDialogProvider>
+                  </ZUISnackbarProvider>
+                </IntlProvider>
+              </LocalizationProvider>
+            </ThemeProvider>
+          </CacheProvider>
+        </StyledEngineProvider>
+      </UserProvider>
+    </EnvProvider>
+    // </ReduxProvider>
   );
 };
 

@@ -18,12 +18,13 @@ import BrowserApiClient from 'core/api/client/BrowserApiClient';
 import Environment, { EnvVars } from 'core/env/Environment';
 import { EnvProvider } from 'core/env/EnvContext';
 import { MessageList } from 'utils/locale';
-import { store } from 'core/store';
+import { persistor, store } from 'core/store';
 import { oldThemeWithLocale } from '../../theme';
 import { UserProvider } from './UserContext';
 import { ZetkinUser } from 'utils/types/zetkin';
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZUISnackbarProvider } from 'zui/ZUISnackbarContext';
+import { PersistGate } from 'redux-persist/integration/react';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -63,34 +64,36 @@ const ClientContext: FC<ClientContextProps> = ({
 
   return (
     <ReduxProvider store={store}>
-      <StyledEngineProvider injectFirst>
-        <CacheProvider value={cache}>
-          <ThemeProvider theme={oldThemeWithLocale(lang)}>
-            <EnvProvider env={env}>
-              <UserProvider user={user}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <IntlProvider
-                    defaultLocale="en"
-                    locale={lang}
-                    messages={messages}
-                  >
-                    <ZUISnackbarProvider>
-                      <IntlProvider
-                        defaultLocale="en"
-                        locale={lang}
-                        messages={messages}
-                      >
-                        <CssBaseline />
-                        {children}
-                      </IntlProvider>
-                    </ZUISnackbarProvider>
-                  </IntlProvider>
-                </LocalizationProvider>
-              </UserProvider>
-            </EnvProvider>
-          </ThemeProvider>
-        </CacheProvider>
-      </StyledEngineProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <StyledEngineProvider injectFirst>
+          <CacheProvider value={cache}>
+            <ThemeProvider theme={oldThemeWithLocale(lang)}>
+              <EnvProvider env={env}>
+                <UserProvider user={user}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <IntlProvider
+                      defaultLocale="en"
+                      locale={lang}
+                      messages={messages}
+                    >
+                      <ZUISnackbarProvider>
+                        <IntlProvider
+                          defaultLocale="en"
+                          locale={lang}
+                          messages={messages}
+                        >
+                          <CssBaseline />
+                          {children}
+                        </IntlProvider>
+                      </ZUISnackbarProvider>
+                    </IntlProvider>
+                  </LocalizationProvider>
+                </UserProvider>
+              </EnvProvider>
+            </ThemeProvider>
+          </CacheProvider>
+        </StyledEngineProvider>
+      </PersistGate>
     </ReduxProvider>
   );
 };
