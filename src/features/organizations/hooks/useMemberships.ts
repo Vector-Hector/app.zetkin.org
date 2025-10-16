@@ -10,6 +10,7 @@ export default function useMemberships(): IFuture<ZetkinMembership[]> {
   const membershipList = useAppSelector(
     (state) => state.organizations.userMembershipList
   );
+  console.log(membershipList);
 
   return loadListIfNecessary(membershipList, dispatch, {
     actionOnLoad: () => dispatch(userMembershipsLoad()),
