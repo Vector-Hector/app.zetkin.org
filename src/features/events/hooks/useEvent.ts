@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
 import { IFuture } from 'core/caching/futures';
-import { loadItemIfNecessary } from 'core/caching/cacheUtils';
 import { ZetkinEvent } from 'utils/types/zetkin';
 import { eventLoad, eventLoaded } from '../store';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
+import useLoadIfNecessary from 'core/hooks/useLoadIfNecessary';
 
 export default function useEvent(
   orgId: number,
@@ -14,16 +16,19 @@ export default function useEvent(
 
   const item = eventList.items.find((item) => item.id == id);
 
-  if (item && item.deleted) {
-    return null;
-  }
+  const hooks = useMemo(
+    () => ({
+      actionOnLoad: () => eventLoad(id),
+      actionOnSuccess: (event) => eventLoaded(event),
+      loader: () =>
+        apiClient.get<ZetkinEvent>(`/api/orgs/${orgId}/actions/${id}`),
+    }),
+    [orgId, id]
+  );
 
-  const eventFuture = loadItemIfNecessary(item, dispatch, {
-    actionOnLoad: () => eventLoad(id),
-    actionOnSuccess: (event) => eventLoaded(event),
-    loader: () =>
-      apiClient.get<ZetkinEvent>(`/api/orgs/${orgId}/actions/${id}`),
-  });
-
-  return eventFuture;
+  return useLoadIfNecessary(
+    item && item.deleted ? null : item,
+    dispatch,
+    hooks
+  );
 }
