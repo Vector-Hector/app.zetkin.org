@@ -86,21 +86,27 @@ export function loadListIfNecessary<
   });
 }
 
-export function loadList<
+export type Hooks<
   DataType,
   OnLoadPayload = void,
-  OnSuccessPayload = DataType[]
+  OnSuccessPayload = DataType
+> = {
+  actionOnError?: (err: unknown) => PayloadAction<unknown>;
+  actionOnLoad: () => PayloadAction<OnLoadPayload>;
+  actionOnSuccess: (item: DataType) => PayloadAction<OnSuccessPayload>;
+  loader: () => Promise<DataType>;
+};
+
+const loadObject = <
+  DataType,
+  OnLoadPayload = void,
+  OnSuccessPayload = DataType
 >(
   dispatch: AppDispatch,
-  hooks: {
-    actionOnError?: (err: unknown) => PayloadAction<unknown>;
-    actionOnLoad: () => PayloadAction<OnLoadPayload>;
-    actionOnSuccess: (items: DataType[]) => PayloadAction<OnSuccessPayload>;
-    loader: () => Promise<DataType[]>;
-  }
-): IFuture<DataType[]> {
+  hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
+): Promise<DataType> => {
   dispatch(hooks.actionOnLoad());
-  const promise = hooks
+  return hooks
     .loader()
     .then((val) => {
       dispatch(hooks.actionOnSuccess(val));
@@ -109,11 +115,25 @@ export function loadList<
     .catch((err: unknown) => {
       if (hooks.actionOnError) {
         dispatch(hooks.actionOnError(err));
-        return null;
+        return;
       } else {
         throw err;
       }
     });
+};
+
+export function loadList<
+  DataType,
+  OnLoadPayload = void,
+  OnSuccessPayload = DataType[]
+>(
+  dispatch: AppDispatch,
+  hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
+): IFuture<DataType[]> {
+  const promise = loadObject<DataType[], OnLoadPayload, OnSuccessPayload>(
+    dispatch,
+    hooks
+  );
 
   return new PromiseFuture(promise);
 }
@@ -150,6 +170,13 @@ export function loadItemIfNecessary<
   dispatch: AppDispatch,
   hooks: {
     /**
+     * Called when an error occurs while loading the list.
+     * @param err The error that occurred during the loading process.
+     * @return {PayloadAction} The action to dispatch when an error occurs.
+     */
+    actionOnError?: (err: unknown) => PayloadAction<unknown>;
+
+    /**
      * Called when the item begins loading.
      * @returns {PayloadAction} The action to dispatch when the item is loading.
      */
@@ -163,19 +190,21 @@ export function loadItemIfNecessary<
 
     /**
      * The function that loads the item. Typically an API call.
-     * @returns {Promise<DataType[]>}
+     * @returns {Promise<DataType>}
      */
     loader: () => Promise<DataType>;
   }
 ): IFuture<DataType> {
   if (!remoteItem || shouldLoad(remoteItem)) {
-    dispatch(hooks.actionOnLoad());
-    const promise = hooks.loader().then((val) => {
-      dispatch(hooks.actionOnSuccess(val));
-      return val;
-    });
+    const promise = loadObject<DataType, OnLoadPayload, OnSuccessPayload>(
+      dispatch,
+      hooks
+    );
 
-    return new PromiseFuture(promise, remoteItem?.data);
+    return new PromiseFuture<DataType>(
+      promise,
+      remoteItem?.data ? remoteItem.data : undefined
+    );
   }
 
   return new RemoteItemFuture(remoteItem);
