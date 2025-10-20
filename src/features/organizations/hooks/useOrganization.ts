@@ -14,7 +14,7 @@ const useOrganization = (orgId: number): IFuture<ZetkinOrganization> => {
   const hooks = useMemo(
     () => ({
       actionOnLoad: () => organizationLoad(),
-      actionOnSuccess: (data) => organizationLoaded(data),
+      actionOnSuccess: (data: ZetkinOrganization) => organizationLoaded(data),
       loader: () => apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`),
     }),
     [organizationLoad, organizationLoaded, apiClient]

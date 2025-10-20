@@ -118,13 +118,13 @@ function useLoadIfNecessary<
       result = loadListIfNecessary<DataType, OnLoadPayload, OnSuccessPayload>(
         obj as RemoteList<DataType>,
         dispatch,
-        wrappedHooks
+        wrappedHooks as Hooks<DataType[], OnLoadPayload, OnSuccessPayload>
       );
     } else {
       result = loadItemIfNecessary<DataType, OnLoadPayload, OnSuccessPayload>(
         obj as RemoteItem<DataType>,
         dispatch,
-        wrappedHooks
+        wrappedHooks as Hooks<DataType, OnLoadPayload, OnSuccessPayload>
       );
     }
 

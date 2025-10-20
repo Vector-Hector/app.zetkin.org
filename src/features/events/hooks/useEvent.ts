@@ -19,7 +19,7 @@ export default function useEvent(
   const hooks = useMemo(
     () => ({
       actionOnLoad: () => eventLoad(id),
-      actionOnSuccess: (event) => eventLoaded(event),
+      actionOnSuccess: (event: ZetkinEvent) => eventLoaded(event),
       loader: () =>
         apiClient.get<ZetkinEvent>(`/api/orgs/${orgId}/actions/${id}`),
     }),

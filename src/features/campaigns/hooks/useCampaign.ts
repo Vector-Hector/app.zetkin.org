@@ -33,7 +33,7 @@ export default function useCampaign(
   const campaignHooks = useMemo(
     () => ({
       actionOnLoad: () => campaignLoad(campId),
-      actionOnSuccess: (data) => campaignLoaded(data),
+      actionOnSuccess: (data: ZetkinCampaign) => campaignLoaded(data),
       loader: async () => {
         const campaign = await apiClient.get<ZetkinCampaign>(
           `/api/orgs/${orgId}/campaigns/${campId}`

@@ -56,9 +56,9 @@ export class PromiseFuture<DataType>
   extends FutureBase<DataType>
   implements IFuture<DataType>
 {
-  private _promise: Promise<DataType>;
+  private _promise: Promise<DataType | null>;
 
-  constructor(promise: Promise<DataType>, existingData?: DataType) {
+  constructor(promise: Promise<DataType | null>, existingData?: DataType) {
     super();
 
     this._promise = promise;

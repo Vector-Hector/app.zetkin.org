@@ -77,7 +77,7 @@ export function loadListIfNecessary<
   const loadIsNecessary = hooks.isNecessary?.() ?? shouldLoad(remoteList);
 
   if (!remoteList || loadIsNecessary) {
-    return loadList(dispatch, hooks);
+    return loadList<DataType, OnLoadPayload, OnSuccessPayload>(dispatch, hooks);
   }
 
   return new RemoteListFuture({
@@ -104,7 +104,7 @@ const loadObject = <
 >(
   dispatch: AppDispatch,
   hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
-): Promise<DataType> => {
+): Promise<DataType | null> => {
   dispatch(hooks.actionOnLoad());
   return hooks
     .loader()
@@ -115,7 +115,7 @@ const loadObject = <
     .catch((err: unknown) => {
       if (hooks.actionOnError) {
         dispatch(hooks.actionOnError(err));
-        return;
+        return null;
       } else {
         throw err;
       }
@@ -128,7 +128,7 @@ export function loadList<
   OnSuccessPayload = DataType[]
 >(
   dispatch: AppDispatch,
-  hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
+  hooks: Hooks<DataType[], OnLoadPayload, OnSuccessPayload>
 ): IFuture<DataType[]> {
   const promise = loadObject<DataType[], OnLoadPayload, OnSuccessPayload>(
     dispatch,
