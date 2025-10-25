@@ -1,5 +1,7 @@
 import { MJMLJsonObject } from 'mjml-core';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 export enum BLOCK_TYPES {
   BUTTON = 'button',
   HEADER = 'header',
@@ -222,7 +224,7 @@ export type ZetkinEmailStats = {
     unsubscribed: number;
   };
   num_clicks: number;
-  num_clicks_by_link: Record<number, number | undefined>;
+  num_clicks_by_link: SafeRecord<number, number | undefined>;
   num_locked_targets: number | null;
   num_opened: number;
   num_sent: number;

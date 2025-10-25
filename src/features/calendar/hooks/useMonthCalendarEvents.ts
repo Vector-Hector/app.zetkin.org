@@ -29,6 +29,12 @@ export default function useMonthCalendarEvents({
   startDate,
 }: UseMonthCalendarEventsParams): UseMonthCalendarEventsReturn {
   const { campId, orgId } = useNumericRouteParams();
+  if (orgId === undefined || campId === undefined) {
+    throw new Error(
+      'useMonthCalendarEvents can only be used on paths with orgId and campId.'
+    );
+  }
+
   const eventActivities = useEventsFromDateRange(
     startDate,
     endDate,

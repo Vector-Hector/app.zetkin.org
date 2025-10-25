@@ -6,6 +6,7 @@ import { EmailState } from '../hooks/useEmailState';
 import messageIds from '../l10n/messageIds';
 import { Msg } from 'core/i18n';
 import oldTheme from 'theme';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface EmailStatusChipProps {
   state: EmailState;
@@ -39,7 +40,7 @@ const EmailStatusChip: FC<EmailStatusChipProps> = ({ state }) => {
     return null;
   }
 
-  const classMap: Record<EmailState, string> = {
+  const classMap: SafeRecord<EmailState, string> = {
     [EmailState.DRAFT]: classes.draft,
     [EmailState.UNKNOWN]: classes.draft,
     [EmailState.SENT]: classes.sent,

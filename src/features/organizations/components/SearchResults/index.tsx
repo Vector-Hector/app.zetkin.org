@@ -3,6 +3,7 @@ import { Box, Link, Typography, useTheme } from '@mui/material';
 import Ancestors from './Ancestors';
 import ProceduralColorIcon from '../ProceduralColorIcon';
 import { TreeItemData } from '../../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface SearchResultsProps {
   flatOrgData: TreeItemData[];
@@ -39,7 +40,7 @@ const SearchResults = ({
     return ancestors.reverse();
   }
 
-  const searchResultsByParent: Record<number, TreeItemData[]> = {};
+  const searchResultsByParent: SafeRecord<number, TreeItemData[]> = {};
 
   matchingOrgs.forEach((result) => {
     //Give 0 as parent id to top level orgs

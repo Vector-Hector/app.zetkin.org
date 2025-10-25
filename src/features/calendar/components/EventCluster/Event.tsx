@@ -223,7 +223,7 @@ const Event = ({
               >
                 <FieldGroup
                   fields={fields}
-                  height={availableHeightPerFieldGroup[index]}
+                  height={availableHeightPerFieldGroup[index] ?? 100}
                 />
               </Box>
             ))}

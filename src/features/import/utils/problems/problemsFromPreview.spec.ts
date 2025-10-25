@@ -1,6 +1,7 @@
 import { ImportProblemKind } from './types';
 import problemsFromPreview from './problemsFromPreview';
 import { ImportPreview, ImportPreviewProblemCode } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type PreviewOverrides = {
   problems?: ImportPreview['problems'];
@@ -8,19 +9,19 @@ type PreviewOverrides = {
     person: {
       summary: {
         addedToOrg?: {
-          byOrg?: Record<number, number>;
+          byOrg?: SafeRecord<number, number>;
           total?: number;
         };
         created?: {
           total?: number;
         };
         tagged?: {
-          byTag?: Record<number, number>;
+          byTag?: SafeRecord<number, number>;
           total?: number;
         };
         updated?: {
-          byChangedField?: Record<string, number>;
-          byInitializedField?: Record<string, number>;
+          byChangedField?: SafeRecord<string, number>;
+          byInitializedField?: SafeRecord<string, number>;
           total?: number;
         };
       };

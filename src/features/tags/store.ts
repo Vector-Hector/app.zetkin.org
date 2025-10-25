@@ -16,11 +16,12 @@ import {
   ZetkinTag,
   ZetkinTagGroup,
 } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface TagsStoreSlice {
   tagGroupList: RemoteList<ZetkinTagGroup>;
   tagList: RemoteList<ZetkinTag>;
-  tagsByPersonId: Record<number, RemoteList<ZetkinAppliedTag>>;
+  tagsByPersonId: SafeRecord<number, RemoteList<ZetkinAppliedTag>>;
 }
 
 const initialState: TagsStoreSlice = {

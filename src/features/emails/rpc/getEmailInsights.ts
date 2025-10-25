@@ -13,6 +13,7 @@ import {
 import { ZetkinEmail } from 'utils/types/zetkin';
 import EmailContentTraverser from '../utils/rendering/EmailContentTraverser';
 import inlineNodesToHtml from '../utils/inlineNodesToHtml';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const paramsSchema = z.object({
   emailId: z.number(),
@@ -83,7 +84,7 @@ async function handle(params: Params, apiClient: IApiClient) {
     `/api/orgs/${orgId}/emails/${emailId}`
   );
 
-  const linkTextByTag: Record<string, string | undefined> = {};
+  const linkTextByTag: SafeRecord<string, string | undefined> = {};
   const traverser = new EmailContentTraverser(
     JSON.parse(email.content || '{}')
   );

@@ -22,6 +22,11 @@ const SingleCampaignLayout: FunctionComponent<SingleCampaignLayoutProps> = ({
 }) => {
   const messages = useMessages(messageIds);
   const { orgId, campId } = useNumericRouteParams();
+  if (orgId === undefined || campId === undefined) {
+    throw new Error(
+      'SingleCampaignLayout can only be used on paths with orgId and campId'
+    );
+  }
   const { campaignFuture } = useCampaign(orgId, campId);
   const { firstEvent, lastEvent } = useCampaignEvents(orgId, campId);
 

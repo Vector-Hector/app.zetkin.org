@@ -11,6 +11,7 @@ import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { Msg } from 'core/i18n';
 import messageIds from 'zui/l10n/messageIds';
 import ZUIText from 'zui/components/ZUIText';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface BreadcrumbTreeItem {
   /**
@@ -21,7 +22,9 @@ export interface BreadcrumbTreeItem {
   /**
    * The icon of the item
    */
-  icon?: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, 'svg'>>;
+  icon?: OverridableComponent<
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
+  >;
 
   /**
    * The title of the item

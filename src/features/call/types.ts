@@ -7,6 +7,7 @@ import {
   ZetkinPerson,
   ZetkinTag,
 } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type ZetkinCall = {
   allocation_time: string;
@@ -97,7 +98,7 @@ export enum LaneStep {
   SUMMARY = 3,
 }
 
-export type SurveySubmissionData = Record<string, string | string[]>;
+export type SurveySubmissionData = SafeRecord<string, string | string[]>;
 
 export type ActivityFilters = {
   customDatesToFilterEventsBy: DateRange<Dayjs>;
@@ -122,7 +123,7 @@ export type LaneState = {
   respondedEventIds: number[];
   selectedSurveyId: number | null;
   step: LaneStep;
-  submissionDataBySurveyId: Record<number, SurveySubmissionData>;
+  submissionDataBySurveyId: SafeRecord<number, SurveySubmissionData>;
   surveySubmissionError: boolean;
   updateCallError: boolean;
 };

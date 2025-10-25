@@ -71,7 +71,7 @@ const Providers: FC<ProvidersProps> = ({
                   <IntlProvider
                     defaultLocale="en"
                     locale={lang}
-                    messages={messages}
+                    messages={messages as Record<string, string>}
                   >
                     <ZUISnackbarProvider>
                       <ZUIConfirmDialogProvider>

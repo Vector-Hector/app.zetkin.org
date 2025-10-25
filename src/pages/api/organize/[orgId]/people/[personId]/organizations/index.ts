@@ -8,9 +8,10 @@ import {
   getPersonOrganizations,
   PersonOrganization,
 } from 'utils/organize/people';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const getOrganizationTrees = async (
-  req: NextApiRequest & { query: Record<string, string> },
+  req: NextApiRequest & { query: SafeRecord<string, string> },
   res: NextApiResponse
 ): Promise<void> => {
   const {

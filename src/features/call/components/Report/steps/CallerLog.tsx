@@ -9,6 +9,7 @@ import messageIds from 'features/call/l10n/messageIds';
 import StepBase from './StepBase';
 import useIsMobile from 'utils/hooks/useIsMobile';
 import { Report } from 'features/call/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   onReportUpdate: (updatedReport: Report) => void;
@@ -22,7 +23,7 @@ const CallerLog: FC<Props> = ({ onReportUpdate, report }) => {
   const [message, setMessage] = useState(report.callerLog || '');
 
   useEffect(() => {
-    const keysPressed: Record<string, boolean> = {};
+    const keysPressed: SafeRecord<string, boolean> = {};
 
     const onKeyDown = (ev: KeyboardEvent) => {
       keysPressed[ev.key] = true;

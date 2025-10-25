@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material';
 
 import { ZUISize } from '../types';
 import AvatarBackground from './AvatarBackground';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface ZUIPersonAvatarProps {
   /**
@@ -33,19 +34,19 @@ export interface ZUIPersonAvatarProps {
   size?: ZUISize;
 }
 
-export const fontSizes: Record<ZUISize, number> = {
+export const fontSizes: SafeRecord<ZUISize, number> = {
   large: 20,
   medium: 16,
   small: 12,
 };
 
-export const avatarSizes: Record<ZUISize, number> = {
+export const avatarSizes: SafeRecord<ZUISize, number> = {
   large: 40,
   medium: 32,
   small: 24,
 };
 
-export const letterSpacing: Record<ZUISize, number> = {
+export const letterSpacing: SafeRecord<ZUISize, number> = {
   large: 0.14,
   medium: 0.11,
   small: 0.08,

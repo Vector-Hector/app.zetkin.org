@@ -1,5 +1,6 @@
 import { Gender } from '../hooks/useGenderMapping';
 import { BulkOp } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type CellData = string | number | null | undefined;
 
@@ -108,19 +109,19 @@ export interface ZetkinPersonImportPostBody {
 
 export type PersonImportSummary = {
   addedToOrg: {
-    byOrg: { [key: number]: number };
+    byOrg: SafeRecord<number, number>;
     total: number;
   };
   created: {
     total: number;
   };
   tagged: {
-    byTag: { [key: number]: number };
+    byTag: SafeRecord<number, number>;
     total: number;
   };
   updated: {
-    byChangedField: { [key: string]: number };
-    byInitializedField: { [key: string]: number };
+    byChangedField: SafeRecord<string, number>;
+    byInitializedField: SafeRecord<string, number>;
     total: number;
   };
 };

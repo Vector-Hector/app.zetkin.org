@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 
 import { AreaAssignmentState } from '../hooks/useAreaAssignmentStatus';
 import oldTheme from 'theme';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface AssigmentStatusChipProps {
   state: AreaAssignmentState;
@@ -13,7 +14,7 @@ const capitalizeFirstLetter = (str: string): string => {
 };
 
 const AssignmentStatusChip: FC<AssigmentStatusChipProps> = ({ state }) => {
-  const bgColorMap: Record<AreaAssignmentState, string> = {
+  const bgColorMap: SafeRecord<AreaAssignmentState, string> = {
     [AreaAssignmentState.CLOSED]: oldTheme.palette.error.main,
     [AreaAssignmentState.DRAFT]: oldTheme.palette.grey[500],
     [AreaAssignmentState.OPEN]: oldTheme.palette.success.main,

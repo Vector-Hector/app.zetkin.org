@@ -35,6 +35,7 @@ import {
 import messageIds from 'features/tasks/l10n/messageIds';
 import useCampaigns from 'features/campaigns/hooks/useCampaigns';
 import { useNumericRouteParams } from 'core/hooks';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 dayjs.extend(utc);
 
@@ -55,7 +56,7 @@ const TaskDetailsForm = ({
   const taskStatus = task ? getTaskStatus(task) : null;
 
   const validate = (values: NewTaskValues) => {
-    const errors: Record<string, string | Record<string, string>> = {};
+    const errors: SafeRecord<string, string | SafeRecord<string, string>> = {};
     if (!values.title) {
       errors.title = messages.form.required();
     }

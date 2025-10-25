@@ -5,7 +5,7 @@ import { Box, Fade, List, ListItem, Switch } from '@mui/material';
 import { FC, useState } from 'react';
 import { DateRangeCalendar, DateRangePickerDay } from '@mui/x-date-pickers-pro';
 import { useIntl } from 'react-intl';
-import { Clear, CalendarMonthOutlined, Search } from '@mui/icons-material';
+import { CalendarMonthOutlined, Clear, Search } from '@mui/icons-material';
 
 import EventListItem from 'features/home/components/EventListItem';
 import { ZetkinEventWithStatus } from 'features/home/types';
@@ -27,6 +27,7 @@ import { filtersUpdated } from '../store';
 import messageIds from '../l10n/messageIds';
 import useCampaign from '../hooks/useCampaign';
 import orgMessageIds from 'features/organizations/l10n/messageIds';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   campId: number;
@@ -181,7 +182,7 @@ const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
     });
 
   const eventsByDate = locationEvents.reduce<
-    Record<string, ZetkinEventWithStatus[]>
+    SafeRecord<string, ZetkinEventWithStatus[]>
   >((dates, event) => {
     const eventDate = event.start_time.slice(0, 10);
     const existingEvents = dates[eventDate] || [];
@@ -308,19 +309,20 @@ const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
           </Fade>
           <Fade appear in mountOnEnter style={{ transitionDelay: nextDelay() }}>
             <Box display="flex" flexDirection="column" gap={1}>
-              {eventsByDate[date].map((event) => (
-                <EventListItem
-                  key={event.id}
-                  event={event}
-                  href={`/o/${event.organization.id}/events/${event.id}`}
-                  onClickSignUp={(ev) => {
-                    if (!user) {
-                      setPostAuthEvent(event);
-                      ev.preventDefault();
-                    }
-                  }}
-                />
-              ))}
+              {eventsByDate[date] &&
+                eventsByDate[date]!.map((event) => (
+                  <EventListItem
+                    key={event.id}
+                    event={event}
+                    href={`/o/${event.organization.id}/events/${event.id}`}
+                    onClickSignUp={(ev) => {
+                      if (!user) {
+                        setPostAuthEvent(event);
+                        ev.preventDefault();
+                      }
+                    }}
+                  />
+                ))}
             </Box>
           </Fade>
         </Box>

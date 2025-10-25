@@ -7,8 +7,7 @@ import {
   PhoneInTalk,
 } from '@mui/icons-material';
 
-import { CHOICES } from './types';
-import { ColumnChoice } from './types';
+import { CHOICES, ColumnChoice } from './types';
 import LocalQueryConfig from '../LocalQueryConfig';
 import SingleIconCardVisual from '../SingleIconCardVisual';
 import oldTheme from 'theme';
@@ -19,6 +18,7 @@ import {
   OPERATION,
 } from 'features/smartSearch/components/types';
 import { COLUMN_TYPE, SelectedViewColumn, ZetkinViewColumn } from '../../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const { blue } = oldTheme.palette.viewColumnGallery;
 
@@ -38,7 +38,9 @@ function createQueryChoice(
     | CHOICES.QUERY_BOOKED
     | CHOICES.QUERY_REACHED
     | CHOICES.QUERY_PARTICIPATED,
-  icon: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, 'svg'>>,
+  icon: OverridableComponent<
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
+  >,
   filterSpec: ZetkinQuery['filter_spec']
 ): ColumnChoice {
   return {

@@ -1,4 +1,5 @@
 import { AreaGraphData, Household, Visit } from '../types';
+import { SafeRecord, safeRecordValues } from 'utils/types/safeRecord';
 
 function isWithin24Hours(startDate: Date, endDate: Date) {
   const timeDifference = endDate.getTime() - startDate.getTime();
@@ -38,14 +39,14 @@ export default function getAreaData(
     );
   });
 
-  const firstVisits = Object.values(
-    visits.reduce((acc: Record<string, VisitFlat>, visit) => {
+  const firstVisits = safeRecordValues(
+    visits.reduce((acc: SafeRecord<string, VisitFlat>, visit) => {
       const visitDate = new Date(visit.timestamp);
 
       if (visitDate >= startDate && visitDate <= endDate) {
         if (
           !acc[visit.householdId] ||
-          visitDate < new Date(acc[visit.householdId].timestamp)
+          visitDate < new Date(acc[visit.householdId]!.timestamp)
         ) {
           acc[visit.householdId] = visit;
         }
@@ -54,7 +55,7 @@ export default function getAreaData(
     }, {})
   );
 
-  const successfulVisits = Object.values(
+  const successfulVisits = safeRecordValues(
     visits
       .filter(
         (vis) =>
@@ -62,12 +63,12 @@ export default function getAreaData(
           new Date(vis.timestamp) >= startDate &&
           new Date(vis.timestamp) <= endDate
       )
-      .reduce((acc: Record<string, VisitFlat>, visit) => {
+      .reduce((acc: SafeRecord<string, VisitFlat>, visit) => {
         const visitDate = new Date(visit.timestamp);
 
         if (
           !acc[visit.householdId] ||
-          visitDate < new Date(acc[visit.householdId].timestamp)
+          visitDate < new Date(acc[visit.householdId]!.timestamp)
         ) {
           acc[visit.householdId] = visit;
         }

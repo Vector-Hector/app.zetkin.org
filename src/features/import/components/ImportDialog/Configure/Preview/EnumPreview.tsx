@@ -5,11 +5,12 @@ import { CellData, ColumnKind, Sheet } from 'features/import/utils/types';
 import useColumn from 'features/import/hooks/useColumn';
 import { useNumericRouteParams } from 'core/hooks';
 import useCustomFields from 'features/profile/hooks/useCustomFields';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface EnumPreviewProps {
   currentSheet: Sheet;
   fieldKey: string;
-  fields: Record<string, CellData> | undefined;
+  fields: SafeRecord<string, CellData> | undefined;
 }
 
 const EnumPreview = ({ currentSheet, fieldKey, fields }: EnumPreviewProps) => {

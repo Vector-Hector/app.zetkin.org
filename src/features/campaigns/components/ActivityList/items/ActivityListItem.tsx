@@ -6,6 +6,7 @@ import { Box, SvgIconTypeMap, Theme, Tooltip, Typography } from '@mui/material';
 import getStatusDotLabel from 'features/events/utils/getStatusDotLabel';
 import oldTheme from 'theme';
 import ZUIIconLabel, { ZUIIconLabelProps } from 'zui/ZUIIconLabel';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface StyleProps {
   color: STATUS_COLORS;
@@ -67,10 +68,10 @@ export enum STATUS_COLORS {
 
 export type AcitivityListItemProps = {
   PrimaryIcon: OverridableComponent<
-    SvgIconTypeMap<Record<string, unknown>, 'svg'>
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
   >;
   SecondaryIcon: OverridableComponent<
-    SvgIconTypeMap<Record<string, unknown>, 'svg'>
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
   >;
   color: STATUS_COLORS;
   endNumber: string | number;

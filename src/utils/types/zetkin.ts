@@ -13,6 +13,7 @@ import {
   ZetkinViewRow,
 } from '../../features/views/components/types';
 import { Latitude, Longitude } from 'features/areas/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface ZetkinCampaign {
   color: string;
@@ -185,11 +186,11 @@ export type ZetkinCustomFieldValue =
   | number
   | boolean
   | ZetkinLngLatFieldValue
-  | Record<string, unknown>
+  | SafeRecord<string, unknown>
   | null;
 
 export type ZetkinPerson = ZetkinPersonNativeFields &
-  Record<string, ZetkinCustomFieldValue>;
+  SafeRecord<string, ZetkinCustomFieldValue>;
 
 export interface EnumChoice {
   key: string;
@@ -542,7 +543,7 @@ export type {
 };
 
 export type ZetkinEmailConfig = {
-  config: Record<string, unknown>;
+  config: SafeRecord<string, unknown>;
   id: number;
   no_reply: boolean;
   organization: {
@@ -586,6 +587,6 @@ export type ZetkinEmailPostBody = Partial<
 export type ZetkinCreatePerson = Partial<
   Omit<ZetkinPersonNativeFields, 'id' | 'is_user'>
 > &
-  Record<string, string | null>;
+  SafeRecord<string, string | null>;
 
 export type ZetkinUpdatePerson = ZetkinCreatePerson;

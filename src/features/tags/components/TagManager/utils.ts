@@ -1,14 +1,16 @@
 import { ZetkinTag } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export const DEFAULT_TAG_COLOR = '#e1e1e1';
 
-interface GroupedTagsHashmap {
-  [key: string]: {
+type GroupedTagsHashmap = SafeRecord<
+  string,
+  {
     id: number | 'ungrouped';
     tags: ZetkinTag[];
     title: string;
-  };
-}
+  }
+>;
 
 export const groupTags = (
   tags: ZetkinTag[],

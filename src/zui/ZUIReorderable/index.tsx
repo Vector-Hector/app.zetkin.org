@@ -13,6 +13,8 @@ import {
   useState,
 } from 'react';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 type IDType = number | string;
 
 export type ZUIReorderableRenderProps = {
@@ -90,7 +92,7 @@ const ZUIReorderable: FC<ZUIReorderableProps> = ({
   const containerRef = useRef<HTMLDivElement>();
   const activeContentNodeRef = useRef<HTMLDivElement>();
   const activeItemNodeRef = useRef<HTMLDivElement>();
-  const nodeByIdRef = useRef<Record<IDType, HTMLDivElement>>({});
+  const nodeByIdRef = useRef<SafeRecord<IDType, HTMLDivElement>>({});
 
   const onMouseMove = (ev: MouseEvent) => {
     const containerRect = containerRef.current?.getBoundingClientRect();

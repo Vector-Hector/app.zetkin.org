@@ -10,6 +10,7 @@ import {
   CampaignActivity,
   EventActivity,
 } from 'features/campaigns/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export function isAllDay(start: string, end: string): boolean {
   const startDate = new Date(removeOffset(start));
@@ -37,7 +38,7 @@ const makeIsoDateString = (date: Date): string | null => {
 };
 
 export const getFutureDays = (
-  activitiesHashMap: Record<string, DaySummary>,
+  activitiesHashMap: SafeRecord<string, DaySummary>,
   targetDate: Date
 ): [string, DaySummary][] => {
   return Object.entries(activitiesHashMap).filter(([dateString]) => {
@@ -49,7 +50,7 @@ export const getFutureDays = (
 };
 
 export const getPreviousDay = (
-  activities: Record<string, DaySummary>,
+  activities: SafeRecord<string, DaySummary>,
   target: Date
 ): [Date, DaySummary] | null => {
   const dates = Object.keys(activities).map(
@@ -86,7 +87,7 @@ export interface DaySummary {
 }
 
 const applyToHashmap = (
-  dateHashmap: Record<string, DaySummary>,
+  dateHashmap: SafeRecord<string, DaySummary>,
   key: string,
   event: EventActivity
 ) => {
@@ -118,8 +119,8 @@ export type MultiDayEventActivity = {
 
 export const getActivitiesByDay = (
   activities: (CampaignActivity | MultiDayEventActivity)[]
-): Record<string, DaySummary> => {
-  const dateHashmap: Record<string, DaySummary> = {};
+): SafeRecord<string, DaySummary> => {
+  const dateHashmap: SafeRecord<string, DaySummary> = {};
 
   // Events
   activities

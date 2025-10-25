@@ -4,10 +4,11 @@ import EmailContentTraverser from './EmailContentTraverser';
 import EmailMJMLConverter from './EmailMJMLConverter';
 import { ZetkinEmail } from 'utils/types/zetkin';
 import { EmailContent, InlineNodeKind } from 'features/emails/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default function renderEmailHtml(
   email: ZetkinEmail,
-  variableValues: Record<string, string>
+  variableValues: SafeRecord<string, string>
 ): string {
   const { theme, content } = email;
 

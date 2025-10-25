@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { SearchResult } from './components/types';
 import { remoteList, RemoteList } from 'utils/storeUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type SearchResultItem = {
   id: string;
@@ -9,7 +10,7 @@ export type SearchResultItem = {
 };
 
 export interface SearchStoreSlice {
-  matchesByQuery: Record<string, RemoteList<SearchResultItem>>;
+  matchesByQuery: SafeRecord<string, RemoteList<SearchResultItem>>;
 }
 
 const initialState: SearchStoreSlice = {

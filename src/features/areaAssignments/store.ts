@@ -1,48 +1,52 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import {
+  RemoteItem,
+  remoteItem,
+  remoteItemDeleted,
+  remoteItemLoad,
+  remoteItemUpdated,
+  remoteList,
+  RemoteList,
   remoteListCreated,
   remoteListLoad,
   remoteListLoaded,
-  remoteItemLoad,
-  remoteItemDeleted,
-  remoteItemUpdated,
-  RemoteItem,
-  remoteItem,
-  remoteList,
-  RemoteList,
 } from 'utils/storeUtils';
 import {
   AreaCardData,
-  ZetkinAreaAssignmentStats,
-  ZetkinAreaAssignment,
-  ZetkinAreaAssignee,
-  ZetkinLocation,
-  ZetkinAssignmentAreaStats,
   SessionDeletedPayload,
+  ZetkinAreaAssignee,
+  ZetkinAreaAssignment,
+  ZetkinAreaAssignmentStats,
+  ZetkinAssignmentAreaStats,
+  ZetkinLocation,
   ZetkinMetric,
 } from './types';
 import { Zetkin2Area } from 'features/areas/types';
+import { SafeRecord, safeRecordValues } from 'utils/types/safeRecord';
 
 export interface AreaAssignmentsStoreSlice {
-  areaGraphByAssignmentId: Record<
+  areaGraphByAssignmentId: SafeRecord<
     number,
     RemoteList<AreaCardData & { id: number }>
   >;
-  areaStatsByAssignmentId: Record<
+  areaStatsByAssignmentId: SafeRecord<
     number,
     RemoteItem<ZetkinAssignmentAreaStats & { id: number }>
   >;
   areaAssignmentList: RemoteList<ZetkinAreaAssignment>;
-  areasByAssignmentId: Record<string, RemoteList<Zetkin2Area>>;
-  assigneesByAssignmentId: Record<
+  areasByAssignmentId: SafeRecord<string, RemoteList<Zetkin2Area>>;
+  assigneesByAssignmentId: SafeRecord<
     number,
     RemoteList<ZetkinAreaAssignee & { id: string }>
   >;
-  locationsByAssignmentId: Record<number, RemoteList<ZetkinLocation>>;
-  locationsByAssignmentIdAndAreaId: Record<string, RemoteList<ZetkinLocation>>;
-  metricsByAssignmentId: Record<number, RemoteList<ZetkinMetric>>;
-  statsByAreaAssId: Record<
+  locationsByAssignmentId: SafeRecord<number, RemoteList<ZetkinLocation>>;
+  locationsByAssignmentIdAndAreaId: SafeRecord<
+    string,
+    RemoteList<ZetkinLocation>
+  >;
+  metricsByAssignmentId: SafeRecord<number, RemoteList<ZetkinMetric>>;
+  statsByAreaAssId: SafeRecord<
     number,
     RemoteItem<ZetkinAreaAssignmentStats & { id: number }>
   >;
@@ -106,7 +110,7 @@ const areaAssignmentSlice = createSlice({
       const assignmentId = action.payload;
 
       state.areaGraphByAssignmentId[assignmentId] = remoteListLoad(
-        state.areaGraphByAssignmentId[assignmentId]
+        state.areaGraphByAssignmentId[assignmentId] ?? null
       );
     },
     areaGraphLoaded: (
@@ -154,17 +158,20 @@ const areaAssignmentSlice = createSlice({
       state.assigneesByAssignmentId[assignee.assignment_id] ||=
         remoteListCreated();
 
-      remoteItemUpdated(state.assigneesByAssignmentId[assignee.assignment_id], {
-        ...assignee,
-        id: `${assignee.user_id}/${assignee.area_id}`,
-      });
+      remoteItemUpdated(
+        state.assigneesByAssignmentId[assignee.assignment_id]!,
+        {
+          ...assignee,
+          id: `${assignee.user_id}/${assignee.area_id}`,
+        }
+      );
 
       const hasStatsItem = !!state.areaStatsByAssignmentId[
         assignee.assignment_id
-      ].data?.stats.find((statsItem) => statsItem.area_id == assignee.area_id);
+      ]!.data?.stats.find((statsItem) => statsItem.area_id == assignee.area_id);
 
       if (!hasStatsItem) {
-        state.areaStatsByAssignmentId[assignee.assignment_id].isStale = true;
+        state.areaStatsByAssignmentId[assignee.assignment_id]!.isStale = true;
       }
     },
     assigneeDeleted: (state, action: PayloadAction<SessionDeletedPayload>) => {
@@ -188,7 +195,7 @@ const areaAssignmentSlice = createSlice({
     assigneesLoad: (state, action: PayloadAction<number>) => {
       const assignmentId = action.payload;
       state.assigneesByAssignmentId[assignmentId] = remoteListLoad(
-        state.assigneesByAssignmentId[assignmentId]
+        state.assigneesByAssignmentId[assignmentId] ?? null
       );
     },
     assigneesLoaded: (
@@ -207,7 +214,7 @@ const areaAssignmentSlice = createSlice({
     assignmentAreasLoad: (state, action: PayloadAction<number>) => {
       const assignmentId = action.payload;
       state.areasByAssignmentId[assignmentId] = remoteListLoad(
-        state.areasByAssignmentId[assignmentId]
+        state.areasByAssignmentId[assignmentId] ?? null
       );
     },
     assignmentAreasLoaded: (
@@ -220,13 +227,15 @@ const areaAssignmentSlice = createSlice({
     locationCreated: (state, action: PayloadAction<ZetkinLocation>) => {
       const location = action.payload;
 
-      Object.values(state.locationsByAssignmentId).forEach((list) => {
+      safeRecordValues(state.locationsByAssignmentId).forEach((list) => {
         remoteItemUpdated(list, location);
       });
 
-      Object.values(state.locationsByAssignmentIdAndAreaId).forEach((list) => {
-        remoteItemUpdated(list, location);
-      });
+      safeRecordValues(state.locationsByAssignmentIdAndAreaId).forEach(
+        (list) => {
+          remoteItemUpdated(list, location);
+        }
+      );
     },
     locationLoaded: (
       state,
@@ -234,14 +243,17 @@ const areaAssignmentSlice = createSlice({
     ) => {
       const [assignmentId, location] = action.payload;
 
-      remoteItemUpdated(state.locationsByAssignmentId[assignmentId], location);
+      const toUpdate = state.locationsByAssignmentId[assignmentId];
+      if (toUpdate) {
+        remoteItemUpdated(toUpdate, location);
+      }
 
       Object.keys(state.locationsByAssignmentIdAndAreaId).forEach((key) => {
         const [keyAssignmentIdStr] = key.split(':');
         const keyAssignmentId = Number(keyAssignmentIdStr);
 
         if (keyAssignmentId == assignmentId) {
-          const list = state.locationsByAssignmentIdAndAreaId[key];
+          const list = state.locationsByAssignmentIdAndAreaId[key]!;
           if (list.items.some((item) => item.id == location.id)) {
             remoteItemUpdated(list, location);
           }
@@ -251,24 +263,26 @@ const areaAssignmentSlice = createSlice({
     locationUpdated: (state, action: PayloadAction<ZetkinLocation>) => {
       const location = action.payload;
 
-      Object.values(state.locationsByAssignmentId).forEach((list) => {
+      safeRecordValues(state.locationsByAssignmentId).forEach((list) => {
         remoteItemUpdated(list, location);
       });
-      Object.values(state.locationsByAssignmentIdAndAreaId).forEach((list) => {
-        remoteItemUpdated(list, location);
-      });
+      safeRecordValues(state.locationsByAssignmentIdAndAreaId).forEach(
+        (list) => {
+          remoteItemUpdated(list, location);
+        }
+      );
     },
     locationsLoad: (state, action: PayloadAction<string>) => {
       const key = action.payload;
 
       state.locationsByAssignmentIdAndAreaId[key] = remoteListLoad(
-        state.locationsByAssignmentIdAndAreaId[key]
+        state.locationsByAssignmentIdAndAreaId[key] ?? null
       );
 
       const [assignmentIdStr] = key.split(':');
       const assignmentId = Number(assignmentIdStr);
       state.locationsByAssignmentId[assignmentId] = remoteListLoad(
-        state.locationsByAssignmentId[assignmentId]
+        state.locationsByAssignmentId[assignmentId] ?? null
       );
     },
     locationsLoaded: (
@@ -282,25 +296,34 @@ const areaAssignmentSlice = createSlice({
       const [assignmentIdStr] = key.split(':');
       const assignmentId = Number(assignmentIdStr);
       state.locationsByAssignmentId[assignmentId] = remoteListLoad(
-        state.locationsByAssignmentId[assignmentId]
+        state.locationsByAssignmentId[assignmentId] ?? null
       );
     },
     metricCreated: (state, action: PayloadAction<[number, ZetkinMetric]>) => {
       const [assignmentId, metric] = action.payload;
-      remoteItemUpdated(state.metricsByAssignmentId[assignmentId], metric);
+      const toUpdate = state.metricsByAssignmentId[assignmentId];
+      if (toUpdate) {
+        remoteItemUpdated(toUpdate, metric);
+      }
     },
     metricDeleted: (state, action: PayloadAction<[number, number]>) => {
       const [assignmentId, metricId] = action.payload;
-      remoteItemDeleted(state.metricsByAssignmentId[assignmentId], metricId);
+      const toUpdate = state.metricsByAssignmentId[assignmentId];
+      if (toUpdate) {
+        remoteItemDeleted(toUpdate, metricId);
+      }
     },
     metricUpdated: (state, action: PayloadAction<[number, ZetkinMetric]>) => {
       const [assignmentId, metric] = action.payload;
-      remoteItemUpdated(state.metricsByAssignmentId[assignmentId], metric);
+      const toUpdate = state.metricsByAssignmentId[assignmentId];
+      if (toUpdate) {
+        remoteItemUpdated(toUpdate, metric);
+      }
     },
     metricsLoad: (state, action: PayloadAction<number>) => {
       const assignmentId = action.payload;
       state.metricsByAssignmentId[assignmentId] = remoteListLoad(
-        state.metricsByAssignmentId[assignmentId]
+        state.metricsByAssignmentId[assignmentId] ?? null
       );
     },
     metricsLoaded: (state, action: PayloadAction<[number, ZetkinMetric[]]>) => {

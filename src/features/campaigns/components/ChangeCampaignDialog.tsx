@@ -66,6 +66,11 @@ const ChangeCampaignDialog: React.FunctionComponent<
   ChangeCampaignDialogProps
 > = ({ title, errorMessage, open, onCampaignSelected, onClose }) => {
   const { orgId, campId } = useNumericRouteParams();
+  if (orgId === undefined || campId === undefined) {
+    throw new Error(
+      'ChangeCampaignDialog can only be used on paths with orgId and campId'
+    );
+  }
   const classes = useStyles();
 
   const [error, setError] = useState(false);

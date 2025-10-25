@@ -9,6 +9,7 @@ import messageIds from 'features/call/l10n/messageIds';
 import StepBase from './StepBase';
 import { Report, ZetkinCallTarget } from 'features/call/types';
 import useIsMobile from 'utils/hooks/useIsMobile';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   disableCallerNotes: boolean;
@@ -43,7 +44,7 @@ const OrganizerLog: FC<Props> = ({
   const [message, setMessage] = useState(initialMessage);
 
   useEffect(() => {
-    const keysPressed: Record<string, boolean> = {};
+    const keysPressed: SafeRecord<string, boolean> = {};
 
     const onKeyDown = (ev: KeyboardEvent) => {
       keysPressed[ev.key] = true;

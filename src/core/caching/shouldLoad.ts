@@ -1,8 +1,9 @@
 import { RemoteItem, RemoteList } from 'utils/storeUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
 
-type RemoteObjectRecord = Record<
+type RemoteObjectRecord = SafeRecord<
   number | string,
   RemoteList<unknown> | RemoteItem<unknown>
 >;

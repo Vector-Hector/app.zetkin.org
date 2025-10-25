@@ -14,6 +14,11 @@ const EditableCampaignTitle: FC<EditableCampaignTitleProps> = ({
   campaign,
 }) => {
   const { orgId } = useNumericRouteParams();
+  if (orgId === undefined) {
+    throw new Error(
+      'EditableCampaignTitle can only be used on paths with orgId'
+    );
+  }
   const { updateCampaign } = useCampaign(orgId, campaign.id);
 
   return (

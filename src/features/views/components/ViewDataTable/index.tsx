@@ -403,7 +403,7 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
   const rowsWithSearch = viewQuickSearch(rows, columns, quickSearch);
 
   const gridRows = rowsWithSearch.map((input) => {
-    const output: Record<string, unknown> = {
+    const output: SafeRecord<string, unknown> = {
       id: input.id,
     };
     input.content.forEach((cellValue, colIndex) => {

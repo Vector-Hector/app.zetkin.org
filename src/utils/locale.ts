@@ -6,21 +6,22 @@ import path from 'path';
 import yaml from 'yaml';
 
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from 'core/i18n/languages';
+import { SafeRecord, safeRecordEntries } from './types/safeRecord';
 
-export type MessageList = Record<string, string>;
-type MessageDB = Record<string, MessageList>;
+export type MessageList = SafeRecord<string, string>;
+type MessageDB = SafeRecord<string, MessageList>;
 
 let MESSAGES: MessageDB | null = null;
 
 function flattenObject(
-  obj: Record<string, unknown>,
+  obj: SafeRecord<string, unknown>,
   baseKey: string | null = null,
-  flat: Record<string, string> = {}
+  flat: SafeRecord<string, string> = {}
 ) {
-  Object.entries(obj).forEach(([key, val]) => {
+  safeRecordEntries(obj).forEach(([key, val]) => {
     const combinedKey = baseKey ? `${baseKey}.${key}` : key;
     if (typeof val === 'object') {
-      flattenObject(val as Record<string, unknown>, combinedKey, flat);
+      flattenObject(val as SafeRecord<string, unknown>, combinedKey, flat);
     } else if (typeof val === 'string') {
       flat[combinedKey] = val;
     }
@@ -64,13 +65,17 @@ async function loadMessages(): Promise<MessageDB> {
     }
   }
 
+  if (!messages.en) {
+    throw new Error('English language must be defined');
+  }
+
   // Fall back to English for any strings that is missing from other languages
   Object.keys(messages).forEach((lang) => {
     if (lang !== 'en') {
       const messagesWithFallbacks: MessageList = { ...messages[lang] };
-      Object.keys(messages.en).forEach((id) => {
-        const val = messages[lang][id];
-        messagesWithFallbacks[id] = val || messages.en[id];
+      Object.keys(messages.en!).forEach((id) => {
+        const val = messages[lang]![id];
+        messagesWithFallbacks[id] = val || messages.en![id];
       });
 
       messages[lang] = messagesWithFallbacks;

@@ -1,10 +1,11 @@
+import { SafeRecord } from 'utils/types/safeRecord';
 import calculateReportState from '../Report/utils/calculateReportState';
 import { Report } from 'features/call/types';
 
 export default function callSummarySentence(name: string, report: Report) {
   const reportState = calculateReportState(report);
 
-  const messageByStatusCode: Record<number, string> = {
+  const messageByStatusCode: SafeRecord<number, string> = {
     1: `You talked to ${name}`,
     11: `${name} did not pick up, you did not leve a message.`,
     12: 'The line was busy',

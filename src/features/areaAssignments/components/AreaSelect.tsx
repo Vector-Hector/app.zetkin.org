@@ -12,8 +12,8 @@ import {
 
 import { ZetkinArea } from 'features/areas/types';
 import {
-  ZetkinAssignmentAreaStatsItem,
   ZetkinAreaAssignee,
+  ZetkinAssignmentAreaStatsItem,
   ZetkinLocation,
 } from '../types';
 import ZUIAvatar from 'zui/ZUIAvatar';
@@ -63,6 +63,10 @@ const AreaSelect: FC<Props> = ({
   const theme = useTheme();
 
   const { orgId } = useNumericRouteParams();
+  if (orgId === undefined) {
+    throw new Error('AreaSelect can only be used on paths with orgId.');
+  }
+
   const { unassignArea } = useAreaAssignmentMutations(orgId, areaAssId);
   const selectedAreaAssignees = sessions
     .filter((session) => session.area_id == selectedArea?.id)

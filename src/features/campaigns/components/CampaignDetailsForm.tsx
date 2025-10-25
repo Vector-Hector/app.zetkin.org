@@ -7,10 +7,11 @@ import ZUISubmitCancelButtons from '../../../zui/ZUISubmitCancelButtons';
 import { Msg, useMessages } from 'core/i18n';
 import { ZetkinCampaign, ZetkinPerson } from 'utils/types/zetkin';
 import messageIds from '../l10n/messageIds';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface CampaignDetailsFormProps {
   campaign?: ZetkinCampaign;
-  onSubmit: (data: Record<string, unknown>) => void;
+  onSubmit: (data: SafeRecord<string, unknown>) => void;
   onCancel: () => void;
 }
 
@@ -38,15 +39,15 @@ const CampaignDetailsForm = ({
     visibility: campaign?.visibility,
   };
 
-  const validate = (values: Record<string, string>) => {
-    const errors: Record<string, string> = {};
+  const validate = (values: SafeRecord<string, string>) => {
+    const errors: SafeRecord<string, string> = {};
     if (!values.title) {
       errors.title = messages.form.required();
     }
     return errors;
   };
 
-  const handleSubmit = (values: Record<string, string>) => {
+  const handleSubmit = (values: SafeRecord<string, string>) => {
     const { info_text, status, title, visibility } = values;
     onSubmit({
       info_text: info_text ?? '',

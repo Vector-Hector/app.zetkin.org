@@ -1,8 +1,10 @@
 import { useRouter } from 'next/router';
 
-export default function useNumericRouteParams(): Record<string, number> {
+import { SafeRecord } from 'utils/types/safeRecord';
+
+export default function useNumericRouteParams(): SafeRecord<string, number> {
   const input = useRouter().query;
-  const output: Record<string, number> = {};
+  const output: SafeRecord<string, number> = {};
   Object.keys(input).forEach((key: string) => {
     const value = parseInt(input[key] as string);
     if (!isNaN(value)) {

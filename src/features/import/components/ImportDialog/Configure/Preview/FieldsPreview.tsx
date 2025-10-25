@@ -5,10 +5,11 @@ import useColumn from 'features/import/hooks/useColumn';
 import { useMessages } from 'core/i18n';
 import { useNumericRouteParams } from 'core/hooks';
 import { CellData, ColumnKind } from 'features/import/utils/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface FieldsPreviewProps {
   fieldKey: string | null;
-  fields: Record<string, CellData> | undefined;
+  fields: SafeRecord<string, CellData> | undefined;
   kind: ColumnKind;
 }
 const FieldsPreview = ({ fieldKey, fields, kind }: FieldsPreviewProps) => {

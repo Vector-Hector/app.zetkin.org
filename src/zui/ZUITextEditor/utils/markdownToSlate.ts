@@ -3,8 +3,9 @@ import remarkGfm from 'remark-gfm';
 import slate from 'remark-slate';
 import { unified } from 'unified';
 
-export interface SlateEl {
-  [key: string]: string | unknown;
+import { SafeRecord } from 'utils/types/safeRecord';
+
+export interface SlateEl extends SafeRecord<string, string | unknown> {
   children?: SlateEl[];
 }
 

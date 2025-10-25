@@ -1,9 +1,11 @@
+import { SafeRecord } from 'utils/types/safeRecord';
+
 type UsePromiseCacheReturn = {
   cache: (promise: Promise<unknown>) => void;
 };
 
 // TODO: Store this in context?
-const promises: Record<string, Promise<unknown>> = {};
+const promises: SafeRecord<string, Promise<unknown>> = {};
 
 export default function usePromiseCache(
   cacheKey: string

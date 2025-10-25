@@ -4,17 +4,19 @@ import {
   Ancestor,
   Descendant,
   Editor,
+  Element as SlateElement,
   NodeEntry,
   Range,
-  Element as SlateElement,
   Text,
   Transforms,
 } from 'slate';
 import { BlockType, LeafType, NodeTypes, serialize } from 'remark-slate';
 import isHotkey, { isKeyHotkey } from 'is-hotkey';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
-const HOTKEYS: { [key: string]: string } = {
+const HOTKEYS: SafeRecord<string, string> = {
   'mod+b': 'bold',
   'mod+i': 'italic',
   'mod+shift+x': 'strikeThrough',

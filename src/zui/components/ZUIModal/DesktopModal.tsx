@@ -5,8 +5,9 @@ import { ZUISize } from '../types';
 import ModalBackground from './ModalBackground';
 import { ZUIModalProps } from '.';
 import ModalContent from './ModalContent';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-const widths: Record<ZUISize | 'auto' | 'full', string> = {
+const widths: SafeRecord<ZUISize | 'auto' | 'full', string> = {
   auto: 'auto',
   full: 'calc(100dvw - 2.5rem)',
   large: '60rem',

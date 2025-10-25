@@ -5,6 +5,7 @@ import { createElement, PropsWithChildren } from 'react';
 import { m } from 'core/i18n';
 import { Message } from 'core/i18n/messages';
 import useCommaPlural from './useCommaPlural';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 describe('useCommaPlural()', () => {
   const opts = {
@@ -20,7 +21,7 @@ describe('useCommaPlural()', () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function mockMessages<MapType extends Record<string, Message<any>>>(
+  function mockMessages<MapType extends SafeRecord<string, Message<any>>>(
     messages: MapType
   ): MapType {
     Object.keys(messages).forEach((key) => (messages[key]._id = 'x'));

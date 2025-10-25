@@ -1,6 +1,8 @@
 import { GridColDef } from '@mui/x-data-grid-pro';
 import { useState } from 'react';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 export interface StorageBackend {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
@@ -14,7 +16,7 @@ export interface ConfigurableDataGridColumns {
 
 interface ColumnConfig {
   fieldOrder: string[];
-  fieldWidths: Record<string, number>;
+  fieldWidths: SafeRecord<string, number>;
 }
 
 function orderColumns(
@@ -100,7 +102,7 @@ export default function useConfigurableDataGridColumns(
 
 function loadConfig(storage: StorageBackend, key: string): ColumnConfig {
   let fieldOrder: string[] = [];
-  let fieldWidths: Record<string, number> = {};
+  let fieldWidths: SafeRecord<string, number> = {};
   try {
     const configStr = storage.getItem(key);
     if (configStr) {

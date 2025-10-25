@@ -8,6 +8,7 @@ import getFilters from 'utils/getFilters';
 import requiredEnvVar from 'utils/requiredEnvVar';
 import { stringToBool } from 'utils/stringUtils';
 import { ZetkinZResource, ZetkinZResult } from 'utils/types/sdk';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export const config = {
   api: {
@@ -24,7 +25,7 @@ interface HttpVerbMethod {
   (resource: ZetkinZResource, req: NextApiRequest): Promise<ZetkinZResult>;
 }
 
-const HTTP_VERBS_TO_ZETKIN_METHODS: Record<string, HttpVerbMethod> = {
+const HTTP_VERBS_TO_ZETKIN_METHODS: SafeRecord<string, HttpVerbMethod> = {
   DELETE: (resource: ZetkinZResource) => resource.del(),
   GET: (resource: ZetkinZResource, req: NextApiRequest) => {
     getFilters(req); // will throw an error if the filter is not valid

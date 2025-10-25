@@ -5,8 +5,9 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 import { IFuture } from 'core/caching/futures';
 import { Msg } from 'core/i18n';
 import messageIds from 'zui/l10n/messageIds';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-interface ZUIFuturesProps<G extends Record<string, unknown>> {
+interface ZUIFuturesProps<G extends SafeRecord<string, unknown>> {
   children?:
     | JSX.Element
     | (({
@@ -19,7 +20,7 @@ interface ZUIFuturesProps<G extends Record<string, unknown>> {
   loadingIndicator?: React.ReactElement;
 }
 
-function ZUIFutures<G extends Record<string, unknown>>({
+function ZUIFutures<G extends SafeRecord<string, unknown>>({
   children,
   errorIndicator,
   futures,
@@ -58,7 +59,7 @@ function ZUIFutures<G extends Record<string, unknown>>({
     );
   }
 
-  const dataObjects: Record<string, unknown> = {};
+  const dataObjects: SafeRecord<string, unknown> = {};
   Object.entries(futures).forEach(([key, future]) => {
     dataObjects[key] = future.data;
   });

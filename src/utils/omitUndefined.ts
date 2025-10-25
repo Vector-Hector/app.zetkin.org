@@ -1,5 +1,7 @@
 import { isUndefined, omitBy } from 'lodash';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 /**
  * Omits properties with `undefined` values from an object.
  *
@@ -7,5 +9,5 @@ import { isUndefined, omitBy } from 'lodash';
  * @returns A new object with all properties that have `undefined` values removed.
  */
 export const omitUndefined = (
-  obj: Record<string, unknown>
-): Record<string, unknown> => omitBy(obj, isUndefined);
+  obj: SafeRecord<string, unknown>
+): SafeRecord<string, unknown> => omitBy(obj, isUndefined);

@@ -1,14 +1,15 @@
 import {
-  Typography,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   Radio,
   RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
+  Typography,
 } from '@mui/material';
 import { useId } from 'react';
 
 import { ZUIOrientation, ZUIPlacement, ZUISize } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Option = {
   disabled?: boolean;
@@ -16,7 +17,7 @@ type Option = {
   value: string;
 };
 
-const sizes: Record<ZUISize, string> = {
+const sizes: SafeRecord<ZUISize, string> = {
   large: '1.75rem',
   medium: '1.5rem',
   small: '1.25rem',

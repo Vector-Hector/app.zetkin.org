@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useApiClient } from 'core/hooks';
 import useDebounce from 'utils/hooks/useDebounce';
 import { ZetkinPerson } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type UsePersonSearchReturn = {
   isLoading: boolean;
@@ -16,10 +17,10 @@ export default function usePersonSearch(orgId: number): UsePersonSearchReturn {
   const [isTyping, setIsTyping] = useState(false);
   const [queryString, setQueryString] = useState('');
   const [loadingByQueryString, setLoadingByQueryString] = useState<
-    Record<string, boolean>
+    SafeRecord<string, boolean>
   >({});
   const [matchesByQueryString, setMatchesByQueryString] = useState<
-    Record<string, ZetkinPerson[]>
+    SafeRecord<string, ZetkinPerson[]>
   >({});
 
   const debouncedFinishedTyping = useDebounce(async () => {

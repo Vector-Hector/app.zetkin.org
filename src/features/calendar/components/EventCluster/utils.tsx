@@ -1,4 +1,5 @@
 import { Field, FIELD_PRESENTATION, PresentableField } from './Event';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const titleHeight = 14;
 const fieldHeight = 18;
@@ -9,8 +10,8 @@ const spaceRequiredForField = fieldHeight + spaceBetweenFields;
 export function availableHeightByEvent(
   totalAvailableHeight: number,
   numberOfEvents: number
-): Record<number, number> {
-  const availableHeights: Record<number, number> = {};
+): SafeRecord<number, number> {
+  const availableHeights: SafeRecord<number, number> = {};
   const actualPixels = totalAvailableHeight - (numberOfEvents - 1);
 
   for (let i = 0; i < numberOfEvents; i++) {
@@ -44,7 +45,7 @@ export function numberOfFieldsThatCanBeShown(availableHeight: number): number {
 export function allCollapsedPresentableFields(
   fieldGroups: PresentableField[][]
 ): PresentableField[] {
-  const fields: Record<string, PresentableField> = {};
+  const fields: SafeRecord<string, PresentableField> = {};
 
   fieldGroups.forEach((group) => {
     group.forEach((field) => {

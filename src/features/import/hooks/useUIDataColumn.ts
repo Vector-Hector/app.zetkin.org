@@ -3,11 +3,12 @@ import messageIds from '../l10n/messageIds';
 import { useAppSelector } from 'core/hooks';
 import { useMessages } from 'core/i18n';
 import { Column, ColumnKind } from '../utils/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type UIDataColumn<CType extends Column> = {
   columnIndex: number;
   mappingResultsMessage: string;
-  numRowsByUniqueValue: Record<string | number, number>;
+  numRowsByUniqueValue: SafeRecord<string | number, number>;
   numberOfEmptyRows: number;
   originalColumn: CType;
   title: string;

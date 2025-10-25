@@ -9,8 +9,8 @@ import {
 } from '../types';
 import { locationLoaded } from 'features/areaAssignments/store';
 import {
-  visitCreated,
   householdVisitCreated as householdVisitCreated,
+  visitCreated,
   visitUpdated,
 } from '../store';
 import useAreaAssignment from 'features/areaAssignments/hooks/useAreaAssignment';
@@ -21,8 +21,9 @@ import summarizeMetrics from '../utils/summarizeMetrics';
 import { ZetkinLocation } from 'features/areaAssignments/types';
 import submitHouseholdVisits from '../rpc/submitHouseholdVisits';
 import useLocationHouseholdVisits from './useLocationHouseholdVisits';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-type VisitByHouseholdIdMap = Record<
+type VisitByHouseholdIdMap = SafeRecord<
   number,
   {
     created: string;

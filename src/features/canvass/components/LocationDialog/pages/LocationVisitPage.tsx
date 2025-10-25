@@ -16,6 +16,7 @@ import { MetricBulkResponse } from 'features/canvass/types';
 import { Msg, useMessages } from 'core/i18n';
 import messageIds from 'features/canvass/l10n/messageIds';
 import useAreaAssignmentMetrics from 'features/areaAssignments/hooks/useAreaAssignmentMetrics';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   active: boolean;
@@ -37,7 +38,7 @@ const LocationVisitPage: FC<Props> = ({
   const [step, setStep] = useState(0);
   const [numHouseholds, setNumHouseholds] = useState(0);
   const [valuesByMetricId, setValuesByMetricId] = useState<
-    Record<string, number[]>
+    SafeRecord<string, number[]>
   >({});
   const metrics = useAreaAssignmentMetrics(
     assignment.organization_id,

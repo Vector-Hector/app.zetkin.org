@@ -8,11 +8,12 @@ import {
   RemoteList,
 } from 'utils/storeUtils';
 import { ZetkinAssignedTask, ZetkinTask } from './components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface TasksStoreSlice {
-  assignedTasksByTaskId: Record<number, RemoteList<ZetkinAssignedTask>>;
-  statsById: Record<number, RemoteItem<TaskStats>>;
-  taskIdsByCampaignId: Record<number, RemoteList<{ id: string | number }>>;
+  assignedTasksByTaskId: SafeRecord<number, RemoteList<ZetkinAssignedTask>>;
+  statsById: SafeRecord<number, RemoteItem<TaskStats>>;
+  taskIdsByCampaignId: SafeRecord<number, RemoteList<{ id: string | number }>>;
   tasksList: RemoteList<ZetkinTask>;
 }
 

@@ -4,6 +4,7 @@ import { DateRange } from '@mui/x-date-pickers-pro';
 
 import { ZetkinCampaign } from 'utils/types/zetkin';
 import { remoteItem, RemoteList, remoteList } from 'utils/storeUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type CampaignEventFilters = {
   customDatesToFilterBy: DateRange<Dayjs>;
@@ -14,7 +15,7 @@ type CampaignEventFilters = {
 
 export interface CampaignsStoreSlice {
   campaignList: RemoteList<ZetkinCampaign>;
-  campaignsByOrgId: Record<string, RemoteList<ZetkinCampaign>>;
+  campaignsByOrgId: SafeRecord<string, RemoteList<ZetkinCampaign>>;
   filters: CampaignEventFilters;
   recentlyCreatedCampaign: ZetkinCampaign | null;
 }

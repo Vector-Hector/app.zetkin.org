@@ -18,6 +18,7 @@ import { FC, RefObject } from 'react';
 
 import { useMessages } from 'core/i18n';
 import messageIds from 'zui/l10n/messageIds';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Option = {
   /**
@@ -44,7 +45,9 @@ type AutocompleteBaseProps = {
    * This renders an action below the list of options, always visible.
    */
   action?: {
-    icon: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, 'svg'>>;
+    icon: OverridableComponent<
+      SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
+    >;
     label: string;
     onClick: () => void;
   };

@@ -1,5 +1,7 @@
 import { alpha, Palette } from '@mui/material';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 const uiSwatches = {
   basic: {
     black: '#000000',
@@ -94,7 +96,7 @@ type FunSwatchNuances = {
   medium: ColorAndContrast;
 };
 
-export const funSwatches: Record<string, FunSwatchNuances> = {
+export const funSwatches: SafeRecord<string, FunSwatchNuances> = {
   aqua: {
     dark: {
       color: '#187F81',

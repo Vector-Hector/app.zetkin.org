@@ -8,6 +8,7 @@ import {
   remoteList,
   RemoteList,
 } from 'utils/storeUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type EphemeralQueryStats = {
   // This property needs to be called `id` to meet the requirements
@@ -19,7 +20,7 @@ export type EphemeralQueryStats = {
 
 export interface smartSearchStoreSlice {
   queryList: RemoteList<ZetkinQuery>;
-  statsByFilterSpec: Record<string, RemoteItem<EphemeralQueryStats>>;
+  statsByFilterSpec: SafeRecord<string, RemoteItem<EphemeralQueryStats>>;
 }
 
 const initialState: smartSearchStoreSlice = {

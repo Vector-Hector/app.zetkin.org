@@ -3,8 +3,9 @@ import Checkbox from '@mui/material/Checkbox';
 import { FC } from 'react';
 
 import { ZUIPlacement, ZUISize } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-const sizes: Record<ZUISize, string> = {
+const sizes: SafeRecord<ZUISize, string> = {
   large: '1.75rem',
   medium: '1.5rem',
   small: '1.25rem',

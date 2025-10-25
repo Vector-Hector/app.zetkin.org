@@ -1,5 +1,6 @@
 import { ImportPreview, ImportPreviewProblemCode } from '../types';
 import { ImportProblem, ImportProblemKind, ImportRowProblem } from './types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default function problemsFromPreview(
   opCount: number,
@@ -8,7 +9,7 @@ export default function problemsFromPreview(
   const problems: ImportProblem[] = [];
   const summary = preview.stats.person.summary;
 
-  const problemByKind: Record<string, ImportRowProblem> = {};
+  const problemByKind: SafeRecord<string, ImportRowProblem> = {};
 
   function accumulateProblem(kind: ImportRowProblem['kind'], row: number) {
     const existing = problemByKind[kind];

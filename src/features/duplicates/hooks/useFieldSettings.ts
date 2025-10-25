@@ -1,6 +1,7 @@
 import { NATIVE_PERSON_FIELDS } from 'features/views/components/types';
 import sortValuesByFrequency from '../utils/sortValuesByFrequency';
 import { ZetkinPerson } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default function useFieldSettings(duplicates: ZetkinPerson[]) {
   const sortedNativePersonFields: NATIVE_PERSON_FIELDS[] = [
@@ -18,7 +19,7 @@ export default function useFieldSettings(duplicates: ZetkinPerson[]) {
     NATIVE_PERSON_FIELDS.EXT_ID,
   ];
 
-  const fieldValues: Record<string, string[]> = {};
+  const fieldValues: SafeRecord<string, string[]> = {};
 
   sortedNativePersonFields.forEach((field) => {
     const values = duplicates.map((person) => {

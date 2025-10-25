@@ -17,6 +17,7 @@ import { objectToFormData } from './utils/objectToFormData';
 import prepareSurveyApiSubmission from 'features/surveys/utils/prepareSurveyApiSubmission';
 import { useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
+import { safeRecordEntries } from 'utils/types/safeRecord';
 
 type Props = {
   assignment: ZetkinCallAssignment;
@@ -208,9 +209,9 @@ const CallHeader: FC<Props> = ({
               }
               setSubmittingReport(true);
 
-              const submissions = Object.entries(submissionDataBySurveyId)
+              const submissions = safeRecordEntries(submissionDataBySurveyId)
                 .filter(([, surveySubmissionData]) => {
-                  return Object.entries(surveySubmissionData).some(
+                  return safeRecordEntries(surveySubmissionData).some(
                     ([, value]) => {
                       if (typeof value == 'string') {
                         return value.trim() !== '';

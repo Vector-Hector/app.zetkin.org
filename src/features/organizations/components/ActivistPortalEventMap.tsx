@@ -12,6 +12,7 @@ import { ZetkinEventWithStatus } from 'features/home/types';
 import { Latitude, Longitude } from 'features/areas/types';
 import { getGeoJSONFeaturesAtLocations } from '../../map/utils/locationFiltering';
 import useMapMarkerClick from '../hooks/useMapMarkerClick';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export const ActivistPortalEventMap: FC<
   PropsWithChildren<{
@@ -77,7 +78,7 @@ export const ActivistPortalEventMap: FC<
             }
             acc[key].count += 1;
             return acc;
-          }, {} as Record<string, { count: number; id: number; lat: Latitude; lng: Longitude }>)
+          }, {} as SafeRecord<string, { count: number; id: number; lat: Latitude; lng: Longitude }>)
       ),
     [events]
   );

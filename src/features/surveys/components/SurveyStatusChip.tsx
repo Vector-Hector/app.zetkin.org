@@ -6,6 +6,7 @@ import { Msg } from 'core/i18n';
 import { SurveyState } from '../hooks/useSurveyState';
 import messageIds from '../l10n/messageIds';
 import oldTheme from 'theme';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface SurveyStatusChipProps {
   state: SurveyState;
@@ -45,7 +46,7 @@ const SurveyStatusChip: FC<SurveyStatusChipProps> = ({ state }) => {
     return null;
   }
 
-  const classMap: Record<SurveyState, string> = {
+  const classMap: SafeRecord<SurveyState, string> = {
     [SurveyState.UNPUBLISHED]: classes.unpublished,
     [SurveyState.DRAFT]: classes.draft,
     [SurveyState.PUBLISHED]: classes.published,

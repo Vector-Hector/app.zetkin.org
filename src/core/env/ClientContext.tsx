@@ -25,6 +25,7 @@ import { ZetkinUser } from 'utils/types/zetkin';
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZUIConfirmDialogProvider } from 'zui/ZUIConfirmDialogProvider';
 import { ZUISnackbarProvider } from 'zui/ZUISnackbarContext';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -34,7 +35,7 @@ declare module '@mui/styles/defaultTheme' {
 type ClientContextProps = {
   children: ReactNode;
   envVars: EnvVars;
-  headers: Record<string, string>;
+  headers: SafeRecord<string, string>;
   lang: string;
   messages: MessageList;
   user: ZetkinUser | null;
@@ -78,13 +79,13 @@ const ClientContext: FC<ClientContextProps> = ({
                   <IntlProvider
                     defaultLocale="en"
                     locale={lang}
-                    messages={messages}
+                    messages={messages as Record<string, string>}
                   >
                     <ZUISnackbarProvider>
                       <IntlProvider
                         defaultLocale="en"
                         locale={lang}
-                        messages={messages}
+                        messages={messages as Record<string, string>}
                       >
                         <ZUIConfirmDialogProvider>
                           <CssBaseline />

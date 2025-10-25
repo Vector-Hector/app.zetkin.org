@@ -30,6 +30,7 @@ import ZUIButton from 'zui/components/ZUIButton';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIDrawerModal from 'zui/components/ZUIDrawerModal';
 import { useEventTypeFilter } from 'features/events/hooks/useEventTypeFilter';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const initializeEventTypesToFilterBy = () => [] as (string | null)[];
 
@@ -134,7 +135,7 @@ const AllEventsList: FC = () => {
     .filter(eventTypeFilter.getShouldShowEvent);
 
   const eventsByDate = filteredEvents.reduce<
-    Record<string, ZetkinEventWithStatus[]>
+    SafeRecord<string, ZetkinEventWithStatus[]>
   >((dates, event) => {
     const eventDate = event.start_time.slice(0, 10);
     const existingEvents = dates[eventDate] || [];

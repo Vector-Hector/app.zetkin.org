@@ -18,13 +18,17 @@ import {
   remoteList,
   RemoteList,
 } from 'utils/storeUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface SurveysStoreSlice {
-  elementsBySurveyId: Record<number, RemoteList<ZetkinSurveyElement>>;
+  elementsBySurveyId: SafeRecord<number, RemoteList<ZetkinSurveyElement>>;
   submissionList: RemoteList<ZetkinSurveySubmission>;
-  submissionsBySurveyId: Record<number, RemoteList<ZetkinSurveySubmission>>;
-  statsBySurveyId: Record<number, RemoteItem<SurveyStats>>;
-  surveyIdsByCampaignId: Record<number, RemoteList<{ id: string | number }>>;
+  submissionsBySurveyId: SafeRecord<number, RemoteList<ZetkinSurveySubmission>>;
+  statsBySurveyId: SafeRecord<number, RemoteItem<SurveyStats>>;
+  surveyIdsByCampaignId: SafeRecord<
+    number,
+    RemoteList<{ id: string | number }>
+  >;
   surveyList: RemoteList<ZetkinSurvey>;
   surveysWithElementsList: RemoteList<ZetkinSurveyExtended>;
 }

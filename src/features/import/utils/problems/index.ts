@@ -1,6 +1,10 @@
 import { ImportProblem, ImportProblemKind } from './types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-const LEVEL_BY_PROBLEM_KIND: Record<ImportProblemKind, 'warning' | 'error'> = {
+const LEVEL_BY_PROBLEM_KIND: SafeRecord<
+  ImportProblemKind,
+  'warning' | 'error'
+> = {
   INVALID_FORMAT: 'error',
   INVALID_ORG_COUNTRY: 'warning',
   MAJOR_CHANGE: 'warning',

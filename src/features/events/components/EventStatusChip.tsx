@@ -6,6 +6,7 @@ import { Msg } from 'core/i18n';
 import { EventState } from '../hooks/useEventState';
 import messageIds from '../l10n/messageIds';
 import oldTheme from 'theme';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface EventStatusChipProps {
   state: EventState;
@@ -45,7 +46,7 @@ const EventStatusChip: FC<EventStatusChipProps> = ({ state }) => {
     return null;
   }
 
-  const classMap: Record<EventState, string> = {
+  const classMap: SafeRecord<EventState, string> = {
     [EventState.ENDED]: classes.ended,
     [EventState.DRAFT]: classes.draft,
     [EventState.OPEN]: classes.open,

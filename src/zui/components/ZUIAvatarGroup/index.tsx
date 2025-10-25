@@ -4,6 +4,7 @@ import { FC } from 'react';
 import ZUIPersonAvatar from '../ZUIPersonAvatar';
 import { ZUISize } from '../types';
 import ZUIOrgAvatar, { ZUIOrgAvatarProps } from '../ZUIOrgAvatar';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type PersonAvatarData = {
   firstName: string;
@@ -28,13 +29,13 @@ type ZUIPersonAvatarGroupProps = {
   size?: ZUISize;
 };
 
-const fontSizes: Record<ZUISize, string> = {
+const fontSizes: SafeRecord<ZUISize, string> = {
   large: '1rem',
   medium: '0.875rem',
   small: '0.625rem',
 };
 
-const avatarSizes: Record<ZUISize, string> = {
+const avatarSizes: SafeRecord<ZUISize, string> = {
   large: '2.5rem',
   medium: '2rem',
   small: '1.5rem',

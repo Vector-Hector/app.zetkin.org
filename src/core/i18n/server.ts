@@ -4,6 +4,7 @@ import IntlMessageFormat from 'intl-messageformat';
 import { getMessages } from 'utils/locale';
 import { HookedMessageFunc, UseMessagesMap } from './useMessages';
 import { Message, MessageMap, MessageValue } from './messages';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default async function getServerMessages<MapType extends MessageMap>(
   lang: string,
@@ -14,14 +15,14 @@ export default async function getServerMessages<MapType extends MessageMap>(
   function makeFunctions<MapType extends MessageMap>(
     map: MapType
   ): UseMessagesMap<MapType> {
-    const output: Record<
+    const output: SafeRecord<
       string,
       HookedMessageFunc<Message<any>> | UseMessagesMap<any>
     > = {};
 
     Object.entries(map).forEach(([key, val]) => {
       if (isMessage(val)) {
-        output[key] = ((values?: Record<string, MessageValue>) => {
+        output[key] = ((values?: SafeRecord<string, MessageValue>) => {
           // TODO: Cache this compilation?
           const msg = localMessages[val._id] || val._defaultMessage;
           const fmt = new IntlMessageFormat(msg, [lang, 'en']);

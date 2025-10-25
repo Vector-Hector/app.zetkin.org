@@ -19,6 +19,7 @@ import {
   ZetkinPerson as ZetkinPersonType,
 } from 'utils/types/zetkin';
 import messageIds from 'features/journeys/l10n/messageIds';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 function makeSelectFilterOperator(
   operatorLabel: string,
@@ -122,7 +123,7 @@ const sortByName = (
 };
 
 function getUniqueById<T extends { id: number }>(objects: T[]): T[] {
-  const objectsById: Record<number, T> = {};
+  const objectsById: SafeRecord<number, T> = {};
   objects.forEach((object) => (objectsById[object.id] = object));
   return Object.values(objectsById);
 }

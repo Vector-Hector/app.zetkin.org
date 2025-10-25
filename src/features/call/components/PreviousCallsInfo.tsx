@@ -18,12 +18,13 @@ import ZUIDivider from 'zui/components/ZUIDivider';
 import ZUIIcon from 'zui/components/ZUIIcon';
 import useIsMobile from 'utils/hooks/useIsMobile';
 import { MUIIcon } from 'zui/components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type PreviousCallsInfoProps = {
   call: ZetkinCall;
 };
 
-export const labels: Record<number, string> = {
+export const labels: SafeRecord<number, string> = {
   1: 'Success',
   11: 'No response',
   12: 'Line busy',
@@ -33,7 +34,7 @@ export const labels: Record<number, string> = {
   21: 'Wrong number',
 };
 
-export const icons: Record<number, MUIIcon> = {
+export const icons: SafeRecord<number, MUIIcon> = {
   1: CallMade,
   11: CallMissedOutgoing,
   12: KeyboardTab,
@@ -43,7 +44,7 @@ export const icons: Record<number, MUIIcon> = {
   21: TurnSlightLeft,
 };
 
-export const colors: Record<number, 'success' | 'warning' | 'error'> = {
+export const colors: SafeRecord<number, 'success' | 'warning' | 'error'> = {
   1: 'success',
   11: 'error',
   12: 'error',
@@ -87,7 +88,12 @@ const PreviousCallsInfo: FC<PreviousCallsInfoProps> = ({ call }) => {
                       if (color == 'warning') {
                         return { color: theme.palette.warning.dark };
                       } else {
-                        return { color: theme.palette[color].main };
+                        return {
+                          color:
+                            color === undefined
+                              ? theme.palette.text.primary
+                              : theme.palette[color].main,
+                        };
                       }
                     }}
                   >

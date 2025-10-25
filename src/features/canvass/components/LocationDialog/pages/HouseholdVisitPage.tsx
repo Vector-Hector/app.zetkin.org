@@ -18,6 +18,7 @@ import { Msg, useMessages } from 'core/i18n';
 import messageIds from 'features/canvass/l10n/messageIds';
 import useHousehold from 'features/canvass/hooks/useHousehold';
 import { MetricResponse } from 'features/canvass/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type HouseholdVisitPageProps = {
   householdId: number;
@@ -42,7 +43,7 @@ const HouseholdVisitPage: FC<HouseholdVisitPageProps> = ({
   );
 
   const [responseByMetricId, setResponseByMetricId] = useState<
-    Record<number, MetricResponse>
+    SafeRecord<number, MetricResponse>
   >({});
   const [step, setStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,7 +121,7 @@ const HouseholdVisitPage: FC<HouseholdVisitPageProps> = ({
               <StepButton
                 onClick={() => {
                   if (index < step) {
-                    const newResponses: Record<number, MetricResponse> = {};
+                    const newResponses: SafeRecord<number, MetricResponse> = {};
                     metrics.forEach((m, i) => {
                       if (i < index && responseByMetricId[m.id]) {
                         newResponses[m.id] = responseByMetricId[m.id];

@@ -16,6 +16,7 @@ import PageBase from './PageBase';
 import { Msg, useMessages } from 'core/i18n';
 import messageIds from 'features/canvass/l10n/messageIds';
 import { MetricResponse } from 'features/canvass/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type BulkHouseholdVisitsPageProps = {
   metrics: ZetkinMetric[];
@@ -32,7 +33,7 @@ const BulkHouseholdVisitsPage: FC<BulkHouseholdVisitsPageProps> = ({
 }) => {
   const messages = useMessages(messageIds);
   const [responseByMetricId, setResponseByMetricId] = useState<
-    Record<number, MetricResponse>
+    SafeRecord<number, MetricResponse>
   >({});
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);

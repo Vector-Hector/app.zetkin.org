@@ -6,10 +6,11 @@ import messageIds from 'features/duplicates/l10n/messageIds';
 import { NATIVE_PERSON_FIELDS } from 'features/views/components/types';
 import { useMessages } from 'core/i18n';
 import { ZetkinPerson } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface FieldSettingsProps {
   duplicates: ZetkinPerson[];
-  fieldValues: Record<string, string[]>;
+  fieldValues: SafeRecord<string, string[]>;
   onChange: (field: NATIVE_PERSON_FIELDS, selectedValue: string) => void;
 }
 

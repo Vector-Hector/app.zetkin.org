@@ -1,12 +1,13 @@
 import { TreeItemData } from '../types';
 import { ZetkinMembership, ZetkinOrganization } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default function generateTreeData(
   organizations: ZetkinOrganization[],
   memberships: ZetkinMembership[]
 ): TreeItemData[] {
-  const roleByOrgId: Record<number, string | null> = {};
-  const orgsByParentId: Record<number, ZetkinOrganization[]> = {};
+  const roleByOrgId: SafeRecord<number, string | null> = {};
+  const orgsByParentId: SafeRecord<number, ZetkinOrganization[]> = {};
 
   // Extract the user's role for each organization that they are connected to
   memberships.forEach(

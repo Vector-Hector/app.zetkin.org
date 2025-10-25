@@ -8,6 +8,7 @@ import { areaFilterContext } from './AreaFilterContext';
 import AddFilterButton from './AddFilterButton';
 import { useMessages } from 'core/i18n';
 import messageIds from 'features/areas/l10n/messageIds';
+import { SafeRecord, safeRecordValues } from 'utils/types/safeRecord';
 
 type Props = {
   areas: ZetkinArea[];
@@ -26,7 +27,7 @@ const AreaFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
   } = useContext(areaFilterContext);
 
   const groupsById = useMemo(() => {
-    const groupsById: Record<
+    const groupsById: SafeRecord<
       number,
       { group: ZetkinTagGroup | null; tags: ZetkinTag[] }
     > = {};
@@ -40,11 +41,14 @@ const AreaFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
             tags: [tag],
           };
         } else {
-          const alreadyAdded = groupsById[groupId].tags.some(
-            (oldTag) => oldTag.id == tag.id
-          );
+          const group = groupsById[groupId];
+          if (!group) {
+            return;
+          }
+
+          const alreadyAdded = group.tags.some((oldTag) => oldTag.id == tag.id);
           if (!alreadyAdded) {
-            groupsById[groupId].tags.push(tag);
+            group.tags.push(tag);
           }
         }
       });
@@ -56,7 +60,7 @@ const AreaFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
   useEffect(() => {
     const filteredAreas = areas.filter((area) => {
       // All selected groups must match (boolean AND)
-      return Object.values(activeTagIdsByGroup).every((idsInGroup) => {
+      return safeRecordValues(activeTagIdsByGroup).every((idsInGroup) => {
         // A group matches if ANY of the tags match (boolean OR) or if
         // there are no tags in the group which indicates that the filter
         // has not yet been configured
@@ -134,7 +138,7 @@ const AreaFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
         }
       })}
       <AddFilterButton
-        items={Object.values(groupsById).map((item) => {
+        items={safeRecordValues(groupsById).map((item) => {
           const groupId = item.group?.id ?? 0;
           const selected = activeGroupIds.includes(groupId);
 

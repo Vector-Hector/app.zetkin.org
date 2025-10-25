@@ -9,6 +9,7 @@ import ZUISection from 'zui/components/ZUISection';
 import ZUISelect from 'zui/components/ZUISelect';
 import ZUIButton from 'zui/components/ZUIButton';
 import { SupportedLanguage } from 'core/i18n/languages';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type ZetkinUserLanguage = SupportedLanguage | null;
 
@@ -18,7 +19,7 @@ type Props = {
 
 const AppPreferences: FC<Props> = ({ user }) => {
   const messages = useMessages(messageIds);
-  const languageOptions: Record<SupportedLanguage, string> = {
+  const languageOptions: SafeRecord<SupportedLanguage, string> = {
     da: 'Dansk',
     de: 'Deutsch',
     en: 'English',

@@ -3,10 +3,12 @@ import { parse } from '@messageformat/parser';
 import path from 'path';
 import yaml from 'yaml';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 run();
 
 async function run() {
-  const messagesByLang: Record<string, Record<string, string>> = {};
+  const messagesByLang: SafeRecord<string, SafeRecord<string, string>> = {};
 
   const dirEnts = await fs.readdir('./src/locale', { withFileTypes: true });
   for (const dirEnt of dirEnts) {
@@ -64,14 +66,14 @@ async function run() {
 }
 
 function flattenObject(
-  obj: Record<string, unknown>,
+  obj: SafeRecord<string, unknown>,
   baseKey: string | null = null,
-  flat: Record<string, string> = {}
+  flat: SafeRecord<string, string> = {}
 ) {
   Object.entries(obj).forEach(([key, val]) => {
     const combinedKey = baseKey ? `${baseKey}.${key}` : key;
     if (typeof val === 'object') {
-      flattenObject(val as Record<string, unknown>, combinedKey, flat);
+      flattenObject(val as SafeRecord<string, unknown>, combinedKey, flat);
     } else if (typeof val === 'string') {
       flat[combinedKey] = val;
     }

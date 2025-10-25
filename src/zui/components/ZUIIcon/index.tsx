@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { useTheme } from '@mui/material';
 
 import { MUIIcon, ZUISize } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type IconColor =
   | 'secondary'
@@ -41,7 +42,7 @@ const ZUIIcon: FC<ZUIIconProps> = ({
   size = 'medium',
 }) => {
   const theme = useTheme();
-  const iconColors: Record<IconColor, string> = {
+  const iconColors: SafeRecord<IconColor, string> = {
     data: theme.palette.data.main,
     error: theme.palette.error.main,
     info: theme.palette.info.main,
@@ -52,7 +53,7 @@ const ZUIIcon: FC<ZUIIconProps> = ({
     white: theme.palette.common.white,
   };
 
-  const fontSizes: Record<ZUISize, string> = {
+  const fontSizes: SafeRecord<ZUISize, string> = {
     large: '2.188rem',
     medium: '1.5rem',
     small: '1.25rem',

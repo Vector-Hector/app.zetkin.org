@@ -1,8 +1,9 @@
 import { Box, useTheme } from '@mui/material';
 
 import { ZUISize } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-const sizes: Record<ZUISize, string> = {
+const sizes: SafeRecord<ZUISize, string> = {
   large: '1rem',
   medium: '0.5rem',
   small: '0.25rem',

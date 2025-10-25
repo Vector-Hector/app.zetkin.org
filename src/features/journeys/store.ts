@@ -7,23 +7,24 @@ import {
   ZetkinJourneyInstance,
   ZetkinJourneyMilestoneStatus,
 } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface JourneysStoreSlice {
   journeyInstanceList: RemoteList<ZetkinJourneyInstance>;
-  journeyInstancesByJourneyId: Record<
+  journeyInstancesByJourneyId: SafeRecord<
     number,
     RemoteList<ZetkinJourneyInstance>
   >;
-  journeyInstancesBySubjectId: Record<
+  journeyInstancesBySubjectId: SafeRecord<
     number,
     RemoteList<ZetkinJourneyInstance>
   >;
   journeyList: RemoteList<ZetkinJourney>;
-  milestonesByInstanceId: Record<
+  milestonesByInstanceId: SafeRecord<
     number,
     RemoteList<ZetkinJourneyMilestoneStatus>
   >;
-  timelineUpdatesByInstanceId: Record<number, RemoteList<ZetkinUpdate>>;
+  timelineUpdatesByInstanceId: SafeRecord<number, RemoteList<ZetkinUpdate>>;
 }
 
 const initialJourneysState: JourneysStoreSlice = {

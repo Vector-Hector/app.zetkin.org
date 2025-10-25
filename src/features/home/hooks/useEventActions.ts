@@ -2,8 +2,9 @@ import { userResponseAdded, userResponseDeleted } from 'features/events/store';
 import useUserMemberships from './useUserMemberships';
 import { useApiClient, useAppDispatch } from 'core/hooks';
 import { ZetkinEvent, ZetkinPerson } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-function isPerson(obj: Record<string, unknown>): obj is ZetkinPerson {
+function isPerson(obj: SafeRecord<string, unknown>): obj is ZetkinPerson {
   return 'first_name' in obj;
 }
 
@@ -22,7 +23,7 @@ export default function useEventActions(orgId: number, eventId: number) {
     requiresConnect,
     async signUp() {
       if (requiresConnect) {
-        const person = await apiClient.post<Record<string, unknown>>(
+        const person = await apiClient.post<SafeRecord<string, unknown>>(
           `/api/orgs/${orgId}/join_requests`,
           {}
         );

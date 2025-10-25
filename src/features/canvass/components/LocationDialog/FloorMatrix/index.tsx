@@ -14,6 +14,7 @@ import {
 import FloorEditor from './FloorEditor';
 import { EditedFloor } from './types';
 import AddFloorButton from './AddFloorButton';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   assignment: ZetkinAreaAssignment;
@@ -65,7 +66,7 @@ const FloorMatrix: FC<Props> = ({
   const successMetric = metrics?.find((m) => m.defines_success);
 
   const householdsByFloor = sortedHouseholds.reduce(
-    (floors: Record<number, HouseholdWithColor[]>, household) => {
+    (floors: SafeRecord<number, HouseholdWithColor[]>, household) => {
       return {
         ...floors,
         [household.level]: [...(floors[household.level] || []), household],

@@ -17,6 +17,7 @@ import { daDK, deDE, Localization, nbNO, svSE } from '@mui/material/locale';
 import './types';
 import palette from './palette';
 import typography from './typography';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const theme = createTheme({
   elevation: {
@@ -46,21 +47,21 @@ const theme = createTheme({
 });
 
 //MUI Material localizations
-const coreLocales: Record<string, Localization> = {};
+const coreLocales: SafeRecord<string, Localization> = {};
 coreLocales['da'] = daDK;
 coreLocales['de'] = deDE;
 coreLocales['nn'] = nbNO;
 coreLocales['sv'] = svSE;
 
 //MUI Data Grid  localizations
-const dataGridLocales: Record<string, DataGridLocalization> = {};
+const dataGridLocales: SafeRecord<string, DataGridLocalization> = {};
 dataGridLocales['da'] = dataGridDaDK;
 dataGridLocales['de'] = dataGridDeDE;
 dataGridLocales['nn'] = dataGridNbNO;
 dataGridLocales['sv'] = dataGridSvSE;
 
 //MUI Date Pickers localizations
-const pickersLocales: Record<string, typeof pickersDaDK> = {};
+const pickersLocales: SafeRecord<string, typeof pickersDaDK> = {};
 pickersLocales['da'] = pickersDaDK;
 pickersLocales['de'] = pickersDeDE;
 pickersLocales['nn'] = pickersNbNO;

@@ -1,4 +1,5 @@
 import { TASK_TYPE } from 'features/tasks/components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export enum FILTER_CATEGORY {
   BASIC = 'basicInformation',
@@ -130,7 +131,7 @@ export enum TASK_STATUS {
 /**
  * Filter Configs
  */
-export type DefaultFilterConfig = Record<string, never>; // Default filter config is an empty object
+export type DefaultFilterConfig = SafeRecord<string, never>; // Default filter config is an empty object
 
 export interface CallBlockedFilterConfig {
   organizations?: FilterConfigOrgOptions;

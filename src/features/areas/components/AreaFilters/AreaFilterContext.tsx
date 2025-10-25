@@ -1,10 +1,12 @@
 import { createContext, FC, PropsWithChildren, useState } from 'react';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 type AreaFilterState = {
   activeGroupIds: number[];
-  activeTagIdsByGroup: Record<string, number[]>;
+  activeTagIdsByGroup: SafeRecord<string, number[]>;
   setActiveGroupIds: (value: number[]) => void;
-  setActiveTagIdsByGroup: (value: Record<string, number[]>) => void;
+  setActiveTagIdsByGroup: (value: SafeRecord<string, number[]>) => void;
 };
 
 export const areaFilterContext = createContext<AreaFilterState>({
@@ -17,7 +19,7 @@ export const areaFilterContext = createContext<AreaFilterState>({
 const AreaFilterProvider: FC<PropsWithChildren> = ({ children }) => {
   const [activeGroupIds, setActiveGroupIds] = useState<number[]>([]);
   const [activeTagIdsByGroup, setActiveTagIdsByGroup] = useState<
-    Record<string, number[]>
+    SafeRecord<string, number[]>
   >({});
 
   return (

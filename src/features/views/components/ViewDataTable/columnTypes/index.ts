@@ -17,6 +17,7 @@ import { UseViewGridReturn } from 'features/views/hooks/useViewGrid';
 import { ZetkinObjectAccess } from 'core/api/types';
 import { AppDispatch, RootState } from 'core/store';
 import { COLUMN_TYPE, ZetkinViewColumn } from 'features/views/components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface IColumnType<
   ColumnType = ZetkinViewColumn,
@@ -90,7 +91,7 @@ class UnsupportedColumnType implements IColumnType {
  * Copy one of the existing ones, and change it's implementation to handle
  * the value correctly.
  */
-const columnTypes: Record<COLUMN_TYPE, IColumnType> = {
+const columnTypes: SafeRecord<COLUMN_TYPE, IColumnType> = {
   [COLUMN_TYPE.LOCAL_BOOL]: new LocalBoolColumnType(),
   [COLUMN_TYPE.LOCAL_PERSON]: new LocalPersonColumnType(),
   [COLUMN_TYPE.LOCAL_QUERY]: new LocalQueryColumnType(),

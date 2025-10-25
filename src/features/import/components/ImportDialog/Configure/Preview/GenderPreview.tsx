@@ -2,11 +2,12 @@ import messageIds from 'features/import/l10n/messageIds';
 import PreviewGrid from './PreviewGrid';
 import { useMessages } from 'core/i18n';
 import { CellData, ColumnKind, Sheet } from 'features/import/utils/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface GenderPreviewProps {
   currentSheet: Sheet;
   fieldKey: string;
-  fields: Record<string, CellData> | undefined;
+  fields: SafeRecord<string, CellData> | undefined;
 }
 
 const GenderPreview = ({

@@ -1,11 +1,13 @@
+import { SafeRecord } from 'utils/types/safeRecord';
+
 export default function sortValuesByFrequency(values: string[]) {
-  const frequency: Record<string | number, number> = {};
+  const frequency: SafeRecord<string | number, number> = {};
 
   values.forEach((value) => {
     if (!frequency[value]) {
       frequency[value] = 0;
     }
-    frequency[value] = frequency[value] + 1;
+    frequency[value] = frequency[value]! + 1;
   });
 
   const uniqueValues = [...new Set(values)];
@@ -14,9 +16,9 @@ export default function sortValuesByFrequency(values: string[]) {
     const a = value1 || '';
     const b = value2 || '';
 
-    if (frequency[a] > frequency[b]) {
+    if (frequency[a]! > frequency[b]!) {
       return -1;
-    } else if (frequency[b] > frequency[a]) {
+    } else if (frequency[b]! > frequency[a]!) {
       return 1;
     } else {
       return 0;

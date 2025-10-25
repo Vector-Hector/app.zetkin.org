@@ -43,6 +43,12 @@ const CalendarMonthView = ({
   lastDayOfCalendar.setDate(lastDayOfCalendar.getDate() + 6 * 7);
 
   const { orgId, campId } = useNumericRouteParams();
+  if (orgId === undefined || campId === undefined) {
+    throw new Error(
+      'CalendarMonthView can only be used on paths with orgId and campId.'
+    );
+  }
+
   const clustersByDate = useMonthCalendarEvents({
     campaignId: campId,
     endDate: lastDayOfCalendar,

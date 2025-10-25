@@ -12,6 +12,7 @@ import ZUIRelativeTime from 'zui/ZUIRelativeTime';
 import ZUISuffixedNumber from 'zui/ZUISuffixedNumber';
 import ZUIIconLabel, { ZUIIconLabelProps } from 'zui/ZUIIconLabel';
 import oldTheme from 'theme';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface StyleProps {
   color: STATUS_COLORS;
@@ -64,10 +65,10 @@ export enum STATUS_COLORS {
 
 interface OverviewListItemProps {
   PrimaryIcon: OverridableComponent<
-    SvgIconTypeMap<Record<string, unknown>, 'svg'>
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
   >;
   SecondaryIcon: OverridableComponent<
-    SvgIconTypeMap<Record<string, unknown>, 'svg'>
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
   > | null;
   color: STATUS_COLORS;
   endDate: CampaignActivity['visibleUntil'];

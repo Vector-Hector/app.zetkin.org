@@ -5,6 +5,7 @@ import { FilterList } from '@mui/icons-material';
 import { areaFilterContext } from './AreaFilterContext';
 import { Msg } from 'core/i18n';
 import messageIds from 'features/areas/l10n/messageIds';
+import { safeRecordValues } from 'utils/types/safeRecord';
 
 type Props = {
   onToggle: () => void;
@@ -12,7 +13,7 @@ type Props = {
 
 const AreaFilterButton: FC<Props> = ({ onToggle }) => {
   const { activeTagIdsByGroup } = useContext(areaFilterContext);
-  const numActiveGroups = Object.values(activeTagIdsByGroup).filter(
+  const numActiveGroups = safeRecordValues(activeTagIdsByGroup).filter(
     (tagIds) => !!tagIds.length
   ).length;
 

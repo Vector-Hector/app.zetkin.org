@@ -13,7 +13,7 @@ import {
 import { FC, useState } from 'react';
 import { DateRangeCalendar, DateRangePickerDay } from '@mui/x-date-pickers-pro';
 import { useIntl } from 'react-intl';
-import { Clear, CalendarMonthOutlined, Search } from '@mui/icons-material';
+import { CalendarMonthOutlined, Clear, Search } from '@mui/icons-material';
 
 import EventListItem from 'features/home/components/EventListItem';
 import { ZetkinEventWithStatus } from 'features/home/types';
@@ -37,6 +37,7 @@ import { useAppDispatch, useAppSelector } from 'core/hooks';
 import { filtersUpdated } from '../store';
 import useOrganization from '../hooks/useOrganization';
 import useIsMobile from 'utils/hooks/useIsMobile';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   orgId: number;
@@ -225,7 +226,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
     includeSubOrgs || topOrgEvents.length == 0 ? allEvents : topOrgEvents;
 
   const eventsByDate = locationEvents.reduce<
-    Record<string, ZetkinEventWithStatus[]>
+    SafeRecord<string, ZetkinEventWithStatus[]>
   >((dates, event) => {
     const eventDate = event.start_time.slice(0, 10);
     const existingEvents = dates[eventDate] || [];

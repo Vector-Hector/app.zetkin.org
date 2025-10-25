@@ -8,14 +8,15 @@ import {
   remoteList,
 } from 'utils/storeUtils';
 import { ZetkinEmail, ZetkinEmailConfig, ZetkinLink } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface EmailStoreSlice {
   configList: RemoteList<ZetkinEmailConfig>;
   emailList: RemoteList<ZetkinEmail>;
   themeList: RemoteList<EmailTheme>;
-  linksByEmailId: Record<number, RemoteList<ZetkinLink>>;
-  statsById: Record<number, RemoteItem<ZetkinEmailStats>>;
-  insightsByEmailId: Record<number, RemoteItem<EmailInsights>>;
+  linksByEmailId: SafeRecord<number, RemoteList<ZetkinLink>>;
+  statsById: SafeRecord<number, RemoteItem<ZetkinEmailStats>>;
+  insightsByEmailId: SafeRecord<number, RemoteItem<EmailInsights>>;
 }
 
 const initialState: EmailStoreSlice = {

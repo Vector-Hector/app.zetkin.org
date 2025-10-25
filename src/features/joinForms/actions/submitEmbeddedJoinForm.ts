@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { EmbeddedJoinFormData, EmbeddedJoinFormStatus } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default async function submitJoinForm(
   prevState: EmbeddedJoinFormStatus,
@@ -22,7 +23,7 @@ export default async function submitJoinForm(
     Iron.defaults
   )) as EmbeddedJoinFormData;
 
-  const outputFormData: Record<string, string | null> = {};
+  const outputFormData: SafeRecord<string, string | null> = {};
 
   joinFormInfo.fields.forEach((field) => {
     const value = inputFormData.get(field.s)?.toString() || '';

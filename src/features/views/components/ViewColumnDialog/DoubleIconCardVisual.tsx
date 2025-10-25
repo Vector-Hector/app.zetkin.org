@@ -3,9 +3,13 @@ import { Box } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 interface DoubleIconCardVisualProps {
   color: string;
-  icons: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, 'svg'>>[];
+  icons: OverridableComponent<
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
+  >[];
 }
 
 const DoubleIconCardVisual = ({ color, icons }: DoubleIconCardVisualProps) => {

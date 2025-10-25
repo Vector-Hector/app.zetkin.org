@@ -5,9 +5,10 @@ import messageIds from 'features/import/l10n/messageIds';
 import PreviewGrid from './PreviewGrid';
 import useColumn from 'features/import/hooks/useColumn';
 import { useMessages } from 'core/i18n';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface DatePreviewProps {
-  fields: Record<string, CellData> | undefined;
+  fields: SafeRecord<string, CellData> | undefined;
   fieldKey: string;
   orgId: number;
 }

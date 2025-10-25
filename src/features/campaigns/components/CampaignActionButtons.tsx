@@ -1,5 +1,4 @@
-import { Box } from '@mui/material';
-import { Link } from '@mui/material';
+import { Box, Link } from '@mui/material';
 import {
   AssignmentOutlined,
   CheckBoxOutlined,
@@ -50,6 +49,11 @@ const CampaignActionButtons: React.FunctionComponent<
   const campaginMessages = useMessages(campaignMessageIds);
   const areaAssignmentMessages = useMessages(areaAssignmentMessageIds);
   const { orgId, campId } = useNumericRouteParams();
+  if (orgId === undefined || campId === undefined) {
+    throw new Error(
+      'CampaignActionButtons can only be used on paths with orgId and campId'
+    );
+  }
   const hasAreaAssignments = useFeature(AREAS);
   const hasTasks = useFeature(TASKS);
 

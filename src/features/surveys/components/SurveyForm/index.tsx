@@ -11,9 +11,10 @@ import TextQuestion from './TextQuestion';
 import OptionsQuestion from './OptionsQuestion';
 import useServerSide from 'core/useServerSide';
 import LinkifiedText from './LinkifiedText';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type SurveyFormProps = {
-  initialValues?: Record<string, string | string[]>;
+  initialValues?: SafeRecord<string, string | string[]>;
   onChange?: (name: string, value: string | string[]) => void;
   survey: ZetkinSurveyExtended;
 };

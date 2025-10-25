@@ -3,6 +3,7 @@ import { GridColDef } from '@mui/x-data-grid-pro';
 import useConfigurableDataGridColumns, {
   StorageBackend,
 } from './useConfigurableDataGridColumns';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const mockSetState = jest.fn();
 
@@ -11,7 +12,7 @@ jest.mock('react', () => ({
 }));
 
 class MockStorage implements StorageBackend {
-  public data: Record<string, string> = {};
+  public data: SafeRecord<string, string> = {};
 
   getItem(key: string): string | null {
     return this.data[key] || null;

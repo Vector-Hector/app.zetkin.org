@@ -8,6 +8,7 @@ import { FC, HTMLInputTypeAttribute, RefObject } from 'react';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 import { ZUILarge, ZUIMedium } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type ZUITextFieldProps = {
   /**
@@ -24,7 +25,7 @@ type ZUITextFieldProps = {
    * An icon to be displayed at the end of the textfield.
    */
   endIcon?: OverridableComponent<
-    SvgIconTypeMap<Record<string, unknown>, 'svg'>
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
   >;
 
   /**
@@ -116,7 +117,7 @@ type ZUITextFieldProps = {
    * An icon to be displayed at the start of the textfield.
    */
   startIcon?: OverridableComponent<
-    SvgIconTypeMap<Record<string, unknown>, 'svg'>
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
   >;
 
   /**

@@ -16,6 +16,7 @@ import {
   ZetkinLocation,
 } from 'utils/types/zetkin';
 import { ZetkinEventWithStatus } from 'features/home/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export enum ACTION_FILTER_OPTIONS {
   CONTACT_MISSING = 'missing',
@@ -53,8 +54,8 @@ export type FilterCategoryType =
 export interface EventsStoreSlice {
   allEventsList: RemoteList<ZetkinEvent>;
   eventList: RemoteList<ZetkinEvent>;
-  eventsByCampaignId: Record<string, RemoteList<ZetkinEvent>>;
-  eventsByDate: Record<string, RemoteList<ZetkinEvent>>;
+  eventsByCampaignId: SafeRecord<string, RemoteList<ZetkinEvent>>;
+  eventsByDate: SafeRecord<string, RemoteList<ZetkinEvent>>;
   filters: {
     selectedActions: string[];
     selectedStates: string[];
@@ -63,11 +64,11 @@ export interface EventsStoreSlice {
   };
   locationList: RemoteList<ZetkinLocation>;
   pendingParticipantOps: ParticipantOp[];
-  participantsByEventId: Record<number, RemoteList<ZetkinEventParticipant>>;
-  remindingByEventId: Record<number, boolean>;
-  respondentsByEventId: Record<number, RemoteList<ZetkinEventResponse>>;
+  participantsByEventId: SafeRecord<number, RemoteList<ZetkinEventParticipant>>;
+  remindingByEventId: SafeRecord<number, boolean>;
+  respondentsByEventId: SafeRecord<number, RemoteList<ZetkinEventResponse>>;
   selectedEventIds: number[];
-  statsByEventId: Record<number, RemoteItem<EventStats>>;
+  statsByEventId: SafeRecord<number, RemoteItem<EventStats>>;
   typeList: RemoteList<ZetkinActivity>;
   userEventList: RemoteList<ZetkinEventWithStatus>;
 }

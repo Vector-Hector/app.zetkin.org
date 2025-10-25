@@ -3,6 +3,7 @@
 import { IntlShape, useIntl } from 'react-intl';
 
 import { Message, MessageMap, MessageValue } from './messages';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 /**
  * The useMessages() takes messages defined by the messages() function, and
@@ -27,14 +28,14 @@ export function injectIntl<MapType extends MessageMap>(
   map: MapType,
   intl: IntlShape
 ): UseMessagesMap<MapType> {
-  const output: Record<
+  const output: SafeRecord<
     string,
     HookedMessageFunc<Message<any>> | UseMessagesMap<any>
   > = {};
 
   Object.entries(map).forEach(([key, val]) => {
     if (isMessage(val)) {
-      output[key] = ((values?: Record<string, MessageValue>) => {
+      output[key] = ((values?: SafeRecord<string, MessageValue>) => {
         return intl.formatMessage(
           {
             defaultMessage: val._defaultMessage,

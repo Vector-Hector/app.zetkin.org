@@ -10,7 +10,7 @@ import { ZetkinTag } from 'utils/types/zetkin';
 interface AddedTagsProps {
   addedTags: ZetkinTag[];
   numPeopleWithTagsAdded: number;
-  peoplePerTag: { [key: number]: number };
+  peoplePerTag: SafeRecord<number, number>;
   tense: 'past' | 'future';
 }
 

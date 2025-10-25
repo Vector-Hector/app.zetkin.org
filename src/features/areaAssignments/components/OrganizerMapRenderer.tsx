@@ -16,8 +16,8 @@ import isPointInsidePolygon from '../../canvass/utils/isPointInsidePolygon';
 import { ZetkinArea } from 'features/areas/types';
 import ZUIAvatar from 'zui/ZUIAvatar';
 import {
-  ZetkinAssignmentAreaStats,
   ZetkinAreaAssignee,
+  ZetkinAssignmentAreaStats,
   ZetkinLocation,
 } from '../types';
 import { getBoundSize } from '../../canvass/utils/getBoundSize';
@@ -26,6 +26,7 @@ import MarkerIcon from 'features/canvass/components/MarkerIcon';
 import locToLatLng from 'features/geography/utils/locToLatLng';
 import oldTheme from 'theme';
 import flipForLeaflet from 'features/areas/utils/flipForLeaflet';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const LocationMarker: FC<{
   location: ZetkinLocation;
@@ -361,7 +362,7 @@ const OrganizerMapRenderer: FC<OrganizerMapRendererProps> = ({
         } ${visitsColorPercent || 1}%)`;
   };
 
-  const locationsByAreaId: Record<string, ZetkinLocation[]> = {};
+  const locationsByAreaId: SafeRecord<string, ZetkinLocation[]> = {};
   areas.forEach((area) => {
     locationsByAreaId[area.id] = [];
 
@@ -374,7 +375,7 @@ const OrganizerMapRenderer: FC<OrganizerMapRendererProps> = ({
         }))
       );
       if (isInsideArea) {
-        locationsByAreaId[area.id].push(location);
+        locationsByAreaId[area.id]!.push(location);
       }
     });
   });
@@ -382,7 +383,7 @@ const OrganizerMapRenderer: FC<OrganizerMapRendererProps> = ({
   let highestHousholds = 0;
   Object.keys(locationsByAreaId).forEach((id) => {
     let numberOfHouseholdsInArea = 0;
-    locationsByAreaId[id].forEach((location) => {
+    locationsByAreaId[id]!.forEach((location) => {
       numberOfHouseholdsInArea +=
         location.num_known_households || location.num_estimated_households;
     });

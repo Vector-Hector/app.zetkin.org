@@ -17,15 +17,16 @@ import {
 } from './types';
 import { ZetkinAreaAssignment } from 'features/areaAssignments/types';
 import { findOrAddItem } from 'utils/storeUtils/findOrAddItem';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface CanvassStoreSlice {
-  householdsByLocationId: Record<number, RemoteList<HouseholdWithColor>>;
+  householdsByLocationId: SafeRecord<number, RemoteList<HouseholdWithColor>>;
   myAssignmentsList: RemoteList<ZetkinAreaAssignment>;
-  visitsByAssignmentAndLocationId: Record<
+  visitsByAssignmentAndLocationId: SafeRecord<
     number,
-    Record<number, RemoteList<ZetkinHouseholdVisit>>
+    SafeRecord<number, RemoteList<ZetkinHouseholdVisit>>
   >;
-  visitsByAssignmentId: Record<string, RemoteList<ZetkinLocationVisit>>;
+  visitsByAssignmentId: SafeRecord<string, RemoteList<ZetkinLocationVisit>>;
 }
 
 const initialState: CanvassStoreSlice = {

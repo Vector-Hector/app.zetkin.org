@@ -1,6 +1,8 @@
 import { Box, lighten, useTheme } from '@mui/material';
 import { FC, ReactNode } from 'react';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 type Props = {
   children: ReactNode;
   state: 'accepting' | 'loading';
@@ -9,7 +11,7 @@ type Props = {
 const DropZoneContainer: FC<Props> = ({ children, state }) => {
   const theme = useTheme();
 
-  const stateColors: Record<Props['state'], string> = {
+  const stateColors: SafeRecord<Props['state'], string> = {
     accepting: theme.palette.primary.main,
     loading: theme.palette.primary.main,
   };

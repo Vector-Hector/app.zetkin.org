@@ -2,6 +2,8 @@
 
 import { ReactElement } from 'react';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 type BaseMessage = {
   _defaultMessage: string;
   _id: string;
@@ -16,7 +18,7 @@ export type MessageValue =
   | Date
   | ReactElement;
 
-export type ValueRecord = Record<string, MessageValue>;
+export type ValueRecord = SafeRecord<string, MessageValue>;
 
 export type PlainMessage<Values = void> = BaseMessage & {
   // This function is never used (see InterpolatedMessage)
@@ -38,7 +40,9 @@ export type Message<Values extends ValueRecord> =
 
 export type AnyMessage = Message<any>;
 
-type RecursiveMap<Leaf> = { [key: string]: Leaf | RecursiveMap<Leaf> };
+type RecursiveMap<Leaf> = {
+  [key: string]: Leaf | RecursiveMap<Leaf> | undefined;
+};
 
 export type MessageMap = RecursiveMap<Message<any>>;
 
@@ -58,7 +62,7 @@ export function m(defaultMessage: string): PlainMessage;
 export function m<Values extends ValueRecord>(
   defaultMessage: string
 ): InterpolatedMessage<Values>;
-export function m<Values extends Record<string, MessageValue>>(
+export function m<Values extends SafeRecord<string, MessageValue>>(
   defaultMessage: string
 ): InterpolatedMessage<Values> {
   return {

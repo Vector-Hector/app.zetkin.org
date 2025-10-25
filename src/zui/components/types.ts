@@ -1,6 +1,8 @@
 import { SvgIconTypeMap } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 export type ZUILarge = 'large';
 export type ZUIMedium = 'medium';
 export type ZUISmall = 'small';
@@ -16,5 +18,5 @@ export type ZUITertiary = 'tertiary';
 export type ZUIVariant = ZUIPrimary | ZUISecondary | ZUITertiary;
 
 export type MUIIcon = OverridableComponent<
-  SvgIconTypeMap<Record<string, unknown>, 'svg'>
+  SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
 >;

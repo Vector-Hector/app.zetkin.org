@@ -139,13 +139,13 @@ describe('useVisitReporting()', () => {
 
       const stateAfterAction = store.getState();
       expect(
-        stateAfterAction.canvass.visitsByAssignmentAndLocationId[ASSIGNMENT_ID][
-          LOCATION_ID
-        ].items[0].data
+        stateAfterAction.canvass.visitsByAssignmentAndLocationId[
+          ASSIGNMENT_ID
+        ]![LOCATION_ID]!.items[0].data
       ).toEqual(newVisit);
 
       const dateStr =
-        result.current.lastVisitByHouseholdId[HOUSEHOLD_ID].created;
+        result.current.lastVisitByHouseholdId[HOUSEHOLD_ID]!.created;
       const date = new Date(dateStr);
       expect(date.getTime() / 10000).toBeCloseTo(
         new Date().getTime() / 10000,
@@ -199,7 +199,7 @@ describe('useVisitReporting()', () => {
       const locationItem =
         stateAfterAction.areaAssignments.locationsByAssignmentId[
           ASSIGNMENT_ID
-        ].items.find((item) => item.id == LOCATION_ID);
+        ]!.items.find((item) => item.id == LOCATION_ID);
 
       expect(locationItem?.data).toEqual(mockLocation);
     });
@@ -334,7 +334,7 @@ describe('useVisitReporting()', () => {
 
       const stateAfterAction = store.getState();
       expect(
-        stateAfterAction.canvass.visitsByAssignmentId[ASSIGNMENT_ID].items[0]
+        stateAfterAction.canvass.visitsByAssignmentId[ASSIGNMENT_ID]!.items[0]
           .data
       ).toEqual(newVisit);
     });
@@ -397,7 +397,7 @@ describe('useVisitReporting()', () => {
       const locationItem =
         stateAfterAction.areaAssignments.locationsByAssignmentId[
           ASSIGNMENT_ID
-        ].items.find((item) => item.id == LOCATION_ID);
+        ]!.items.find((item) => item.id == LOCATION_ID);
 
       expect(locationItem?.data).toEqual(mockLocation);
     });
@@ -452,7 +452,7 @@ describe('useVisitReporting()', () => {
       );
 
       const dateStr =
-        result.current.lastVisitByHouseholdId[HOUSEHOLD_ID].created;
+        result.current.lastVisitByHouseholdId[HOUSEHOLD_ID]!.created;
       const date = new Date(dateStr);
       expect(date.getTime() / 10000).toBeCloseTo(
         new Date().getTime() / 10000,
@@ -461,7 +461,7 @@ describe('useVisitReporting()', () => {
 
       const stateAfterAction = store.getState();
       expect(
-        stateAfterAction.canvass.visitsByAssignmentId[ASSIGNMENT_ID].items[0]
+        stateAfterAction.canvass.visitsByAssignmentId[ASSIGNMENT_ID]!.items[0]
           .data
       ).toEqual(newVisit);
     });
@@ -558,7 +558,7 @@ describe('useVisitReporting()', () => {
       );
 
       const dateStr =
-        result.current.lastVisitByHouseholdId[HOUSEHOLD_ID].created;
+        result.current.lastVisitByHouseholdId[HOUSEHOLD_ID]!.created;
       const date = new Date(dateStr);
       expect(date.getTime() / 10000).toBeCloseTo(
         new Date().getTime() / 10000,
@@ -567,7 +567,7 @@ describe('useVisitReporting()', () => {
 
       const stateAfterAction = store.getState();
       expect(
-        stateAfterAction.canvass.visitsByAssignmentId[ASSIGNMENT_ID].items[0]
+        stateAfterAction.canvass.visitsByAssignmentId[ASSIGNMENT_ID]!.items[0]
           .data
       ).toEqual(newVisit);
     });
@@ -716,7 +716,7 @@ describe('useVisitReporting()', () => {
       const locationItem =
         stateAfterAction.areaAssignments.locationsByAssignmentId[
           ASSIGNMENT_ID
-        ].items.find((item) => item.id == LOCATION_ID);
+        ]!.items.find((item) => item.id == LOCATION_ID);
 
       expect(locationItem?.data).toEqual(mockLocation);
     });
@@ -808,7 +808,7 @@ describe('useVisitReporting()', () => {
       );
 
       const patched =
-        store.getState().canvass.visitsByAssignmentId[ASSIGNMENT_ID].items[0]
+        store.getState().canvass.visitsByAssignmentId[ASSIGNMENT_ID]!.items[0]
           .data;
       expect(patched).toEqual(updatedVisit);
     });
@@ -857,7 +857,7 @@ describe('useVisitReporting()', () => {
         expect.objectContaining({ metrics: expect.any(Array) })
       );
       const created =
-        store.getState().canvass.visitsByAssignmentId[ASSIGNMENT_ID].items[0]
+        store.getState().canvass.visitsByAssignmentId[ASSIGNMENT_ID]!.items[0]
           .data;
       expect(created).toEqual(newVisit);
     });
@@ -951,19 +951,19 @@ describe('useVisitReporting()', () => {
       const stateAfterAction = store.getState();
 
       expect(
-        stateAfterAction.canvass.visitsByAssignmentAndLocationId[ASSIGNMENT_ID][
-          LOCATION_ID
-        ].items[0].data
+        stateAfterAction.canvass.visitsByAssignmentAndLocationId[
+          ASSIGNMENT_ID
+        ]![LOCATION_ID]!.items[0].data
       ).toMatchObject(mockRpcResult.visits[0]);
       expect(
-        stateAfterAction.canvass.visitsByAssignmentAndLocationId[ASSIGNMENT_ID][
-          LOCATION_ID
-        ].items[1].data
+        stateAfterAction.canvass.visitsByAssignmentAndLocationId[
+          ASSIGNMENT_ID
+        ]![LOCATION_ID]!.items[1].data
       ).toMatchObject(mockRpcResult.visits[1]);
       expect(
-        stateAfterAction.canvass.visitsByAssignmentAndLocationId[ASSIGNMENT_ID][
-          LOCATION_ID
-        ].items[2].data
+        stateAfterAction.canvass.visitsByAssignmentAndLocationId[
+          ASSIGNMENT_ID
+        ]![LOCATION_ID]!.items[2].data
       ).toMatchObject(mockRpcResult.visits[2]);
     });
   });

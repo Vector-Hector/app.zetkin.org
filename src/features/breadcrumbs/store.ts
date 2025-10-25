@@ -2,6 +2,7 @@ import { Action, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { BreadcrumbElement } from 'pages/api/breadcrumbs';
 import { remoteItem, RemoteItem } from 'utils/storeUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type BreadcrumbItem = {
   elements: BreadcrumbElement[];
@@ -9,7 +10,7 @@ type BreadcrumbItem = {
 };
 
 export interface BreadcrumbsStoreSlice {
-  crumbsByPath: Record<string, RemoteItem<BreadcrumbItem>>;
+  crumbsByPath: SafeRecord<string, RemoteItem<BreadcrumbItem>>;
 }
 
 const initialState: BreadcrumbsStoreSlice = {
@@ -26,7 +27,7 @@ const breadcrumbsSlice = createSlice({
       // In lieu of a general-purpose way of identifying what changed, when
       // anything is updated, we invalidate all breadcrumbs.
       Object.keys(state.crumbsByPath).forEach((path) => {
-        state.crumbsByPath[path].isStale = true;
+        state.crumbsByPath[path]!.isStale = true;
       });
     });
   },

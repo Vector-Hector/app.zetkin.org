@@ -7,6 +7,7 @@ import {
   ZUIButtonVariant,
 } from 'zui/components/ZUIButton';
 import { MUIIcon, ZUISize } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type ZUIIconButtonProps = Omit<
   ZUIButtonProps,
@@ -41,7 +42,7 @@ const getPadding = (size: ZUISize, variant: ZUIButtonVariant) => {
     }
   }
 
-  const padding: Record<ZUISize, string> = {
+  const padding: SafeRecord<ZUISize, string> = {
     large: '0.469rem',
     medium: '0.406rem',
     small: '0.313rem',

@@ -2,9 +2,13 @@ import { Box } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { SvgIconTypeMap } from '@mui/material/SvgIcon';
 
+import { SafeRecord } from 'utils/types/safeRecord';
+
 interface SingleIconCardVisualProps {
   color: string;
-  icon: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, 'svg'>>;
+  icon: OverridableComponent<
+    SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>
+  >;
 }
 
 const SingleIconCardVisual = ({

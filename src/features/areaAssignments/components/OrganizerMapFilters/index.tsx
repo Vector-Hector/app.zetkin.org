@@ -9,6 +9,7 @@ import FilterDropDown from 'features/areas/components/FilterDropDown';
 import { assigneesFilterContext } from './AssigneeFilterContext';
 import { useMessages } from 'core/i18n';
 import messageIds from 'features/areaAssignments/l10n/messageIds';
+import { SafeRecord, safeRecordValues } from 'utils/types/safeRecord';
 
 type Props = {
   areas: ZetkinArea[];
@@ -35,7 +36,7 @@ const OrganizerMapFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
   );
 
   const groupsById = useMemo(() => {
-    const groupsById: Record<
+    const groupsById: SafeRecord<
       number,
       { group: ZetkinTagGroup | null; tags: ZetkinTag[] }
     > = {};
@@ -49,11 +50,14 @@ const OrganizerMapFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
             tags: [tag],
           };
         } else {
-          const alreadyAdded = groupsById[groupId].tags.some(
-            (oldTag) => oldTag.id == tag.id
-          );
+          const group = groupsById[groupId];
+          if (!group) {
+            return;
+          }
+
+          const alreadyAdded = group.tags.some((oldTag) => oldTag.id == tag.id);
           if (!alreadyAdded) {
-            groupsById[groupId].tags.push(tag);
+            group.tags.push(tag);
           }
         }
       });
@@ -65,7 +69,7 @@ const OrganizerMapFilters: FC<Props> = ({ areas, onFilteredIdsChange }) => {
   useEffect(() => {
     const filteredAreas = areas.filter((area) => {
       // All selected groups must match (boolean AND)
-      return Object.values(activeTagIdsByGroup).every((idsInGroup) => {
+      return safeRecordValues(activeTagIdsByGroup).every((idsInGroup) => {
         // A group matches if ANY of the tags match (boolean OR) or if
         // there are no tags in the group which indicates that the filter
         // has not yet been configured

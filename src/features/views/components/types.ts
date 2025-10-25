@@ -4,6 +4,7 @@ import {
   ZetkinQuery,
   ZetkinSmartSearchFilter,
 } from 'features/smartSearch/components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface ZetkinViewFolder {
   id: number;
@@ -41,7 +42,7 @@ export interface ZetkinViewColumnBase {
   type: COLUMN_TYPE;
   title: string;
   description?: string;
-  config?: Record<string, unknown>;
+  config?: SafeRecord<string, unknown>;
 }
 
 export enum COLUMN_TYPE {
@@ -62,12 +63,12 @@ export enum COLUMN_TYPE {
 
 export interface LocalBoolViewColumn extends ZetkinViewColumnBase {
   type: COLUMN_TYPE.LOCAL_BOOL;
-  config?: Record<string, never>;
+  config?: SafeRecord<string, never>;
 }
 
 export interface LocalPersonViewColumn extends ZetkinViewColumnBase {
   type: COLUMN_TYPE.LOCAL_PERSON;
-  config?: Record<string, never>;
+  config?: SafeRecord<string, never>;
 }
 
 export interface LocalQueryViewColumn extends ZetkinViewColumnBase {
@@ -79,7 +80,7 @@ export interface LocalQueryViewColumn extends ZetkinViewColumnBase {
 
 export interface LocalTextViewColumn extends ZetkinViewColumnBase {
   type: COLUMN_TYPE.LOCAL_TEXT;
-  config?: Record<string, never>;
+  config?: SafeRecord<string, never>;
 }
 
 export interface OrganizerActionViewColumn extends ZetkinViewColumnBase {
@@ -161,7 +162,7 @@ export type ZetkinViewColumn =
   | SurveySubmittedViewColumn
   | UnsupportedViewColumn;
 
-export type NewZetkinViewColumn = Record<string, never>;
+export type NewZetkinViewColumn = SafeRecord<string, never>;
 
 export type PendingZetkinViewColumn = Omit<ZetkinViewColumn, 'id'>;
 

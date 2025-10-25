@@ -3,11 +3,12 @@ import path from 'path';
 import yaml from 'yaml';
 
 import { AnyMessage, MessageMap } from 'core/i18n/messages';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 run();
 
 async function run() {
-  let full: Record<string, string> = {};
+  let full: SafeRecord<string, string> = {};
 
   for await (const messageFilePath of findMessageFiles('./src')) {
     // Find path relative to src folder
@@ -35,7 +36,7 @@ async function run() {
   await fs.writeFile('./src/locale/en.yml', output);
 }
 
-function objFromIdMap(map: Record<string, string>): RecursiveStringMap {
+function objFromIdMap(map: SafeRecord<string, string>): RecursiveStringMap {
   const output: RecursiveStringMap = {};
 
   Object.entries(map).forEach(([id, val]) => {
@@ -57,7 +58,10 @@ function objFromIdMap(map: Record<string, string>): RecursiveStringMap {
   return output;
 }
 
-function flattenMessageMap(map: MessageMap, flat: Record<string, string> = {}) {
+function flattenMessageMap(
+  map: MessageMap,
+  flat: SafeRecord<string, string> = {}
+) {
   Object.values(map).forEach((val) => {
     if (isMessage(val)) {
       flat[val._id] = val._defaultMessage;
@@ -74,7 +78,7 @@ function isMessage(obj: AnyMessage | MessageMap): obj is AnyMessage {
 }
 
 interface RecursiveStringMap {
-  [key: string]: string | RecursiveStringMap;
+  [key: string]: string | RecursiveStringMap | undefined;
 }
 
 async function* findMessageFiles(dir: string): AsyncIterable<string> {

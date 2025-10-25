@@ -11,10 +11,11 @@ import {
 } from 'utils/storeUtils';
 import { Zetkin2Area } from './types';
 import { ZetkinAppliedTag } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface AreasStoreSlice {
   areaList: RemoteList<Zetkin2Area>;
-  tagsByAreaId: Record<string, RemoteList<ZetkinAppliedTag>>;
+  tagsByAreaId: SafeRecord<string, RemoteList<ZetkinAppliedTag>>;
 }
 
 const initialState: AreasStoreSlice = {

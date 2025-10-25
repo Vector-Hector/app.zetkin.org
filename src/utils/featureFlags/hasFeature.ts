@@ -1,7 +1,9 @@
+import { SafeRecord } from 'utils/types/safeRecord';
+
 export default function hasFeature(
   featureLabel: string,
   orgId: number,
-  envVars: Record<string, string | undefined>
+  envVars: SafeRecord<string, string | undefined>
 ): boolean {
   const envValue = envVars[featureLabel];
 

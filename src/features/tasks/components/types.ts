@@ -5,6 +5,7 @@ import {
   ZetkinQuery,
   ZetkinSmartSearchFilter,
 } from 'features/smartSearch/components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export enum TASK_TYPE {
   COLLECT_DEMOGRAPHICS = 'demographic',
@@ -42,7 +43,7 @@ export type AnyTaskTypeConfig =
   | ShareLinkConfig
   | VisitLinkConfig
   | CollectDemographicsConfig
-  | Record<string, never>;
+  | SafeRecord<string, never>;
 
 // Task object from backend
 export interface ZetkinTask<TaskTypeConfig = AnyTaskTypeConfig> {

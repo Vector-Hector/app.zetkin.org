@@ -17,20 +17,18 @@ import { ZetkinSession, ZetkinUser } from './types/zetkin';
 import { hasFeature } from './featureFlags';
 import { EnvVars } from 'core/env/Environment';
 import { omitUndefined } from './omitUndefined';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 //TODO: Create module definition and revert to import.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Z = require('zetkin');
 
-type RegularProps = {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  [key: string]: any;
-};
+type RegularProps = SafeRecord<string, unknown>;
 
 export type ScaffoldedProps = RegularProps & {
   envVars: EnvVars;
   lang: string;
-  messages: Record<string, string>;
+  messages: SafeRecord<string, string>;
   user: ZetkinUser | null;
 };
 
@@ -57,7 +55,7 @@ interface ScaffoldOptions {
 }
 
 const hasProps = (result: any): result is ResultWithProps => {
-  const resultObj = result as Record<string, unknown>;
+  const resultObj = result as SafeRecord<string, unknown>;
   if (resultObj.notFound) {
     return false;
   }

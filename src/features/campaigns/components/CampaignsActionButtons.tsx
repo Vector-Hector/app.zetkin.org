@@ -9,6 +9,11 @@ import { useNumericRouteParams } from 'core/hooks';
 const CampaignActionButtons: React.FunctionComponent = () => {
   const messages = useMessages(messageIds);
   const { orgId } = useNumericRouteParams();
+  if (orgId === undefined) {
+    throw new Error(
+      'CampaignActionButtons can only be used on paths with orgId'
+    );
+  }
   const createCampaign = useCreateCampaign(orgId);
 
   return (

@@ -7,6 +7,7 @@ import {
   getTagColumns,
   JourneyTagColumnData,
 } from 'features/journeys/utils/journeyInstanceUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface JourneyInstancesData {
   journeyInstances: ZetkinJourneyInstance[];
@@ -14,7 +15,7 @@ interface JourneyInstancesData {
 }
 
 const getJourneyTableData = async (
-  req: NextApiRequest & { query: Record<string, string> },
+  req: NextApiRequest & { query: SafeRecord<string, string> },
   res: NextApiResponse<
     ZetkinApiSuccessResponse<JourneyInstancesData> | { error: string }
   >

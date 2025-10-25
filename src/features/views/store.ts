@@ -23,18 +23,22 @@ import {
   ZetkinQuery,
   ZetkinTag,
 } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type ZetkinObjectAccessWithId = ZetkinObjectAccess & {
   id: number;
 };
 
 export interface ViewsStoreSlice {
-  accessByViewId: Record<number | string, RemoteList<ZetkinObjectAccessWithId>>;
-  columnsByViewId: Record<number | string, RemoteList<ZetkinViewColumn>>;
+  accessByViewId: SafeRecord<
+    number | string,
+    RemoteList<ZetkinObjectAccessWithId>
+  >;
+  columnsByViewId: SafeRecord<number | string, RemoteList<ZetkinViewColumn>>;
   folderList: RemoteList<ZetkinViewFolder>;
   officialList: RemoteList<ZetkinOfficial>;
   recentlyCreatedFolder: ZetkinViewFolder | null;
-  rowsByViewId: Record<number | string, RemoteList<ZetkinViewRow>>;
+  rowsByViewId: SafeRecord<number | string, RemoteList<ZetkinViewRow>>;
   viewList: RemoteList<ZetkinView>;
 }
 

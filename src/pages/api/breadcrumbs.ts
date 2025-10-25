@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ApiFetch, createApiFetch } from 'utils/apiFetch';
 import { isInteger } from 'utils/stringUtils';
 import { ZetkinViewFolder } from 'features/views/components/types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface LabeledBreadcrumbElement {
   href: string;
@@ -262,7 +263,7 @@ const validateQuery = (
   query: NextApiRequest['query']
 ): {
   error?: string;
-  query?: Record<string, string>;
+  query?: SafeRecord<string, string>;
 } => {
   for (const key of Object.keys(query)) {
     if (typeof query[key] !== 'string') {
@@ -288,7 +289,7 @@ const validateQuery = (
       }
     }
   }
-  return { query: query as Record<string, string> };
+  return { query: query as SafeRecord<string, string> };
 };
 
 export default breadcrumbs;

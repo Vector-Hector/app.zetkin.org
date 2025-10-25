@@ -2,8 +2,8 @@ import isURL from 'validator/lib/isURL';
 import { z } from 'zod';
 import {
   CountryCode,
-  isValidPhoneNumber,
   getCountries,
+  isValidPhoneNumber,
 } from 'libphonenumber-js';
 
 import { ColumnKind, Sheet } from '../types';
@@ -16,8 +16,9 @@ import {
 } from './types';
 import parserFactory from '../dateParsing/parserFactory';
 import { cleanPhoneNumber } from '../phoneUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-const VALIDATORS: Record<CUSTOM_FIELD_TYPE, (value: string) => boolean> = {
+const VALIDATORS: SafeRecord<CUSTOM_FIELD_TYPE, (value: string) => boolean> = {
   date: (value) => {
     try {
       return new Date(value).toISOString().slice(0, 10) == value;
@@ -40,8 +41,8 @@ export function predictProblems(
   const problems: ImportProblem[] = [];
   let hadImpact = false;
 
-  const problemByField: Record<string, ImportFieldProblem> = {};
-  const rowProblemByKind: Record<string, ImportRowProblem> = {};
+  const problemByField: SafeRecord<string, ImportFieldProblem> = {};
+  const rowProblemByKind: SafeRecord<string, ImportRowProblem> = {};
 
   const sheetHasId = sheet.columns.some(
     (col) => col.kind == ColumnKind.ID_FIELD
@@ -80,7 +81,7 @@ export function predictProblems(
     }
   }
 
-  const customFieldsBySlug: Record<string, ZetkinCustomField> = {};
+  const customFieldsBySlug: SafeRecord<string, ZetkinCustomField> = {};
   customFields.forEach((field) => {
     customFieldsBySlug[field.slug] = field;
   });

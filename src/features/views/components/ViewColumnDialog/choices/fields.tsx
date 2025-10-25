@@ -13,6 +13,7 @@ import {
   SelectedViewColumn,
   ZetkinViewColumn,
 } from '../../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const { blue, purple } = oldTheme.palette.viewColumnGallery;
 
@@ -94,7 +95,7 @@ function createFieldChoice(
     | NATIVE_PERSON_FIELDS.LAST_NAME
     | NATIVE_PERSON_FIELDS.EMAIL
     | NATIVE_PERSON_FIELDS.PHONE,
-  icon: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, 'svg'>>
+  icon: OverridableComponent<SvgIconTypeMap<SafeRecord<string, unknown>, 'svg'>>
 ): ColumnChoice {
   return {
     alreadyInView: (columns) => {

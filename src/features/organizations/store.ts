@@ -15,6 +15,7 @@ import {
   ZetkinOrganization,
   ZetkinSubOrganization,
 } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type OrgEventFilters = {
   customDatesToFilterBy: DateRange<Dayjs>;
@@ -25,10 +26,10 @@ type OrgEventFilters = {
 };
 
 export interface OrganizationsStoreSlice {
-  eventsByOrgId: Record<number, RemoteList<ZetkinEvent>>;
+  eventsByOrgId: SafeRecord<number, RemoteList<ZetkinEvent>>;
   filters: OrgEventFilters;
   orgData: RemoteItem<ZetkinOrganization>;
-  subOrgsByOrgId: Record<number, RemoteList<ZetkinSubOrganization>>;
+  subOrgsByOrgId: SafeRecord<number, RemoteList<ZetkinSubOrganization>>;
   suborgsWithStats: RemoteList<SuborgResult>;
   treeDataList: RemoteList<TreeItemData>;
   userMembershipList: RemoteList<ZetkinMembership & { id: number }>;

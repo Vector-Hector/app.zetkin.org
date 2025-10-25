@@ -5,10 +5,11 @@ import parserFactory from './dateParsing/parserFactory';
 import { ZetkinPerson } from 'utils/types/zetkin';
 import { BulkOp, BulkSubOp } from '../types';
 import { cleanPhoneNumber } from './phoneUtils';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 // TODO: Get rid of this type and dependencies on it
 export type ZetkinPersonImportOp = {
-  data?: Record<string, CellData>;
+  data?: SafeRecord<string, CellData>;
   dateFormat?: string | null; //STÄMMER DETTA?
   op: 'person.import';
   organizations?: number[];

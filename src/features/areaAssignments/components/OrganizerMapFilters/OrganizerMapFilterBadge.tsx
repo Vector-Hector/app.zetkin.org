@@ -4,12 +4,13 @@ import { FilterList } from '@mui/icons-material';
 
 import { areaFilterContext } from 'features/areas/components/AreaFilters/AreaFilterContext';
 import { assigneesFilterContext } from './AssigneeFilterContext';
+import { safeRecordValues } from 'utils/types/safeRecord';
 
 const OrganizerMapFilterBadge: FC = () => {
   const { activeTagIdsByGroup } = useContext(areaFilterContext);
   const { assigneesFilter } = useContext(assigneesFilterContext);
 
-  const numActiveGroups = Object.values(activeTagIdsByGroup).filter(
+  const numActiveGroups = safeRecordValues(activeTagIdsByGroup).filter(
     (tagIds) => !!tagIds.length
   ).length;
 

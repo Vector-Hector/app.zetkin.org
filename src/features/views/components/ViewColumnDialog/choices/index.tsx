@@ -3,8 +3,9 @@ import * as fields from './fields';
 import * as misc from './misc';
 import * as query from './query';
 import * as surveys from './surveys';
+import { SafeRecord } from 'utils/types/safeRecord';
 
-const choices: Record<CHOICES, ColumnChoice> = {
+const choices: SafeRecord<CHOICES, ColumnChoice> = {
   [CHOICES.FULL_NAME]: fields.fullName,
   [CHOICES.EMAIL]: fields.email,
   [CHOICES.PHONE]: fields.phone,

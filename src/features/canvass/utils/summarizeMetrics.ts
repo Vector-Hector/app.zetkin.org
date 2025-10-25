@@ -3,11 +3,12 @@ import {
   ZetkinHouseholdVisit,
   ZetkinLocationVisit,
 } from '../types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export default function summarizeMetrics(
   visits: Pick<ZetkinHouseholdVisit, 'household_id' | 'metrics'>[]
 ): Pick<ZetkinLocationVisit, 'num_households_visited' | 'metrics'> {
-  const responsesByMetricId: Record<number, MetricResponse[]> = {};
+  const responsesByMetricId: SafeRecord<number, MetricResponse[]> = {};
   const householdSet = new Set(visits.map((visit) => visit.household_id));
 
   visits.forEach((visit) => {

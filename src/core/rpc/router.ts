@@ -2,10 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { RPCRouteDef } from './types';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export class RPCRouter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _defsByName: Record<string, RPCRouteDef<any, any>> = {};
+  private _defsByName: SafeRecord<string, RPCRouteDef<any, any>> = {};
 
   async handle(req: NextApiRequest, res: NextApiResponse) {
     // TODO: Handle auth here?

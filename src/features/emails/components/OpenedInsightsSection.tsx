@@ -16,13 +16,14 @@ import useEmailStats from '../hooks/useEmailStats';
 import useSecondaryEmailInsights from '../hooks/useSecondaryEmailInsights';
 import { EmailInsights } from '../types';
 import EmailDiagramHoverCard from './EmailDiagramHoverCard';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 type Props = {
   email: ZetkinEmail;
   secondaryEmailId: number;
 };
 
-const HOURS_BY_SPAN: Record<string, number> = {
+const HOURS_BY_SPAN: SafeRecord<string, number> = {
   first24: 24,
   first48: 48,
   firstMonth: 24 * 30,

@@ -6,6 +6,7 @@ import { CallAssignmentState } from '../hooks/useCallAssignmentState';
 import { Msg } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
 import oldTheme from 'theme';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface CallAssignmentStatusChipProps {
   state: CallAssignmentState;
@@ -44,7 +45,7 @@ const CallAssignmentStatusChip: FC<CallAssignmentStatusChipProps> = ({
     return null;
   }
 
-  const classMap: Record<CallAssignmentState, string> = {
+  const classMap: SafeRecord<CallAssignmentState, string> = {
     [CallAssignmentState.ACTIVE]: classes.open,
     [CallAssignmentState.CLOSED]: classes.closed,
     [CallAssignmentState.DRAFT]: classes.draft,

@@ -47,6 +47,12 @@ const CalendarWeekView = ({ focusDate, onClickDay }: CalendarWeekViewProps) => {
     null
   );
   const { orgId, campId } = useNumericRouteParams();
+  if (orgId === undefined || campId === undefined) {
+    throw new Error(
+      'CalendarMonthView can only be used on paths with orgId and campId.'
+    );
+  }
+
   const createEvent = useCreateEvent(orgId);
   const focusWeekStartDay =
     dayjs(focusDate).isoWeekday() == 7

@@ -8,6 +8,7 @@ import {
   remoteList,
 } from 'utils/storeUtils';
 import { ZetkinCustomField, ZetkinPerson } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export type PersonOrgData = {
   id: string;
@@ -19,8 +20,8 @@ export type PersonOrgData = {
 
 export interface ProfilesStoreSlice {
   fieldsList: RemoteList<ZetkinCustomField>;
-  orgsByPersonId: Record<number, RemoteItem<PersonOrgData>>;
-  personById: Record<number, RemoteItem<ZetkinPerson>>;
+  orgsByPersonId: SafeRecord<number, RemoteItem<PersonOrgData>>;
+  personById: SafeRecord<number, RemoteItem<ZetkinPerson>>;
 }
 
 const initialState: ProfilesStoreSlice = {

@@ -13,20 +13,21 @@ import {
   CallAssignmentStats,
   ZetkinCallAssignmentStats,
 } from './apiTypes';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 export interface CallAssignmentSlice {
   assignmentList: RemoteList<CallAssignmentData>;
-  callAssignmentIdsByCampaignId: Record<
+  callAssignmentIdsByCampaignId: SafeRecord<
     number,
     RemoteList<{ id: string | number }>
   >;
-  callersById: Record<number, RemoteList<CallAssignmentCaller>>;
+  callersById: SafeRecord<number, RemoteList<CallAssignmentCaller>>;
   callList: RemoteList<Call>;
-  simpleStatsById: Record<
+  simpleStatsById: SafeRecord<
     number,
     RemoteItem<ZetkinCallAssignmentStats & { id: number }>
   >;
-  statsById: Record<number, RemoteItem<CallAssignmentStats>>;
+  statsById: SafeRecord<number, RemoteItem<CallAssignmentStats>>;
   userAssignmentList: RemoteList<CallAssignmentData>;
 }
 
@@ -59,8 +60,8 @@ const callAssignmentsSlice = createSlice({
       if (callAssignment.campaign) {
         state.callAssignmentIdsByCampaignId[callAssignment.campaign.id] =
           remoteList([
-            ...state.callAssignmentIdsByCampaignId[callAssignment.campaign.id]
-              .items,
+            ...(state.callAssignmentIdsByCampaignId[callAssignment.campaign.id]
+              ?.items ?? []),
             { id: callAssignment.id },
           ]);
       }
@@ -181,7 +182,10 @@ const callAssignmentsSlice = createSlice({
     },
     callerAdd: (state, action: PayloadAction<[number, number]>) => {
       const [assignmentId, callerId] = action.payload;
-      state.callersById[assignmentId].items.push(
+      if (!state.callersById[assignmentId]) {
+        state.callersById[assignmentId] = remoteList();
+      }
+      state.callersById[assignmentId]!.items.push(
         remoteItem(callerId, { isLoading: true })
       );
     },
@@ -190,13 +194,19 @@ const callAssignmentsSlice = createSlice({
       action: PayloadAction<[number, CallAssignmentCaller]>
     ) => {
       const [caId, caller] = action.payload;
-      state.callersById[caId].items = state.callersById[caId].items
-        .filter((c) => c.id != caller.id)
-        .concat([remoteItem(caller.id, { data: caller })]);
+      if (!state.callersById[caId]) {
+        state.callersById[caId] = remoteList();
+      }
+      state.callersById[caId]!.items = state.callersById[caId]!.items.filter(
+        (c) => c.id != caller.id
+      ).concat([remoteItem(caller.id, { data: caller })]);
     },
     callerConfigure: (state, action: PayloadAction<[number, number]>) => {
       const [caId, callerId] = action.payload;
-      const item = state.callersById[caId].items.find(
+      if (!state.callersById[caId]) {
+        state.callersById[caId] = remoteList();
+      }
+      const item = state.callersById[caId]!.items.find(
         (item) => item.id == callerId
       );
       if (item) {
@@ -208,7 +218,10 @@ const callAssignmentsSlice = createSlice({
       action: PayloadAction<[number, CallAssignmentCaller]>
     ) => {
       const [caId, caller] = action.payload;
-      const item = state.callersById[caId].items.find(
+      if (!state.callersById[caId]) {
+        state.callersById[caId] = remoteList();
+      }
+      const item = state.callersById[caId]!.items.find(
         (item) => item.id == caller.id
       );
       if (item) {
@@ -218,7 +231,10 @@ const callAssignmentsSlice = createSlice({
     },
     callerRemove: (state, action: PayloadAction<[number, number]>) => {
       const [caId, callerId] = action.payload;
-      const item = state.callersById[caId].items.find(
+      if (!state.callersById[caId]) {
+        state.callersById[caId] = remoteList();
+      }
+      const item = state.callersById[caId]!.items.find(
         (item) => item.id == callerId
       );
       if (item) {
@@ -227,13 +243,16 @@ const callAssignmentsSlice = createSlice({
     },
     callerRemoved: (state, action: PayloadAction<[number, number]>) => {
       const [caId, callerId] = action.payload;
-      state.callersById[caId].items = state.callersById[caId].items.filter(
+      if (!state.callersById[caId]) {
+        state.callersById[caId] = remoteList();
+      }
+      state.callersById[caId]!.items = state.callersById[caId]!.items.filter(
         (item) => item.id != callerId
       );
     },
     callersLoad: (state, action: PayloadAction<number>) => {
       state.callersById[action.payload] = remoteList<CallAssignmentCaller>();
-      state.callersById[action.payload].isLoading = true;
+      state.callersById[action.payload]!.isLoading = true;
     },
     callersLoaded: (
       state,
@@ -243,14 +262,14 @@ const callAssignmentsSlice = createSlice({
       const timestamp = new Date().toISOString();
 
       state.callersById[assignmentId] = remoteList(callers);
-      state.callersById[assignmentId].loaded = timestamp;
+      state.callersById[assignmentId]!.loaded = timestamp;
     },
     campaignCallAssignmentsLoad: (state, action: PayloadAction<number>) => {
       const campaignId = action.payload;
       if (!state.callAssignmentIdsByCampaignId[campaignId]) {
         state.callAssignmentIdsByCampaignId[campaignId] = remoteList();
       }
-      state.callAssignmentIdsByCampaignId[campaignId].isLoading = true;
+      state.callAssignmentIdsByCampaignId[campaignId]!.isLoading = true;
     },
     campaignCallAssignmentsLoaded: (
       state,
@@ -261,7 +280,7 @@ const callAssignmentsSlice = createSlice({
 
       state.callAssignmentIdsByCampaignId[campaignId] =
         remoteList(callAssignmentIds);
-      state.callAssignmentIdsByCampaignId[campaignId].loaded = timestamp;
+      state.callAssignmentIdsByCampaignId[campaignId]!.loaded = timestamp;
     },
     simpleStatsLoad: (state, action: PayloadAction<number>) => {
       const id = action.payload;

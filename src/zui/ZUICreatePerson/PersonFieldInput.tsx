@@ -8,6 +8,7 @@ import {
   ZetkinCreatePerson,
   ZetkinPersonNativeFields,
 } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 interface PersonFieldInputProps {
   disabled?: boolean;
@@ -17,7 +18,7 @@ interface PersonFieldInputProps {
   required?: boolean;
   isURLField?: boolean;
   inputRef?: MutableRefObject<HTMLInputElement | undefined> | undefined;
-  style?: Record<string, unknown>;
+  style?: SafeRecord<string, unknown>;
   error?: boolean;
   value?: string;
 }

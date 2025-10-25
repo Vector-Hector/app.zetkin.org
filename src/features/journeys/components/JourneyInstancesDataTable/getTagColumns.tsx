@@ -19,6 +19,7 @@ import {
 } from 'features/journeys/utils/journeyInstanceUtils';
 import { Msg, UseMessagesMap } from 'core/i18n';
 import { ZetkinJourneyInstance, ZetkinTag } from 'utils/types/zetkin';
+import { SafeRecord } from 'utils/types/safeRecord';
 
 const has = (
   col: JourneyTagGroupColumn | JourneyUnsortedTagsColumn,
@@ -90,7 +91,7 @@ const getTagColumns = (
     const col = makeJourneyTagColumn(colData);
 
     if (col.type == JourneyTagColumnType.TAG_GROUP) {
-      const tagsById: Record<string, ZetkinTag> = {};
+      const tagsById: SafeRecord<string, ZetkinTag> = {};
       journeyInstances
         .flatMap((instance) => col.tagsGetter(instance.tags))
         .forEach((tag) => (tagsById[tag.id.toString()] = tag));
@@ -165,7 +166,7 @@ const getTagColumns = (
           col.valueGetter(params.row as ZetkinJourneyInstance),
       });
     } else if (col.type == JourneyTagColumnType.UNSORTED) {
-      const tagsById: Record<string, ZetkinTag> = {};
+      const tagsById: SafeRecord<string, ZetkinTag> = {};
       journeyInstances
         .flatMap((instance) => col.tagsGetter(instance.tags))
         .forEach((tag) => (tagsById[tag.id.toString()] = tag));
