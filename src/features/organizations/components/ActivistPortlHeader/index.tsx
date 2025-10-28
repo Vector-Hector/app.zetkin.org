@@ -1,14 +1,7 @@
 import { Box, Button } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  ChevronLeft,
-  Event,
-  Home,
-  Logout,
-  Settings,
-} from '@mui/icons-material';
-import NextLink from 'next/link';
+import { Event, Home, Logout, Settings } from '@mui/icons-material';
 
 import messageIds from 'features/organizations/l10n/messageIds';
 import ZUIText from 'zui/components/ZUIText';
@@ -22,7 +15,6 @@ import ZUIMenu, { MenuItem } from 'zui/components/ZUIMenu';
 
 type Props = {
   button?: JSX.Element;
-  noHomeChevron?: boolean; // disable the arrow pointing left that brings users home
   selectedTab?: string;
   subtitle?: string | JSX.Element;
   tabs?: ZUITabbedNavBarProps['items'];
@@ -37,7 +29,6 @@ const ActivistPortalHeader: FC<Props> = ({
   subtitle,
   title,
   topLeftComponent,
-  noHomeChevron,
 }) => {
   const user = useUser();
   const messages = useMessages(messageIds);
@@ -101,18 +92,6 @@ const ActivistPortalHeader: FC<Props> = ({
             display: 'flex',
           }}
         >
-          {!noHomeChevron && (
-            <NextLink
-              href={'/my'}
-              style={{
-                alignItems: 'center',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <ChevronLeft />
-            </NextLink>
-          )}
           {topLeftComponent}
           {user && (
             <>

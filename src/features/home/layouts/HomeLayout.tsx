@@ -3,14 +3,12 @@
 import { Box } from '@mui/material';
 import { FC, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { Home, Settings, Event } from '@mui/icons-material';
 import NextLink from 'next/link';
 
 import { useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
 import ZUIPublicFooter from 'zui/components/ZUIPublicFooter';
 import ActivistPortalHeader from 'features/organizations/components/ActivistPortlHeader';
-import ZUILogo from 'zui/ZUILogo';
 import ZUIText from 'zui/components/ZUIText';
 
 type Props = {
@@ -32,24 +30,20 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
       }}
     >
       <ActivistPortalHeader
-        noHomeChevron={true}
         selectedTab={lastSegment}
         tabs={[
           {
             href: `/my/home`,
-            icon: Home,
             label: messages.tabs.home(),
             value: 'home',
           },
           {
             href: `/my/feed`,
-            icon: Event,
             label: messages.tabs.feed(),
             value: 'feed',
           },
           {
             href: `/my/settings`,
-            icon: Settings,
             label: messages.tabs.settings(),
             value: 'settings',
           },
@@ -70,7 +64,6 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
                 justifyContent: 'center',
               }}
             >
-              <ZUILogo />
               <ZUIText
                 style={{
                   marginBottom: '3px',
