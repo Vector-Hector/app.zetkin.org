@@ -17,6 +17,7 @@ import { Msg, useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
 import ZUIEllipsisMenu from 'zui/ZUIEllipsisMenu';
 import ZUISnackbarContext from 'zui/ZUISnackbarContext';
+import useMembership from 'features/organizations/hooks/useMembership';
 
 type Props = {
   campaign: ZetkinCampaign;
@@ -27,6 +28,7 @@ const PublicProjectLayout: FC<Props> = ({ children, campaign }) => {
   const dispatch = useAppDispatch();
   const messages = useMessages(messageIds);
   const { showSnackbar } = useContext(ZUISnackbarContext);
+  const mem = useMembership(campaign.organization.id);
 
   const { allEvents, filteredEvents } = useFilteredCampaignEvents(
     campaign.organization.id,
@@ -69,6 +71,12 @@ const PublicProjectLayout: FC<Props> = ({ children, campaign }) => {
                 },
               ]}
             />
+          }
+          editHref={
+            (mem.data &&
+              mem.data.role &&
+              `/organize/${campaign.organization.id}/projects/${campaign.id}#editProject`) ||
+            undefined
           }
           subtitle={campaign.info_text}
           title={campaign.title}

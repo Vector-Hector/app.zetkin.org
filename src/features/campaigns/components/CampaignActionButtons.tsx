@@ -1,5 +1,4 @@
-import { Box } from '@mui/material';
-import { Link } from '@mui/material';
+import { Box, Link } from '@mui/material';
 import {
   AssignmentOutlined,
   CheckBoxOutlined,
@@ -55,7 +54,9 @@ const CampaignActionButtons: React.FunctionComponent<
 
   // Dialogs
   const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
-  const [editCampaignDialogOpen, setEditCampaignDialogOpen] = useState(false);
+  const [editCampaignDialogOpen, setEditCampaignDialogOpen] = useState(
+    window.location.hash === '#editProject'
+  );
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
 
   const createAreaAssignment = useCreateAreaAssignment(orgId, campId);

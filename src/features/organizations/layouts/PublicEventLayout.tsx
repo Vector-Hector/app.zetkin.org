@@ -13,6 +13,7 @@ import ZUITimeSpan from 'zui/ZUITimeSpan';
 import useIsMobile from 'utils/hooks/useIsMobile';
 import useEvent from 'features/events/hooks/useEvent';
 import { removeOffset } from 'utils/dateUtils';
+import useMembership from 'features/organizations/hooks/useMembership';
 
 type Props = PropsWithChildren<{
   eventId: number;
@@ -22,6 +23,7 @@ type Props = PropsWithChildren<{
 export const PublicEventLayout: FC<Props> = ({ children, eventId, orgId }) => {
   const messages = useMessages(messageIds);
   const isMobile = useIsMobile();
+  const mem = useMembership(campaign.organization.id);
 
   const eventFuture = useEvent(orgId, eventId);
   const event = eventFuture?.data;
@@ -41,6 +43,13 @@ export const PublicEventLayout: FC<Props> = ({ children, eventId, orgId }) => {
         >
           <Box bgcolor="white">
             <ActivistPortalHeader
+              editHref={
+                (mem.data &&
+                  mem.data.role &&
+                  event.campaign &&
+                  `/organize/${event.organization.id}/projects/${event.campaign.id}/events/${event.id}`) ||
+                undefined
+              }
               subtitle={
                 <Box
                   sx={{

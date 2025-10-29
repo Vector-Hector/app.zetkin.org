@@ -21,6 +21,7 @@ import { useAppDispatch, useAppSelector } from 'core/hooks';
 import { filtersUpdated } from '../store';
 import ZUIEllipsisMenu from 'zui/ZUIEllipsisMenu';
 import ZUISnackbarContext from 'zui/ZUISnackbarContext';
+import useMembership from 'features/organizations/hooks/useMembership';
 
 type Props = {
   children: ReactNode;
@@ -35,6 +36,8 @@ const PublicOrgLayout: FC<Props> = ({ children, org }) => {
   const subOrgs = usePublicSubOrgs(org.id);
   const { allEvents, filteredEvents } = useFilteredOrgEvents(org.id);
   const path = usePathname();
+
+  const mem = useMembership(org.id);
 
   const lastSegment = path?.split('/')[3] ?? 'home';
   const showSuborgsTab = lastSegment == 'suborgs' || subOrgs.length > 0;
@@ -97,6 +100,10 @@ const PublicOrgLayout: FC<Props> = ({ children, org }) => {
                 ]}
               />
             </>
+          }
+          editHref={
+            (mem.data && mem.data.role && `/organize/${org.id}/settings`) ||
+            undefined
           }
           selectedTab={lastSegment}
           tabs={navBarItems}

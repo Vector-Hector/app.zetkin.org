@@ -1,6 +1,7 @@
 import { Box, Button } from '@mui/material';
 import { FC, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Edit } from '@mui/icons-material';
 
 import messageIds from 'features/organizations/l10n/messageIds';
 import ZUIText from 'zui/components/ZUIText';
@@ -11,9 +12,11 @@ import ZUIPersonAvatar from 'zui/components/ZUIPersonAvatar';
 import useUser from 'core/hooks/useUser';
 import { useMessages } from 'core/i18n';
 import ZUIMenu, { MenuItem } from 'zui/components/ZUIMenu';
+import ZUIButton from 'zui/components/ZUIButton';
 
 type Props = {
   button?: JSX.Element;
+  editHref?: string;
   selectedTab?: string;
   subtitle?: string | JSX.Element;
   tabs?: ZUITabbedNavBarProps['items'];
@@ -24,6 +27,7 @@ type Props = {
 const ActivistPortalHeader: FC<Props> = ({
   tabs,
   button,
+  editHref,
   selectedTab,
   subtitle,
   title,
@@ -66,6 +70,7 @@ const ActivistPortalHeader: FC<Props> = ({
           flexDirection: 'column',
           gap: 2,
           padding: 2,
+          position: 'relative',
           width: '100%',
         }}
       >
@@ -111,6 +116,15 @@ const ActivistPortalHeader: FC<Props> = ({
               title
             )}
           </Box>
+          {editHref && (
+            <Box
+              sx={{
+                marginLeft: 'auto',
+              }}
+            >
+              <ZUIButton href={editHref} label={'Edit'} startIcon={Edit} />
+            </Box>
+          )}
           {button && button}
         </Box>
         {subtitle && (
