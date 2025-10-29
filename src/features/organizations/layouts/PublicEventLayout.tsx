@@ -23,7 +23,7 @@ type Props = PropsWithChildren<{
 export const PublicEventLayout: FC<Props> = ({ children, eventId, orgId }) => {
   const messages = useMessages(messageIds);
   const isMobile = useIsMobile();
-  const mem = useMembership(campaign.organization.id);
+  const mem = useMembership(orgId);
 
   const eventFuture = useEvent(orgId, eventId);
   const event = eventFuture?.data;
