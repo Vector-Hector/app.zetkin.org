@@ -17,12 +17,8 @@ export default function useRemoteItem<
     isNecessary?: () => boolean;
     loader: () => Promise<DataType>;
   }
-): DataType {
+): DataType | null {
   useRemoteObject(remoteItem, hooks);
 
-  if (!remoteItem?.data) {
-    throw new Error('Item not loading or loaded');
-  }
-
-  return remoteItem.data;
+  return remoteItem?.data || null;
 }

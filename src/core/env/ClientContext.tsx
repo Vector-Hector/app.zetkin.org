@@ -25,6 +25,7 @@ import { ZetkinUser } from 'utils/types/zetkin';
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZUIConfirmDialogProvider } from 'zui/ZUIConfirmDialogProvider';
 import { ZUISnackbarProvider } from 'zui/ZUISnackbarContext';
+import { ResourceCacheProvider } from 'core/hooks/ResourceCacheContext';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -87,8 +88,10 @@ const ClientContext: FC<ClientContextProps> = ({
                         messages={messages}
                       >
                         <ZUIConfirmDialogProvider>
-                          <CssBaseline />
-                          <Suspense>{children}</Suspense>
+                          <ResourceCacheProvider>
+                            <CssBaseline />
+                            <Suspense>{children}</Suspense>
+                          </ResourceCacheProvider>
                         </ZUIConfirmDialogProvider>
                       </IntlProvider>
                     </ZUISnackbarProvider>

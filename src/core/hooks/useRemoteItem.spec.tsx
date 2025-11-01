@@ -6,6 +6,7 @@ import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 
 import { RemoteItem, remoteItem } from 'utils/storeUtils';
 import useRemoteItem from './useRemoteItem';
+import { ResourceCacheProvider } from 'core/hooks/ResourceCacheContext';
 
 type ItemObjectForTest = { id: number; name: string };
 type StoreState = {
@@ -160,6 +161,10 @@ function setupWrapperComponent(initialItem?: RemoteItem<ItemObjectForTest>) {
 
     const data = useRemoteItem(item, hooks);
 
+    if (!data) {
+      return null;
+    }
+
     return (
       <div>
         <p>loaded1</p>
@@ -175,6 +180,10 @@ function setupWrapperComponent(initialItem?: RemoteItem<ItemObjectForTest>) {
 
     const data = useRemoteItem(item, hooks);
 
+    if (!data) {
+      return null;
+    }
+
     return (
       <div>
         <p>loaded2</p>
@@ -189,12 +198,14 @@ function setupWrapperComponent(initialItem?: RemoteItem<ItemObjectForTest>) {
     render: () =>
       render(
         <ReduxProvider store={store}>
-          <Suspense fallback={<p>loading1</p>}>
-            <Component />
-          </Suspense>
-          <Suspense fallback={<p>loading2</p>}>
-            <Component2 />
-          </Suspense>
+          <ResourceCacheProvider>
+            <Suspense fallback={<p>loading1</p>}>
+              <Component />
+            </Suspense>
+            <Suspense fallback={<p>loading2</p>}>
+              <Component2 />
+            </Suspense>
+          </ResourceCacheProvider>
         </ReduxProvider>
       ),
     store,

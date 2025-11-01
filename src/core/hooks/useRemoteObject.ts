@@ -1,11 +1,14 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { useAppDispatch } from './index';
 import shouldLoad from '../caching/shouldLoad';
-import usePromiseCache from './usePromiseCache';
-import { RemoteItem, RemoteList } from '../../utils/storeUtils';
+import { RemoteItem, RemoteList } from 'utils/storeUtils';
 import { AppDispatch } from 'core/store';
+import {
+  createResource,
+  ResourceCacheContext,
+} from 'core/hooks/ResourceCacheContext';
 
 export type Hooks<
   DataType,
@@ -59,66 +62,56 @@ function useRemoteObject<
   const dispatch = useAppDispatch();
   const loadIsNecessary = hooks.isNecessary?.() ?? shouldLoad(remoteObject);
 
-  const promiseKey = hooks.cacheKey || hooks.loader.toString();
+  const cacheKey = hooks.cacheKey || hooks.loader.toString();
 
   const stateHasLoadedOnce =
-    remoteObject &&
+    !!remoteObject &&
     (remoteObject.isLoading ||
-      remoteObject.error ||
-      remoteObject.loaded ||
+      !!remoteObject.error ||
+      !!remoteObject.loaded ||
       'data' in remoteObject ||
       ('items' in remoteObject && remoteObject.items.length > 0) ||
       ('isStale' in remoteObject && remoteObject.isStale) ||
       ('mutating' in remoteObject &&
         (remoteObject.mutating as string[]).length > 0));
 
-  // initial load, suspense based data loading
-  {
-    const { cache, getOldPromise } = usePromiseCache(
-      'suspense_based_' + promiseKey
-    );
-    const oldPromise = getOldPromise();
-    if (oldPromise) {
-      throw oldPromise; // throws cached promise, so second component won't call API
+  const resourceCacheCtx = useContext(ResourceCacheContext);
+  if (resourceCacheCtx.hasLoaded && resourceCacheCtx.cache.current) {
+    const resource = resourceCacheCtx.cache.current.get(cacheKey);
+    if (resource) {
+      resource.read(); // suspend if necessary
+    }
+  }
+
+  useEffect(() => {
+    if (!resourceCacheCtx.cache.current) {
+      return;
     }
 
-    if (loadIsNecessary && !stateHasLoadedOnce) {
-      const promise = makePromise<DataType, OnLoadPayload, OnSuccessPayload>(
-        dispatch,
-        hooks
+    if (!resourceCacheCtx.cache.current.get(cacheKey)) {
+      resourceCacheCtx.cache.current.set(
+        cacheKey,
+        createResource(() =>
+          makePromise<DataType, OnLoadPayload, OnSuccessPayload>(
+            dispatch,
+            hooks
+          )
+        )
       );
-
-      // cache the promise, so other components using the same hook don't also call the API
-      cache(promise);
-
-      throw promise;
     }
-  }
 
-  // consecutive loads, hook based loading (keeps stale data until update arrives)
-  {
-    const { cache, getOldPromise } = usePromiseCache(
-      'hook_based_' + promiseKey
-    );
+    if (!loadIsNecessary) {
+      return;
+    }
 
-    useEffect(() => {
-      if (!loadIsNecessary || !stateHasLoadedOnce || getOldPromise()) {
-        return;
-      }
+    const cache = resourceCacheCtx.cache.current.get(cacheKey);
 
-      const promise = makePromise(dispatch, hooks);
+    if (!cache) {
+      return;
+    }
 
-      // cache the promise, so other components using the same hook don't also call the API
-      cache(promise);
-    }, [
-      loadIsNecessary,
-      stateHasLoadedOnce,
-      dispatch,
-      cache,
-      getOldPromise,
-      // intentionally omitting hooks as they are often not wrapped in useMemo or useCallback in Zetkin...
-    ]);
-  }
+    cache.fetch(!stateHasLoadedOnce);
+  });
 }
 
 export default useRemoteObject;

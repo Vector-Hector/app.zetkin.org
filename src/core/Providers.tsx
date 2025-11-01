@@ -19,6 +19,7 @@ import { ZetkinUser } from 'utils/types/zetkin';
 import { ZUIConfirmDialogProvider } from 'zui/ZUIConfirmDialogProvider';
 import { ZUISnackbarProvider } from 'zui/ZUISnackbarContext';
 import { UserProvider } from './env/UserContext';
+import { ResourceCacheProvider } from 'core/hooks/ResourceCacheContext';
 
 type ProviderData = {
   env: Environment;
@@ -77,7 +78,9 @@ const Providers: FC<ProvidersProps> = ({
                       <ZUIConfirmDialogProvider>
                         <EventPopperProvider>
                           <DndProvider backend={HTML5Backend}>
-                            {children}
+                            <ResourceCacheProvider>
+                              {children}
+                            </ResourceCacheProvider>
                           </DndProvider>
                         </EventPopperProvider>
                       </ZUIConfirmDialogProvider>

@@ -20,7 +20,7 @@ export default function useRemoteList<
 ): DataType[] {
   useRemoteObject<DataType, OnLoadPayload, OnSuccessPayload>(remoteList, hooks);
 
-  return remoteList?.items
+  return (remoteList?.items || [])
     .filter((item) => !item.deleted)
     .map((item) => item.data)
     .filter((data) => !!data) as DataType[];
