@@ -50,7 +50,11 @@ const HouseholdVisitPage: FC<HouseholdVisitPageProps> = ({
   useEffect(() => {
     setResponseByMetricId({});
     setStep(0);
-  }, [household.id]);
+  }, [household?.id]);
+
+  if (!household) {
+    return null;
+  }
 
   return (
     <PageBase

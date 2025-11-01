@@ -6,7 +6,7 @@ import { orgUserLoad, orgUserLoaded } from '../store';
 export default function useOrgUser(
   orgId: number,
   userId: number
-): ZetkinOrgUser {
+): ZetkinOrgUser | null {
   const apiClient = useApiClient();
   const userItem = useAppSelector((state) =>
     state.user.orgUserList.items.find((item) => item.id == userId)

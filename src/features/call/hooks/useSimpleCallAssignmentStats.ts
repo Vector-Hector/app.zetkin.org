@@ -9,7 +9,7 @@ import {
 export default function useSimpleCallAssignmentStats(
   orgId: number,
   assignmentId: number
-): ZetkinCallAssignmentStats & { id: number } {
+): (ZetkinCallAssignmentStats & { id: number }) | null {
   const apiClient = useApiClient();
   const statsItem = useAppSelector(
     (state) => state.callAssignments.simpleStatsById[assignmentId]

@@ -50,6 +50,11 @@ const CallPanels: FC<Props> = ({
     assignment.organization.id,
     assignment.id
   );
+
+  if (!stats) {
+    return null;
+  }
+
   return (
     <>
       <Box

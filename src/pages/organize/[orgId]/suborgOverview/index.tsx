@@ -41,6 +41,10 @@ export const getServerSideProps: GetServerSideProps = scaffold(
 export const SuborgCard: FC<{ orgId: number }> = ({ orgId }) => {
   const suborgWithFullStats = useSuborgWithFullStats(orgId);
 
+  if (!suborgWithFullStats) {
+    return null;
+  }
+
   if (isError(suborgWithFullStats)) {
     return (
       <Alert severity="error">{`Error fetching data for org ${orgId}`}</Alert>

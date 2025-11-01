@@ -10,6 +10,11 @@ type Props = {
 
 const UserItem: FC<Props> = ({ orgId, userId }) => {
   const user = useOrgUser(orgId, userId);
+
+  if (!user) {
+    return null;
+  }
+
   const name = `${user.first_name} ${user.last_name}`;
 
   return (

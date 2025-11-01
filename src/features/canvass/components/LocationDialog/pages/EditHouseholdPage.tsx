@@ -31,16 +31,24 @@ const EditHouseholdPage: FC<Props> = ({
     householdId
   );
 
-  const [title, setTitle] = useState(household.title || '');
-  const [floor, setFloor] = useState(household.level ?? 0);
-  const [color, setcolor] = useState(household.color);
+  const [title, setTitle] = useState(household?.title || '');
+  const [floor, setFloor] = useState(household?.level ?? 0);
+  const [color, setcolor] = useState(household?.color ?? '#000000');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (!household) {
+      return;
+    }
+
     setTitle(household.title || '');
     setFloor(household.level ?? 0);
     setcolor(household.color);
   }, [household]);
+
+  if (!household) {
+    return null;
+  }
 
   const nothingHasBeenEdited =
     title == household.title &&
