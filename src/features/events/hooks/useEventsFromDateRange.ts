@@ -6,6 +6,7 @@ import { ZetkinEvent } from 'utils/types/zetkin';
 import { ACTIVITIES, EventActivity } from 'features/campaigns/types';
 import { eventRangeLoad, eventRangeLoaded } from '../store';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
+import useRemoteObject, { hasLoadedOnce } from 'core/hooks/useRemoteObject';
 
 export default function useEventsFromDateRange(
   startDate: Date,
@@ -24,30 +25,30 @@ export default function useEventsFromDateRange(
     dayjs(startDate).startOf('day').add(diff, 'day').utc(true).toISOString()
   );
 
-  const mustLoad = dateRange.some((date) =>
-    shouldLoad(eventsState.eventsByDate[date.slice(0, 10)])
-  );
-
-  if (mustLoad) {
-    dispatch(eventRangeLoad(dateRange));
-    const apiEndDate = new Date(endDate);
-    apiEndDate.setDate(apiEndDate.getDate() + 1);
-    const promise = apiClient
-      .get<ZetkinEvent[]>(
+  useRemoteObject({
+    actionOnLoad: () => dispatch(eventRangeLoad(dateRange)),
+    actionOnSuccess: (events: ZetkinEvent[]) =>
+      dispatch(eventRangeLoaded([events, dateRange])),
+    hasLoadedOnce: () =>
+      dateRange.some((date) =>
+        hasLoadedOnce(eventsState.eventsByDate[date.slice(0, 10)])
+      ),
+    isNecessary: () =>
+      dateRange.some((date) =>
+        shouldLoad(eventsState.eventsByDate[date.slice(0, 10)])
+      ),
+    loader: async () => {
+      const apiEndDate = new Date(endDate);
+      apiEndDate.setDate(apiEndDate.getDate() + 1);
+      return await apiClient.get<ZetkinEvent[]>(
         `/api/orgs/${orgId}/actions?filter=start_time>${startDate
           .toISOString()
           .slice(0, 10)}&filter=end_time<${apiEndDate
           .toISOString()
           .slice(0, 10)}`
-      )
-      .then((events) => {
-        dispatch(eventRangeLoaded([events, dateRange]));
-      });
-
-    // This will suspend React from rendering this branch
-    // until the promise resolves.
-    throw promise;
-  }
+      );
+    },
+  });
 
   const events = dateRange.flatMap((date) => {
     const dateStr = date.slice(0, 10);

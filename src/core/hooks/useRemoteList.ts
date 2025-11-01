@@ -1,7 +1,9 @@
 import { PayloadAction } from '@reduxjs/toolkit';
+import { useMemo } from 'react';
 
 import { RemoteList } from 'utils/storeUtils';
-import useRemoteObject from './useRemoteObject';
+import useRemoteObject, { hasLoadedOnce, Hooks } from './useRemoteObject';
+import shouldLoad from 'core/caching/shouldLoad';
 
 export default function useRemoteList<
   DataType,
@@ -18,7 +20,17 @@ export default function useRemoteList<
     loader: () => Promise<DataType[]>;
   }
 ): DataType[] {
-  useRemoteObject<DataType, OnLoadPayload, OnSuccessPayload>(remoteList, hooks);
+  const objHooks: Hooks<DataType, DataType[], OnLoadPayload, OnSuccessPayload> =
+    useMemo(
+      () => ({
+        ...hooks,
+        hasLoadedOnce: () => hasLoadedOnce(remoteList),
+        isNecessary: () => hooks.isNecessary?.() ?? shouldLoad(remoteList),
+      }),
+      [hooks, remoteList]
+    );
+
+  useRemoteObject(objHooks);
 
   return (remoteList?.items || [])
     .filter((item) => !item.deleted)
