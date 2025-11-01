@@ -1,6 +1,6 @@
 import { AreaCardData } from '../types';
 import { loadListIfNecessary } from 'core/caching/cacheUtils';
-import { areaGraphLoad, areaGraphLoaded } from '../store';
+import { areaGraphFailed, areaGraphLoad, areaGraphLoaded } from '../store';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
 
 export default function useAssignmentAreaStats(
@@ -16,6 +16,7 @@ export default function useAssignmentAreaStats(
   return loadListIfNecessary(stats, dispatch, {
     actionOnLoad: () => areaGraphLoad(areaAssId),
     actionOnSuccess: (data) => areaGraphLoaded([areaAssId, data]),
+    actionOnError: (err) => areaGraphFailed([areaAssId, err]),
     loader: () =>
       apiClient.get<AreaCardData[]>(
         `/beta/orgs/${orgId}/areaassignments/${areaAssId}/areasgraph`

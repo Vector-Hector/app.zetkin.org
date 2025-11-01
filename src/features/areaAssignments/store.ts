@@ -102,6 +102,17 @@ const areaAssignmentSlice = createSlice({
     ) => {
       state.areaAssignmentList = remoteListLoaded(action.payload);
     },
+    areaGraphFailed: (state, action: PayloadAction<[number, unknown]>) => {
+      const [assignmentId, err] = action.payload;
+
+      state.areaGraphByAssignmentId[assignmentId] = {
+        error: err,
+        isLoading: false,
+        isStale: false,
+        items: [],
+        loaded: null,
+      };
+    },
     areaGraphLoad: (state, action: PayloadAction<number>) => {
       const assignmentId = action.payload;
 
@@ -338,6 +349,7 @@ const areaAssignmentSlice = createSlice({
 
 export default areaAssignmentSlice;
 export const {
+  areaGraphFailed,
   areaGraphLoad,
   areaGraphLoaded,
   areaStatsLoad,
