@@ -96,7 +96,7 @@ describe('useRemoteList()', () => {
       loaded: new Date(1857, 6, 5).toISOString(),
     });
 
-    const { queryByText, queryAllByText, debug } = render();
+    const { queryByText, queryAllByText } = render();
 
     expect(queryAllByText('Clara Zetkin')).toHaveLength(2);
     expect(queryAllByText('Rosa Luxemburg')).toHaveLength(2);
