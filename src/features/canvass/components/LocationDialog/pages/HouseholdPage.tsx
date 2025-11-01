@@ -35,6 +35,10 @@ const HouseholdPage: FC<HouseholdPageProps> = ({
     householdId
   );
 
+  if (!household) {
+    return null;
+  }
+
   return (
     <PageBase
       actions={

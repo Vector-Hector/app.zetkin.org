@@ -7,7 +7,7 @@ export default function useHousehold(
   orgId: number,
   locationId: number,
   householdId: number
-): HouseholdWithColor {
+): HouseholdWithColor | null {
   const apiClient = useApiClient();
   const item = useAppSelector((state) =>
     state.canvass.householdsByLocationId[locationId].items.find(
