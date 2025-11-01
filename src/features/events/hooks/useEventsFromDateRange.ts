@@ -5,7 +5,7 @@ import shouldLoad from 'core/caching/shouldLoad';
 import { ZetkinEvent } from 'utils/types/zetkin';
 import { ACTIVITIES, EventActivity } from 'features/campaigns/types';
 import { eventRangeLoad, eventRangeLoaded } from '../store';
-import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
+import { useApiClient, useAppSelector } from 'core/hooks';
 import useRemoteObject, { hasLoadedOnce } from 'core/hooks/useRemoteObject';
 
 export default function useEventsFromDateRange(
@@ -15,7 +15,6 @@ export default function useEventsFromDateRange(
   campId?: number
 ): EventActivity[] {
   const apiClient = useApiClient();
-  const dispatch = useAppDispatch();
   const eventsState = useAppSelector((state) => state.events);
 
   const dateRange = range(
@@ -26,9 +25,9 @@ export default function useEventsFromDateRange(
   );
 
   useRemoteObject({
-    actionOnLoad: () => dispatch(eventRangeLoad(dateRange)),
+    actionOnLoad: () => eventRangeLoad(dateRange),
     actionOnSuccess: (events: ZetkinEvent[]) =>
-      dispatch(eventRangeLoaded([events, dateRange])),
+      eventRangeLoaded([events, dateRange]),
     hasLoadedOnce: () =>
       dateRange.some((date) =>
         hasLoadedOnce(eventsState.eventsByDate[date.slice(0, 10)])
