@@ -14,9 +14,9 @@ export default function useAssignmentAreaStats(
   );
 
   return loadListIfNecessary(stats, dispatch, {
+    actionOnError: (err) => areaGraphFailed([areaAssId, err]),
     actionOnLoad: () => areaGraphLoad(areaAssId),
     actionOnSuccess: (data) => areaGraphLoaded([areaAssId, data]),
-    actionOnError: (err) => areaGraphFailed([areaAssId, err]),
     loader: () =>
       apiClient.get<AreaCardData[]>(
         `/beta/orgs/${orgId}/areaassignments/${areaAssId}/areasgraph`

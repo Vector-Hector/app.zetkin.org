@@ -106,7 +106,7 @@ const areaAssignmentSlice = createSlice({
       const [assignmentId, err] = action.payload;
 
       state.areaGraphByAssignmentId[assignmentId] = {
-        error: err,
+        error: err instanceof Error ? err.message : String(err),
         isLoading: false,
         isStale: false,
         items: [],
