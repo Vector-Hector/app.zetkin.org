@@ -6,6 +6,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import useRemoteList from './useRemoteList';
 import { RemoteList, remoteList } from 'utils/storeUtils';
+import { ResourceCacheProvider } from 'core/hooks/ResourceCacheContext';
 
 type ListObjectForTest = { id: number; name: string };
 type StoreState = {
@@ -108,8 +109,6 @@ describe('useRemoteList()', () => {
       await promise;
     });
 
-    debug();
-
     expect(hooks.loader).toHaveBeenCalled();
     expect(store.dispatch).toHaveBeenCalledTimes(2);
     expect(queryByText('loading1')).toBeNull();
@@ -210,12 +209,14 @@ function setupWrapperComponent(initialList?: RemoteList<ListObjectForTest>) {
     render: () =>
       render(
         <ReduxProvider store={store}>
-          <Suspense fallback={<p>loading1</p>}>
-            <Component />
-          </Suspense>
-          <Suspense fallback={<p>loading2</p>}>
-            <Component2 />
-          </Suspense>
+          <ResourceCacheProvider>
+            <Suspense fallback={<p>loading1</p>}>
+              <Component />
+            </Suspense>
+            <Suspense fallback={<p>loading2</p>}>
+              <Component2 />
+            </Suspense>
+          </ResourceCacheProvider>
         </ReduxProvider>
       ),
     store,
