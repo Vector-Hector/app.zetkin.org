@@ -34,7 +34,6 @@ async function makePromise<
   hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
 ): Promise<DataType | DataType[] | null> {
   try {
-    await Promise.resolve();
     dispatch(hooks.actionOnLoad());
     const val = await hooks.loader();
     dispatch(hooks.actionOnSuccess(val as never));
