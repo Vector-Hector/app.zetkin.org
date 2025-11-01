@@ -1,8 +1,10 @@
 import React, {
-  createContext, createRef,
+  createContext,
+  createRef,
   ReactNode,
   useEffect,
-  useMemo, useRef,
+  useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Box, SxProps } from '@mui/material';
@@ -12,16 +14,17 @@ export function createResource<T>(fetchFn: () => Promise<T>) {
   let result: T | undefined;
   let error: unknown;
 
-  const sendPromise = () => fetchFn().then(
-    (r) => {
-      status = 'success';
-      result = r;
-    },
-    (e) => {
-      status = 'error';
-      error = e;
-    }
-  );
+  const sendPromise = () =>
+    fetchFn().then(
+      (r) => {
+        status = 'success';
+        result = r;
+      },
+      (e) => {
+        status = 'error';
+        error = e;
+      }
+    );
 
   let promise: Promise<void>;
 
@@ -31,11 +34,11 @@ export function createResource<T>(fetchFn: () => Promise<T>) {
      * Doesn't fetch again if there is already a pending fetch.
      */
     fetch(suspend?: boolean) {
-      if (status === "pending-suspend" || status === "pending") {
+      if (status === 'pending-suspend' || status === 'pending') {
         return;
       }
       promise = sendPromise();
-      status = suspend ? "pending-suspend" : "pending";
+      status = suspend ? 'pending-suspend' : 'pending';
     },
     /**
      * Read reads out the current result if available. Otherwise suspends or throws an error.
@@ -52,7 +55,7 @@ export function createResource<T>(fetchFn: () => Promise<T>) {
   };
 }
 
-export type ResourceCache<T = unknown> = ReturnType<typeof createResource<T>>
+export type ResourceCache = ReturnType<typeof createResource>;
 
 export const ResourceCacheContext = createContext({
   cache: createRef<Map<string, ResourceCache>>(),
@@ -79,14 +82,19 @@ export const ResourceCacheProvider: React.FC<Props> = ({ children }) => {
 
   const cache = useRef(new Map<string, ResourceCache>());
 
-  const ctx = useMemo(() => ({
-    cache,
-    hasLoaded,
-  }), [hasLoaded, cache]);
+  const ctx = useMemo(
+    () => ({
+      cache,
+      hasLoaded,
+    }),
+    [hasLoaded, cache]
+  );
 
   return (
     <Box sx={sx}>
-      <ResourceCacheContext.Provider value={ctx}>{children}</ResourceCacheContext.Provider>
+      <ResourceCacheContext.Provider value={ctx}>
+        {children}
+      </ResourceCacheContext.Provider>
     </Box>
   );
 };
