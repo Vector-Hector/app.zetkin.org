@@ -1,7 +1,9 @@
 import { PayloadAction } from '@reduxjs/toolkit';
+import { useMemo } from 'react';
 
 import { RemoteItem } from 'utils/storeUtils';
-import useRemoteObject from './useRemoteObject';
+import useRemoteObject, { hasLoadedOnce, Hooks } from './useRemoteObject';
+import shouldLoad from 'core/caching/shouldLoad';
 
 export default function useRemoteItem<
   DataType,
@@ -18,7 +20,17 @@ export default function useRemoteItem<
     loader: () => Promise<DataType>;
   }
 ): DataType | null {
-  useRemoteObject(remoteItem, hooks);
+  const objHooks: Hooks<DataType, DataType, OnLoadPayload, OnSuccessPayload> =
+    useMemo(
+      () => ({
+        ...hooks,
+        hasLoadedOnce: () => hasLoadedOnce(remoteItem),
+        isNecessary: () => hooks.isNecessary?.() ?? shouldLoad(remoteItem),
+      }),
+      [hooks, remoteItem]
+    );
+
+  useRemoteObject(objHooks);
 
   return remoteItem?.data || null;
 }

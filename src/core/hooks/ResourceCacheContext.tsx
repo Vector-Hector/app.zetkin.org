@@ -2,6 +2,8 @@ import React, {
   createContext,
   createRef,
   ReactNode,
+  useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -97,4 +99,35 @@ export const ResourceCacheProvider: React.FC<Props> = ({ children }) => {
       </ResourceCacheContext.Provider>
     </Box>
   );
+};
+
+export const useResourceCache = (
+  cacheKey: string,
+  fetchFn: () => Promise<unknown>
+) => {
+  const resourceCacheCtx = useContext(ResourceCacheContext);
+  if (resourceCacheCtx.hasLoaded && resourceCacheCtx.cache.current) {
+    const resource = resourceCacheCtx.cache.current.get(cacheKey);
+    if (resource) {
+      resource.read(); // suspend if necessary
+    }
+  }
+
+  useEffect(() => {
+    if (!resourceCacheCtx.cache.current) {
+      return;
+    }
+
+    if (!resourceCacheCtx.cache.current.get(cacheKey)) {
+      resourceCacheCtx.cache.current.set(cacheKey, createResource(fetchFn));
+    }
+  }, [resourceCacheCtx.cache, cacheKey, fetchFn]);
+
+  return useCallback(() => {
+    if (!resourceCacheCtx.cache.current) {
+      return undefined;
+    }
+
+    return resourceCacheCtx.cache.current.get(cacheKey);
+  }, []);
 };

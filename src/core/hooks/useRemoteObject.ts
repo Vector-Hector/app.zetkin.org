@@ -8,31 +8,33 @@ import { AppDispatch } from 'core/store';
 import {
   createResource,
   ResourceCacheContext,
+  useResourceCache,
 } from 'core/hooks/ResourceCacheContext';
 
 export type Hooks<
   DataType,
+  LoaderPayload = DataType | DataType[],
   OnLoadPayload = void,
   OnSuccessPayload = DataType
 > = {
   actionOnError?: (err: unknown) => PayloadAction<unknown>;
   actionOnLoad: () => PayloadAction<OnLoadPayload>;
-  actionOnSuccess:
-    | ((item: DataType) => PayloadAction<OnSuccessPayload>)
-    | ((items: DataType[]) => PayloadAction<OnSuccessPayload>);
+  actionOnSuccess: (item: LoaderPayload) => PayloadAction<OnSuccessPayload>;
   cacheKey?: string;
-  isNecessary?: () => boolean;
-  loader: (() => Promise<DataType>) | (() => Promise<DataType[]>);
+  hasLoadedOnce: () => boolean;
+  isNecessary: () => boolean;
+  loader: () => Promise<LoaderPayload>;
 };
 
 async function makePromise<
   DataType,
+  LoaderPayload = DataType | DataType[],
   OnLoadPayload = void,
   OnSuccessPayload = DataType
 >(
   dispatch: AppDispatch,
-  hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
-): Promise<DataType | DataType[] | null> {
+  hooks: Hooks<DataType, LoaderPayload, OnLoadPayload, OnSuccessPayload>
+): Promise<LoaderPayload | null> {
   try {
     dispatch(hooks.actionOnLoad());
     const val = await hooks.loader();
@@ -50,20 +52,10 @@ async function makePromise<
   }
 }
 
-function useRemoteObject<
-  DataType,
-  OnLoadPayload = void,
-  OnSuccessPayload = DataType
->(
-  remoteObject: RemoteItem<DataType> | RemoteList<DataType> | undefined | null,
-  hooks: Hooks<DataType, OnLoadPayload, OnSuccessPayload>
+export function hasLoadedOnce<DataType>(
+  remoteObject: RemoteItem<DataType> | RemoteList<DataType> | undefined | null
 ) {
-  const dispatch = useAppDispatch();
-  const loadIsNecessary = hooks.isNecessary?.() ?? shouldLoad(remoteObject);
-
-  const cacheKey = hooks.cacheKey || hooks.loader.toString();
-
-  const stateHasLoadedOnce =
+  return (
     !!remoteObject &&
     (remoteObject.isLoading ||
       !!remoteObject.error ||
@@ -72,44 +64,45 @@ function useRemoteObject<
       ('items' in remoteObject && remoteObject.items.length > 0) ||
       ('isStale' in remoteObject && remoteObject.isStale) ||
       ('mutating' in remoteObject &&
-        (remoteObject.mutating as string[]).length > 0));
+        (remoteObject.mutating as string[]).length > 0))
+  );
+}
 
-  const resourceCacheCtx = useContext(ResourceCacheContext);
-  if (resourceCacheCtx.hasLoaded && resourceCacheCtx.cache.current) {
-    const resource = resourceCacheCtx.cache.current.get(cacheKey);
-    if (resource) {
-      resource.read(); // suspend if necessary
-    }
+export function useRemoteObject<
+  DataType,
+  LoaderPayload = DataType | DataType[],
+  OnLoadPayload = void,
+  OnSuccessPayload = DataType
+>(
+  hooks: Hooks<DataType, LoaderPayload, OnLoadPayload, OnSuccessPayload> & {
+    hasLoadedOnce: () => boolean;
+    isNecessary: () => boolean;
   }
+) {
+  const dispatch = useAppDispatch();
+  const loadIsNecessary = hooks.isNecessary();
+
+  const cacheKey = hooks.cacheKey || hooks.loader.toString();
+
+  const getResourceCache = useResourceCache(cacheKey, () =>
+    makePromise<DataType, LoaderPayload, OnLoadPayload, OnSuccessPayload>(
+      dispatch,
+      hooks
+    )
+  );
 
   useEffect(() => {
-    if (!resourceCacheCtx.cache.current) {
-      return;
-    }
-
-    if (!resourceCacheCtx.cache.current.get(cacheKey)) {
-      resourceCacheCtx.cache.current.set(
-        cacheKey,
-        createResource(() =>
-          makePromise<DataType, OnLoadPayload, OnSuccessPayload>(
-            dispatch,
-            hooks
-          )
-        )
-      );
-    }
-
     if (!loadIsNecessary) {
       return;
     }
 
-    const cache = resourceCacheCtx.cache.current.get(cacheKey);
+    const cache = getResourceCache();
 
     if (!cache) {
       return;
     }
 
-    cache.fetch(!stateHasLoadedOnce);
+    cache.fetch(!hooks.hasLoadedOnce());
   });
 }
 
