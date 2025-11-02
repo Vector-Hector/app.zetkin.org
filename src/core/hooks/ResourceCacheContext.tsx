@@ -129,5 +129,5 @@ export const useResourceCache = (
     }
 
     return resourceCacheCtx.cache.current.get(cacheKey);
-  }, []);
+  }, [resourceCacheCtx.cache]);
 };
