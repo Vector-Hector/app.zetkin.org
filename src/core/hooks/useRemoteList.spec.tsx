@@ -129,7 +129,7 @@ function setupWrapperComponent(initialList?: RemoteList<ListObjectForTest>) {
       if (action.type == 'load') {
         return {
           list: {
-            ...remoteList(),
+            ...(state?.list ?? remoteList()),
             isLoading: true,
           },
         };
