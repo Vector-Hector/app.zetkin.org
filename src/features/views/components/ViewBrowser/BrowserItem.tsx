@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import NextLink from 'next/link';
 import { CircularProgress, Link, Theme } from '@mui/material';
-import { FC, MouseEvent, useContext } from 'react';
+import { FC, memo, MouseEvent, useCallback, useContext } from 'react';
 
 import BrowserDraggableItem from './BrowserDragableItem';
 import { Msg } from 'core/i18n';
@@ -14,7 +14,7 @@ import messageIds from 'features/views/l10n/messageIds';
 interface BrowserItemProps {
   basePath: string;
   item: ViewBrowserItem;
-  onClick: (ev: MouseEvent) => void;
+  onSelect?: (item: ViewBrowserItem, ev: MouseEvent) => void;
 }
 
 const useStyles = makeStyles<Theme, BrowserRowDropProps>({
@@ -28,11 +28,17 @@ const useStyles = makeStyles<Theme, BrowserRowDropProps>({
   },
 });
 
-const BrowserItem: FC<BrowserItemProps> = ({ basePath, item, onClick }) => {
+const BrowserItem: FC<BrowserItemProps> = memo(function BrowserItem({
+  basePath,
+  item,
+  onSelect,
+}) {
   const dropProps = useContext(BrowserRowContext);
   const styles = useStyles(dropProps);
   const { orgId } = useNumericRouteParams();
   const { itemIsRenaming } = useViewBrowserMutations(orgId);
+
+  const onClick = useCallback((ev: MouseEvent) => onSelect?.(item, ev), []);
 
   if (item.type == 'back') {
     const subPath = item.folderId ? 'folders/' + item.folderId : '';
@@ -75,6 +81,6 @@ const BrowserItem: FC<BrowserItemProps> = ({ basePath, item, onClick }) => {
       </BrowserDraggableItem>
     );
   }
-};
+});
 
 export default BrowserItem;
