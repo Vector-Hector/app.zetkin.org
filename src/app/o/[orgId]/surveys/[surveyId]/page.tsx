@@ -2,11 +2,12 @@
 
 import { FC } from 'react';
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 import PublicSurveyPage from 'features/surveys/pages/PublicSurveyPage';
 import BackendApiClient from 'core/api/client/BackendApiClient';
-import { ZetkinUser } from 'utils/types/zetkin';
-import surveyFetch from 'utils/fetching/surveyFetch';
+import { ZetkinSurveyExtended, ZetkinUser } from 'utils/types/zetkin';
+import { ApiClientError } from 'core/api/errors';
 
 type Props = {
   params: {
@@ -23,7 +24,19 @@ const Page: FC<Props> = async ({ params }) => {
   const apiClient = new BackendApiClient(headersObject);
 
   const { orgId, surveyId } = params;
-  const survey = await surveyFetch(apiClient, orgId, surveyId);
+
+  let survey: ZetkinSurveyExtended;
+  try {
+    survey = await apiClient.get<ZetkinSurveyExtended>(
+      `/api/orgs/${orgId}/surveys/${surveyId}`
+    );
+  } catch (e) {
+    if (e instanceof ApiClientError && e.status === 404) {
+      notFound();
+    } else {
+      throw e;
+    }
+  }
 
   let user: ZetkinUser | null;
   try {
