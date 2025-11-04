@@ -13,6 +13,7 @@ import { ZetkinEventWithStatus } from '../types';
 import { removeOffset } from 'utils/dateUtils';
 import { timeSpanToString } from 'zui/utils/timeSpanString';
 import { EventSignupButton } from './EventSignupButton';
+import { ZUILabelText } from 'zui/components/ZUIIconLabel';
 
 type Props = {
   event: ZetkinEventWithStatus;
@@ -40,9 +41,13 @@ const EventListItem: FC<Props> = ({ event, href, onClickSignUp }) => {
       info={[
         {
           Icon: GroupWorkOutlined,
-          labels: [event.campaign?.title, event.organization.title].filter(
-            (label) => !!label
-          ) as string[],
+          labels: [
+            event.campaign?.title,
+            {
+              href: `/o/${event.organization.id}/`,
+              text: event.organization.title,
+            },
+          ].filter((label) => !!label) as ZUILabelText[],
         },
         {
           Icon: WatchLaterOutlined,

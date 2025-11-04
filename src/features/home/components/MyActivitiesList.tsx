@@ -13,6 +13,7 @@ import useIncrementalDelay from '../hooks/useIncrementalDelay';
 import ZUIButton from 'zui/components/ZUIButton';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIFilterButton from 'zui/components/ZUIFilterButton';
+import { ZUILabelText } from 'zui/components/ZUIIconLabel';
 
 const MyActivitiesList: FC = () => {
   const activities = useMyActivities();
@@ -91,12 +92,13 @@ const MyActivitiesList: FC = () => {
               info={[
                 {
                   Icon: GroupWorkOutlined,
-                  labels: activity.data.campaign
-                    ? [
-                        activity.data.campaign.title,
-                        activity.data.organization.title,
-                      ]
-                    : [activity.data.organization.title],
+                  labels: [
+                    activity.data.campaign?.title,
+                    {
+                      href: `/o/${activity.data.organization.id}/`,
+                      text: activity.data.organization.title,
+                    },
+                  ].filter((label) => !!label) as ZUILabelText[],
                 },
               ]}
               title={
