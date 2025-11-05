@@ -30,6 +30,7 @@ import ZUIButton from 'zui/components/ZUIButton';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIDrawerModal from 'zui/components/ZUIDrawerModal';
 import { useEventTypeFilter } from 'features/events/hooks/useEventTypeFilter';
+import useUserMemberships from 'features/home/hooks/useUserMemberships';
 
 const initializeEventTypesToFilterBy = () => [] as (string | null)[];
 
@@ -38,6 +39,7 @@ const AllEventsList: FC = () => {
   const messages = useMessages(messageIds);
   const allEvents = useAllEvents();
   const nextDelay = useIncrementalDelay();
+  const memberships = useUserMemberships();
 
   const [drawerContent, setDrawerContent] = useState<
     'orgs' | 'calendar' | 'eventTypes' | null
@@ -324,6 +326,7 @@ const AllEventsList: FC = () => {
                   key={event.id}
                   event={event}
                   href={`/o/${event.organization.id}/events/${event.id}`}
+                  memberships={memberships}
                 />
               ))}
             </Box>

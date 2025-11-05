@@ -13,12 +13,14 @@ import useIncrementalDelay from '../hooks/useIncrementalDelay';
 import ZUIButton from 'zui/components/ZUIButton';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIFilterButton from 'zui/components/ZUIFilterButton';
+import useUserMemberships from 'features/home/hooks/useUserMemberships';
 
 const MyActivitiesList: FC = () => {
   const activities = useMyActivities();
   const messages = useMessages(messageIds);
   const [filteredKinds, setFilteredKinds] = useState<string[]>([]);
   const nextDelay = useIncrementalDelay();
+  const memberships = useUserMemberships();
 
   const kinds = Array.from(
     new Set(activities.map((activity) => activity.kind))
@@ -125,7 +127,13 @@ const MyActivitiesList: FC = () => {
           );
         } else if (activity.kind == 'event') {
           href = `/o/${activity.data.organization.id}/events/${activity.data.id}`;
-          elem = <EventListItem event={activity.data} href={href} />;
+          elem = (
+            <EventListItem
+              event={activity.data}
+              href={href}
+              memberships={memberships}
+            />
+          );
         }
 
         return (

@@ -13,14 +13,21 @@ import { ZetkinEventWithStatus } from '../types';
 import { removeOffset } from 'utils/dateUtils';
 import { timeSpanToString } from 'zui/utils/timeSpanString';
 import { EventSignupButton } from './EventSignupButton';
+import { ZetkinMembership } from 'utils/types/zetkin';
 
 type Props = {
   event: ZetkinEventWithStatus;
   href?: string;
+  memberships: ZetkinMembership[];
   onClickSignUp?: (ev: MouseEvent) => void;
 };
 
-const EventListItem: FC<Props> = ({ event, href, onClickSignUp }) => {
+const EventListItem: FC<Props> = ({
+  event,
+  href,
+  onClickSignUp,
+  memberships,
+}) => {
   const intl = useIntl();
   const messages = useMessages(messageIds);
 
@@ -28,6 +35,7 @@ const EventListItem: FC<Props> = ({ event, href, onClickSignUp }) => {
     <EventSignupButton
       key="signup"
       event={event}
+      memberships={memberships}
       onClickSignUp={onClickSignUp}
     />,
   ];

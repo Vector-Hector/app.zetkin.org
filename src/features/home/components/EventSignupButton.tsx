@@ -8,19 +8,23 @@ import ZUIText from 'zui/components/ZUIText';
 import ZUIButton from 'zui/components/ZUIButton';
 import ZUISignUpChip from 'zui/components/ZUISignUpChip';
 import useUser from 'core/hooks/useUser';
+import { ZetkinMembership } from 'utils/types/zetkin';
 
 export const EventSignupButton = ({
   event,
+  memberships,
   onClickSignUp,
 }: {
   event: ZetkinEventWithStatus;
+  memberships: ZetkinMembership[];
   onClickSignUp?: (ev: React.MouseEvent<HTMLButtonElement>) => void;
 }): JSX.Element => {
   const messages = useMessages(messageIds);
   const user = useUser();
   const { requiresConnect, signUp, undoSignup } = useEventActions(
     event.organization.id,
-    event.id
+    event.id,
+    memberships
   );
 
   if (event.status == 'booked') {

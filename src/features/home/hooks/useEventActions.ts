@@ -1,16 +1,23 @@
 import { userResponseAdded, userResponseDeleted } from 'features/events/store';
 import useUserMemberships from './useUserMemberships';
 import { useApiClient, useAppDispatch } from 'core/hooks';
-import { ZetkinEvent, ZetkinPerson } from 'utils/types/zetkin';
+import {
+  ZetkinEvent,
+  ZetkinMembership,
+  ZetkinPerson,
+} from 'utils/types/zetkin';
 
 function isPerson(obj: Record<string, unknown>): obj is ZetkinPerson {
   return 'first_name' in obj;
 }
 
-export default function useEventActions(orgId: number, eventId: number) {
+export default function useEventActions(
+  orgId: number,
+  eventId: number,
+  memberships: ZetkinMembership[]
+) {
   const apiClient = useApiClient();
   const dispatch = useAppDispatch();
-  const memberships = useUserMemberships();
   const relevantMembership = memberships.find(
     (membership) => membership.organization.id == orgId
   );
