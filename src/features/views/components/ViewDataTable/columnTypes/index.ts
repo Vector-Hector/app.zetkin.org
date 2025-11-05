@@ -29,7 +29,8 @@ export interface IColumnType<
     state?: RootState,
     apiClient?: IApiClient,
     dispatch?: AppDispatch,
-    orgId?: number
+    orgId?: number,
+    getSelection?: () => number[]
   ): Omit<GridColDef, 'field'>;
   getSearchableStrings(cell: CellType, column: ColumnType): string[];
   handleKeyDown?(

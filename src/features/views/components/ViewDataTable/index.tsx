@@ -13,7 +13,14 @@ import {
   GridSortModel,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
-import { FunctionComponent, useContext, useEffect, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Box, Link, useTheme } from '@mui/material';
 
 import columnTypes from './columnTypes';
@@ -305,6 +312,14 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
     createView(view.folder?.id ?? 0, selection);
   };
 
+  const selectionRef = useRef(selection);
+
+  useEffect(() => {
+    selectionRef.current = selection;
+  }, [selection]);
+
+  const getSelection = useCallback(() => selectionRef.current, []);
+
   const avatarColumn: GridColDef = {
     disableColumnMenu: true,
     disableExport: true,
@@ -378,7 +393,8 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
           state,
           apiClient,
           dispatch,
-          orgId
+          orgId,
+          getSelection
         )
       ),
       headerName: col.title,
@@ -392,7 +408,8 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
         state,
         apiClient,
         dispatch,
-        orgId
+        orgId,
+        getSelection
       ),
     })),
   ];

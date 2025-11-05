@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import { useRouter } from 'next/router';
 import { Box, lighten, TextField, TextFieldProps } from '@mui/material';
-import { FC, KeyboardEvent, useCallback, useState } from 'react';
+import { FC, KeyboardEvent, useCallback, useContext, useState } from 'react';
 import {
   GridColDef,
   GridRenderCellParams,
@@ -9,6 +9,7 @@ import {
   MuiEvent,
   useGridApiContext,
 } from '@mui/x-data-grid-pro';
+import NProgress from 'nprogress';
 
 import compareTags from 'features/tags/utils/compareTags';
 import { DEFAULT_TAG_COLOR } from 'features/tags/components/TagManager/utils';
@@ -27,6 +28,7 @@ import ZUIFuture from 'zui/ZUIFuture';
 import { AppDispatch, RootState } from 'core/store';
 import { PersonTagViewColumn, ZetkinViewRow } from '../../../types';
 import { tagLoad, tagLoaded } from 'features/tags/store';
+import { ZUIConfirmDialogContext } from 'zui/ZUIConfirmDialogProvider';
 
 type PersonTagViewCell = null | {
   value?: string;
@@ -43,7 +45,8 @@ export default class PersonTagColumnType implements IColumnType {
     state: RootState,
     apiClient: IApiClient,
     dispatch: AppDispatch,
-    orgId: number
+    orgId: number,
+    getSelection: () => number[]
   ): Omit<GridColDef, 'field'> {
     const tagId = column.config.tag_id;
 
@@ -72,6 +75,7 @@ export default class PersonTagColumnType implements IColumnType {
       ) => (
         <Cell
           cellValue={params.value}
+          getSelection={getSelection}
           personId={params.row.id}
           tag={tag || params.value}
         />
@@ -135,11 +139,12 @@ const useStyles = makeStyles(() => ({
 
 interface CellProps {
   cellValue: ZetkinAppliedTag | string | undefined;
+  getSelection?: () => number[];
   personId: number;
   tag?: ZetkinTag | ZetkinAppliedTag | null;
 }
 
-const Cell: FC<CellProps> = ({ cellValue, personId, tag }) => {
+const Cell: FC<CellProps> = ({ cellValue, getSelection, personId, tag }) => {
   if (typeof cellValue === 'string') {
     return null;
   } else if (!tag) {
@@ -165,7 +170,14 @@ const Cell: FC<CellProps> = ({ cellValue, personId, tag }) => {
       return <ValueTagCell tag={cellValue} />;
     }
   } else {
-    return <BasicTagCell cell={cellValue} personId={personId} tagId={tag.id} />;
+    return (
+      <BasicTagCell
+        cell={cellValue}
+        getSelection={getSelection}
+        personId={personId}
+        tagId={tag.id}
+      />
+    );
   }
 };
 
@@ -230,11 +242,35 @@ const ValueTagEditCell = (
   );
 };
 
+const processPromiseBatch = async (promises: (() => Promise<void>)[]) => {
+  let completed = 0;
+
+  NProgress.start();
+  NProgress.configure({ trickle: false });
+  try {
+    const promiseBufferSize = 10;
+
+    for (let i = 0; i < promises.length; i += promiseBufferSize) {
+      const slice = promises.slice(i, i + promiseBufferSize);
+
+      await Promise.all(slice.map((p) => p()));
+
+      completed += promiseBufferSize;
+      NProgress.set(completed / promises.length);
+      await new Promise(requestAnimationFrame); // so NProgress gets a chance to render
+    }
+  } finally {
+    NProgress.done();
+    NProgress.configure({ trickle: true });
+  }
+};
+
 const BasicTagCell: FC<{
   cell: ZetkinAppliedTag | undefined;
+  getSelection?: () => number[];
   personId: number;
   tagId: number;
-}> = ({ cell, personId, tagId }) => {
+}> = ({ cell, getSelection, personId, tagId }) => {
   // TODO: Find a way to share a model between cells in a column
   const query = useRouter().query;
   const orgId = parseInt(query.orgId as string);
@@ -244,11 +280,29 @@ const BasicTagCell: FC<{
   const styles = useStyles({});
 
   const [isRestricted] = useAccessLevel();
+  const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
 
   if (cell) {
     return (
       <TagChip
         onDelete={() => {
+          if (getSelection) {
+            const selection = getSelection();
+            if (selection.some((s) => s === personId)) {
+              showConfirmDialog({
+                onSubmit: () => {
+                  processPromiseBatch(
+                    selection.map(
+                      (s) => () => removeFromPerson(s, tagId).catch(() => {})
+                    )
+                  );
+                },
+                title: 'Batch delete tag',
+                warningText: `Remove this tag from ${selection.length} people?`,
+              });
+              return;
+            }
+          }
           removeFromPerson(personId, tagId);
         }}
         tag={cell}
@@ -265,6 +319,24 @@ const BasicTagCell: FC<{
             <Box
               className={styles.ghostContainer}
               onClick={() => {
+                if (getSelection) {
+                  const selection = getSelection();
+                  if (selection.some((s) => s === personId)) {
+                    showConfirmDialog({
+                      onSubmit: () => {
+                        processPromiseBatch(
+                          selection.map(
+                            (s) => () =>
+                              assignToPerson(s, tagId).catch(() => {})
+                          )
+                        );
+                      },
+                      title: 'Batch add tag',
+                      warningText: `Add this tag to ${selection.length} people?`,
+                    });
+                    return;
+                  }
+                }
                 assignToPerson(personId, tagId);
               }}
             >
