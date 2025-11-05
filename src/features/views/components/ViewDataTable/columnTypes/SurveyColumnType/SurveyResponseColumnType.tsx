@@ -8,14 +8,22 @@ import {
   GridValueGetterParams,
 } from '@mui/x-data-grid-pro';
 import { History } from '@mui/icons-material';
+import { GridColumnHeaderParams } from '@mui/x-data-grid/models/params/gridColumnHeaderParams';
 
 import { getEllipsedString } from 'utils/stringUtils';
-import { IColumnType } from '.';
-import { SurveyResponseViewColumn } from '../../types';
+import { IColumnType } from 'features/views/components/ViewDataTable/columnTypes/index';
+import {
+  SurveyResponseViewColumn,
+  ZetkinViewColumn,
+} from 'features/views/components/types';
 import SurveySubmissionPane from 'features/surveys/panes/SurveySubmissionPane';
 import { usePanes } from 'utils/panes';
-import ViewSurveySubmissionPreview from '../../ViewSurveySubmissionPreview';
+import ViewSurveySubmissionPreview from 'features/views/components/ViewSurveySubmissionPreview';
 import useToggleDebounce from 'utils/hooks/useToggleDebounce';
+import { ZetkinObjectAccess } from 'core/api/types';
+import { AppDispatch, RootState } from 'core/store';
+import IApiClient from 'core/api/client/IApiClient';
+import { SurveyAnswerColumnTypeHeader } from 'features/views/components/ViewDataTable/columnTypes/SurveyColumnType/SurveyAnswerColumnTypeHeader';
 
 export type SurveyResponseViewCell = {
   submission_id: number;
@@ -30,12 +38,28 @@ export default class SurveyResponseColumnType
     return cell?.length ? cell[0].text : '';
   }
 
-  getColDef(): Omit<GridColDef<SurveyResponseViewCell>, 'field'> {
+  getColDef(
+    column: ZetkinViewColumn,
+    _accessLevel: ZetkinObjectAccess['level'] | null,
+    _state?: RootState,
+    _apiClient?: IApiClient,
+    _dispatch?: AppDispatch,
+    orgId?: number
+  ): Omit<GridColDef<SurveyResponseViewColumn>, 'field'> {
     return {
       filterable: true,
       renderCell: (params: GridRenderCellParams) => {
         return <Cell cell={params.row[params.field]} />;
       },
+      renderHeader: (
+        params: GridColumnHeaderParams<SurveyResponseViewColumn>
+      ) => (
+        <SurveyAnswerColumnTypeHeader
+          column={column}
+          orgId={orgId}
+          params={params}
+        />
+      ),
       sortComparator: (v1: string[], v2: string[]) => {
         const lastInV1 = v1[v1.length - 1];
         const lastInV2 = v2[v2.length - 1];

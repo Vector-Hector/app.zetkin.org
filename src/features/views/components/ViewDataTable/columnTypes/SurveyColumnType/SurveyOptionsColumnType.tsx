@@ -7,15 +7,21 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from '@mui/x-data-grid-pro';
+import { GridColumnHeaderParams } from '@mui/x-data-grid/models/params/gridColumnHeaderParams';
+import * as React from 'react';
 
-import { ZetkinViewColumn } from '../../types';
+import { ZetkinViewColumn } from 'features/views/components/types';
 import { ZetkinSurveyOption } from 'utils/types/zetkin';
 import { usePanes } from 'utils/panes';
-import { IColumnType } from '.';
+import { IColumnType } from 'features/views/components/ViewDataTable/columnTypes/index';
 import SurveySubmissionPane from 'features/surveys/panes/SurveySubmissionPane';
-import ViewSurveySubmissionPreview from '../../ViewSurveySubmissionPreview';
+import ViewSurveySubmissionPreview from 'features/views/components/ViewSurveySubmissionPreview';
 import useToggleDebounce from 'utils/hooks/useToggleDebounce';
 import oldTheme from 'theme';
+import { ZetkinObjectAccess } from 'core/api/types';
+import { AppDispatch, RootState } from 'core/store';
+import IApiClient from 'core/api/client/IApiClient';
+import { SurveyAnswerColumnTypeHeader } from 'features/views/components/ViewDataTable/columnTypes/SurveyColumnType/SurveyAnswerColumnTypeHeader';
 
 export type SurveyOptionsViewCell =
   | {
@@ -32,12 +38,26 @@ export default class SurveyOptionsColumnType
     return cell?.length ? cell[0].selected.map((o) => o.text).toString() : '';
   }
 
-  getColDef(): Omit<GridColDef, 'field'> {
+  getColDef(
+    column: ZetkinViewColumn,
+    _accessLevel: ZetkinObjectAccess['level'] | null,
+    _state?: RootState,
+    _apiClient?: IApiClient,
+    _dispatch?: AppDispatch,
+    orgId?: number
+  ): Omit<GridColDef, 'field'> {
     return {
       filterable: true,
       renderCell: (params: GridRenderCellParams) => {
         return <Cell cell={params.row[params.field]} />;
       },
+      renderHeader: (params: GridColumnHeaderParams<ZetkinViewColumn>) => (
+        <SurveyAnswerColumnTypeHeader
+          column={column}
+          orgId={orgId}
+          params={params}
+        />
+      ),
       sortComparator: (v1: string[][], v2: string[][]) => {
         const getPriority = (cell: string[][]) => {
           if (cell == null || cell.length == 0) {

@@ -3,16 +3,25 @@ import { useRouter } from 'next/router';
 import { Box, Typography } from '@mui/material';
 import { Check, History } from '@mui/icons-material';
 import { FC, useState } from 'react';
+import { GridColumnHeaderParams } from '@mui/x-data-grid/models/params/gridColumnHeaderParams';
+import * as React from 'react';
 
-import { IColumnType } from '.';
+import { IColumnType } from 'features/views/components/ViewDataTable/columnTypes/index';
 import { Msg } from 'core/i18n';
-import { SurveyOptionViewColumn } from '../../types';
+import {
+  SurveyOptionViewColumn,
+  ZetkinViewColumn,
+} from 'features/views/components/types';
 import SurveySubmissionPane from 'features/surveys/panes/SurveySubmissionPane';
-import oldTheme from '../../../../../theme';
+import oldTheme from 'theme';
 import { usePanes } from 'utils/panes';
-import ViewSurveySubmissionPreview from '../../ViewSurveySubmissionPreview';
+import ViewSurveySubmissionPreview from 'features/views/components/ViewSurveySubmissionPreview';
 import messageIds from 'features/views/l10n/messageIds';
 import useToggleDebounce from 'utils/hooks/useToggleDebounce';
+import { SurveyAnswerColumnTypeHeader } from 'features/views/components/ViewDataTable/columnTypes/SurveyColumnType/SurveyAnswerColumnTypeHeader';
+import { ZetkinObjectAccess } from 'core/api/types';
+import { AppDispatch, RootState } from 'core/store';
+import IApiClient from 'core/api/client/IApiClient';
 
 type SurveyOptionViewCell =
   | {
@@ -30,12 +39,28 @@ export default class SurveyOptionColumnType
     return pickedThisOption?.length ? pickedThisOption[0].submitted : '';
   }
 
-  getColDef(): Omit<GridColDef<SurveyOptionViewColumn>, 'field'> {
+  getColDef(
+    column: ZetkinViewColumn,
+    _accessLevel: ZetkinObjectAccess['level'] | null,
+    _state?: RootState,
+    _apiClient?: IApiClient,
+    _dispatch?: AppDispatch,
+    orgId?: number
+  ): Omit<GridColDef<SurveyOptionViewColumn>, 'field'> {
     return {
       headerAlign: 'center',
       renderCell: (params) => {
         return <Cell cell={params.value} />;
       },
+      renderHeader: (
+        params: GridColumnHeaderParams<SurveyOptionViewColumn>
+      ) => (
+        <SurveyAnswerColumnTypeHeader
+          column={column}
+          orgId={orgId}
+          params={params}
+        />
+      ),
       sortComparator: (v1: SurveyOptionViewCell, v2: SurveyOptionViewCell) => {
         const getPriority = (cell: SurveyOptionViewCell) => {
           if (!cell || cell.length == 0) {

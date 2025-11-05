@@ -38,5 +38,9 @@ export default function useSurveysWithElements(
       );
     },
   });
+  if (!listaDeSurveys.data?.length && listaDeSurveys.isLoading) {
+    return new LoadingFuture();
+  }
+
   return listaDeSurveys;
 }

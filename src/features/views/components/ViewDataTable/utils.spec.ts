@@ -1,7 +1,7 @@
 import { COLUMN_TYPE } from 'features/views/components/types';
 import mockViewCol from 'utils/testing/mocks/mockViewCol';
 import mockViewRow from 'utils/testing/mocks/mockViewRow';
-import { SurveyResponseViewCell } from './columnTypes/SurveyResponseColumnType';
+import { SurveyResponseViewCell } from 'features/views/components/ViewDataTable/columnTypes/SurveyColumnType/SurveyResponseColumnType';
 import { viewQuickSearch } from './utils';
 
 let nextSubmissionId = 1;
