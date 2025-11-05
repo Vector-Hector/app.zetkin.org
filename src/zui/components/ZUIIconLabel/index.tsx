@@ -99,7 +99,6 @@ const ZUIIconLabel: FC<ZUIIconLabelProps> = ({
   } else {
     labels.push(getLabelText(label, 0));
   }
-  console.log(labels);
 
   return (
     <Box
