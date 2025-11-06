@@ -243,14 +243,18 @@ const BasicTagCell: FC<{
 
   const styles = useStyles({});
 
-  const [isRestricted] = useAccessLevel();
+  const [isRestricted, accessLevel] = useAccessLevel();
 
   if (cell) {
     return (
       <TagChip
-        onDelete={() => {
-          removeFromPerson(personId, tagId);
-        }}
+        onDelete={
+          accessLevel === 'readonly'
+            ? undefined
+            : () => {
+                removeFromPerson(personId, tagId);
+              }
+        }
         tag={cell}
       />
     );
