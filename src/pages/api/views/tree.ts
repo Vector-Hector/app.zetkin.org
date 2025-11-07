@@ -17,13 +17,10 @@ export default async function handle(
   const client = new BackendApiClient(req.headers);
 
   try {
-    const views = await client.get<ZetkinView[]>(
-      `/api/orgs/${orgId}/people/views`
-    );
-    const folders = await client.get<ZetkinViewFolder[]>(
-      `/api/orgs/${orgId}/people/view_folders`
-    );
-
+    const [views, folders] = await Promise.all([
+      client.get<ZetkinView[]>(`/api/orgs/${orgId}/people/views`),
+      client.get<ZetkinViewFolder[]>(`/api/orgs/${orgId}/people/view_folders`),
+    ]);
     const output: ViewTreeData = {
       folders,
       views,

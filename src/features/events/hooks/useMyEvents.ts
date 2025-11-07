@@ -17,29 +17,30 @@ export default function useMyEvents() {
     loader: async () => {
       const bookedEventIds: number[] = [];
 
-      const bookedEvents = await apiClient
-        .get<ZetkinEvent[]>(`/api/users/me/actions?filter=end_time>=${today}`)
-        .then((events) =>
-          events.map<ZetkinEventWithStatus>((event) => {
-            bookedEventIds.push(event.id);
-            return {
-              ...event,
-              status: 'booked',
-            };
-          })
-        );
-
-      const signedUpEvents = await apiClient
-        .get<{ action: ZetkinEvent }[]>(`/api/users/me/action_responses`)
-        .then((events) =>
-          events
-            .map<ZetkinEventWithStatus>((signup) => ({
-              ...signup.action,
-              status: 'signedUp',
-            }))
-            .filter((event) => !bookedEventIds.includes(event.id))
-            .filter(({ end_time }) => end_time >= today)
-        );
+      const [bookedEvents, signedUpEvents] = await Promise.all([
+        apiClient
+          .get<ZetkinEvent[]>(`/api/users/me/actions?filter=end_time>=${today}`)
+          .then((events) =>
+            events.map<ZetkinEventWithStatus>((event) => {
+              bookedEventIds.push(event.id);
+              return {
+                ...event,
+                status: 'booked',
+              };
+            })
+          ),
+        apiClient
+          .get<{ action: ZetkinEvent }[]>(`/api/users/me/action_responses`)
+          .then((events) =>
+            events
+              .map<ZetkinEventWithStatus>((signup) => ({
+                ...signup.action,
+                status: 'signedUp',
+              }))
+              .filter((event) => !bookedEventIds.includes(event.id))
+              .filter(({ end_time }) => end_time >= today)
+          ),
+      ]);
 
       return [...bookedEvents, ...signedUpEvents];
     },

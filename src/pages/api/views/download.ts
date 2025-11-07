@@ -37,16 +37,15 @@ export default async function handler(
 
   const apiClient = new BackendApiClient(req.headers);
 
-  const view = await apiClient.get<ZetkinView>(
-    `/api/orgs/${orgId}/people/views/${viewId}`
-  );
-  const columns = await apiClient.get<ZetkinViewColumn[]>(
-    `/api/orgs/${orgId}/people/views/${viewId}/columns`
-  );
-  const rows = await apiClient.get<ZetkinViewRow[]>(
-    `/api/orgs/${orgId}/people/views/${viewId}/rows`
-  );
-
+  const [view, columns, rows] = await Promise.all([
+    apiClient.get<ZetkinView>(`/api/orgs/${orgId}/people/views/${viewId}`),
+    apiClient.get<ZetkinViewColumn[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/columns`
+    ),
+    apiClient.get<ZetkinViewRow[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/rows`
+    ),
+  ]);
   const headerRow: string[] = ['ID'].concat(columns.map((col) => col.title));
 
   const dataRows: string[][] = rows.map((row) =>

@@ -29,18 +29,18 @@ export async function GET(request: NextRequest, { params }: RouteMeta) {
     }/households?${request.nextUrl.searchParams.toString()}`
   );
 
-  const householdsWithColor: HouseholdWithColor[] = [];
-  for (const household of households) {
-    const householdColorModel = await HouseholdColorModel.findOne({
-      householdId: household.id,
-    });
-
-    const householdWithColor: HouseholdWithColor = {
-      ...household,
-      color: (householdColorModel?.color ?? 'clear') as HouseholdColor,
-    };
-    householdsWithColor.push(householdWithColor);
-  }
+  const householdsWithColor = await Promise.all(
+    households.map(async (household) => {
+      const householdColorModel = await HouseholdColorModel.findOne({
+        householdId: household.id,
+      });
+      const householdWithColor: HouseholdWithColor = {
+        ...household,
+        color: (householdColorModel?.color ?? 'clear') as HouseholdColor,
+      };
+      return householdWithColor;
+    })
+  );
 
   return NextResponse.json({ data: householdsWithColor });
 }

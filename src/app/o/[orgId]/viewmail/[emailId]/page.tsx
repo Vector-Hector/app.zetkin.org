@@ -20,7 +20,6 @@ export default async function Page({ params }: PageProps) {
   const { emailId, orgId } = params;
 
   const lang = getBrowserLanguage(headers().get('accept-language') || '');
-  const messages = await getServerMessages(lang, messageIds);
 
   const headersList = headers();
   const headersEntries = headersList.entries();
@@ -28,9 +27,10 @@ export default async function Page({ params }: PageProps) {
   const apiClient = new BackendApiClient(headersObject);
 
   try {
-    const email = await apiClient.get<ZetkinEmail>(
-      `/api/orgs/${orgId}/emails/${emailId}`
-    );
+    const [email, messages] = await Promise.all([
+      apiClient.get<ZetkinEmail>(`/api/orgs/${orgId}/emails/${emailId}`),
+      getServerMessages(lang, messageIds),
+    ]);
 
     const emailHtml = renderEmailHtml(email, {
       'target.first_name': messages.varDefaults.target(),

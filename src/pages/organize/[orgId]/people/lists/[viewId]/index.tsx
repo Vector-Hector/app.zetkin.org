@@ -28,15 +28,14 @@ export const getServerSideProps: GetServerSideProps = scaffold(async (ctx) => {
   // Try to fetch the view as the current user. If this is unsuccessful, and error object will
   // be returned and the apiClient will throw an error for us to catch.
   try {
-    // Note: We don't actually care for the returned view, but we still want to perform
-    // the api request to know if this user may access this particular view.
-    await apiClient.get<ZetkinView>(
-      `/api/orgs/${orgId}/people/views/${viewId}`
-    );
-
-    // Check if user is an official
-    // TODO: Consider moving this to some more general-purpose utility
-    const officialMemberships = await getUserMemberships(ctx, false);
+    const [, officialMemberships] = await Promise.all([
+      // Note: We don't actually care for the returned view, but we still want to perform
+      // the api request to know if this user may access this particular view.
+      apiClient.get<ZetkinView>(`/api/orgs/${orgId}/people/views/${viewId}`),
+      // Check if user is an official
+      // TODO: Consider moving this to some more general-purpose utility
+      getUserMemberships(ctx, false),
+    ]);
     const isOfficialMember = officialMemberships.includes(
       parseInt(orgId as string)
     );
