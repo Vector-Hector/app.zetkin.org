@@ -28,12 +28,10 @@ export default makeRPCDef<Params, Result>('deleteViewFolder');
 async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { orgId, folderId } = params;
 
-  const folders = await apiClient.get<ZetkinViewFolder[]>(
-    `/api/orgs/${orgId}/people/view_folders`
-  );
-  const views = await apiClient.get<ZetkinView[]>(
-    `/api/orgs/${orgId}/people/views`
-  );
+  const [folders, views] = await Promise.all([
+    apiClient.get<ZetkinViewFolder[]>(`/api/orgs/${orgId}/people/view_folders`),
+    apiClient.get<ZetkinView[]>(`/api/orgs/${orgId}/people/views`),
+  ]);
 
   const stats: DeleteFolderReport = {
     foldersDeleted: [],
@@ -57,16 +55,24 @@ async function deleteFolder(
   const childFolders = folders.filter(
     (folder) => folder.parent?.id == folderId
   );
-  for await (const childFolder of childFolders) {
-    await deleteFolder(apiClient, orgId, childFolder.id, views, folders, stats);
-  }
+  await Promise.all(
+    childFolders.map((childFolder) =>
+      deleteFolder(apiClient, orgId, childFolder.id, views, folders, stats)
+    )
+  );
 
   // Then delete any views in the folder
   const childViews = views.filter((view) => view.folder?.id == folderId);
-  for await (const childView of childViews) {
-    await apiClient.delete(`/api/orgs/${orgId}/people/views/${childView.id}`);
-    stats.viewsDeleted.push(childView.id);
-  }
+  stats.viewsDeleted.push(
+    ...(await Promise.all(
+      childViews.map(async (childView) => {
+        await apiClient.delete(
+          `/api/orgs/${orgId}/people/views/${childView.id}`
+        );
+        return childView.id;
+      })
+    ))
+  );
 
   // Finally delete the folder itself
   await apiClient.delete(`/api/orgs/${orgId}/people/view_folders/${folderId}`);

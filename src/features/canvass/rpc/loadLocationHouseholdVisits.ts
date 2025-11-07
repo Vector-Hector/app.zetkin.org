@@ -34,13 +34,16 @@ async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
       ),
     100
   );
-  const visits: ZetkinHouseholdVisit[] = [];
-  for await (const household of households) {
-    const householdVisits = await apiClient.get<ZetkinHouseholdVisit[]>(
-      `/api2/orgs/${orgId}/area_assignments/${assignmentId}/households/${household.id}/visits`
-    );
-    visits.push(...householdVisits);
-  }
 
-  return { visits };
+  return {
+    visits: (
+      await Promise.all(
+        households.map((household) =>
+          apiClient.get<ZetkinHouseholdVisit[]>(
+            `/api2/orgs/${orgId}/area_assignments/${assignmentId}/households/${household.id}/visits`
+          )
+        )
+      )
+    ).flat(),
+  };
 }

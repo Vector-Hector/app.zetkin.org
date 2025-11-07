@@ -28,31 +28,33 @@ export default makeRPCDef<Params, Result>(addBulkOptionsDef.name);
 async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { orgId, surveyId, elemId, options } = params;
 
-  const addedOptions: ZetkinSurveyOption[] = [];
-
   const existingOptions = await apiClient.get<ZetkinSurveyOption[]>(
     `/api/orgs/${orgId}/surveys/${surveyId}/elements/${elemId}/options`
   );
 
-  for (const optionText of options) {
-    const option = await apiClient.post<ZetkinSurveyOption>(
-      `/api/orgs/${orgId}/surveys/${surveyId}/elements/${elemId}/options`,
-      { text: optionText }
-    );
-
-    addedOptions.push(option);
-  }
+  const addedOptions = await Promise.all(
+    options.map((optionText) =>
+      apiClient.post<ZetkinSurveyOption>(
+        `/api/orgs/${orgId}/surveys/${surveyId}/elements/${elemId}/options`,
+        { text: optionText }
+      )
+    )
+  );
 
   // Delete all empty options
-  const removedOptions: ZetkinSurveyOption[] = [];
-  for (const oldOption of existingOptions) {
-    if (oldOption.text.trim() == '') {
-      await apiClient.delete(
-        `/api/orgs/${orgId}/surveys/${surveyId}/elements/${elemId}/options/${oldOption.id}`
-      );
-      removedOptions.push(oldOption);
-    }
-  }
+  const removedOptions = (
+    await Promise.all(
+      existingOptions.map(async (oldOption) => {
+        if (oldOption.text.trim() == '') {
+          await apiClient.delete(
+            `/api/orgs/${orgId}/surveys/${surveyId}/elements/${elemId}/options/${oldOption.id}`
+          );
+          return oldOption;
+        }
+        return null;
+      })
+    )
+  ).filter((option) => !!option);
 
   return {
     addedOptions,

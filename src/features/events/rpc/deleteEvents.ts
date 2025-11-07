@@ -24,13 +24,12 @@ export default makeRPCDef<Params, Result>(deleteEventsDef.name);
 async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { events, orgId } = params;
 
-  const removedEvents: number[] = [];
-  for (const eventId of events) {
-    await apiClient.delete(`/api/orgs/${orgId}/actions/${eventId}`);
-    removedEvents.push(eventId);
-  }
-
   return {
-    removedEvents,
+    removedEvents: await Promise.all(
+      events.map(async (eventId) => {
+        await apiClient.delete(`/api/orgs/${orgId}/actions/${eventId}`);
+        return eventId;
+      })
+    ),
   };
 }

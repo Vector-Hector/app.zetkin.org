@@ -52,21 +52,16 @@ export default makeRPCDef<Params, Result>(submitHouseholdVisitsDef.name);
 async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { assignmentId, households, orgId, responses } = params;
 
-  const visits: ZetkinHouseholdVisit[] = [];
-
-  for (const householdId of households) {
-    const visit = await apiClient.post<
-      ZetkinHouseholdVisit,
-      ZetkinHouseholdVisitPostBody
-    >(
-      `/api2/orgs/${orgId}/area_assignments/${assignmentId}/households/${householdId}/visits`,
-      {
-        metrics: responses,
-      }
-    );
-
-    visits.push(visit);
-  }
-
-  return { visits };
+  return {
+    visits: await Promise.all(
+      households.map((householdId) =>
+        apiClient.post<ZetkinHouseholdVisit, ZetkinHouseholdVisitPostBody>(
+          `/api2/orgs/${orgId}/area_assignments/${assignmentId}/households/${householdId}/visits`,
+          {
+            metrics: responses,
+          }
+        )
+      )
+    ),
+  };
 }

@@ -30,16 +30,13 @@ export default makeRPCDef<Params, Result>(updateEventsDef.name);
 
 async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { events, orgId } = params;
-  const updatedEvents: ZetkinEvent[] = [];
-
-  for (const event of events) {
-    const { id, ...data } = event;
-    const updatedEvent = await apiClient.patch<ZetkinEvent>(
-      `/api/orgs/${orgId}/actions/${id}`,
-      data
-    );
-    updatedEvents.push(updatedEvent);
-  }
-
-  return updatedEvents;
+  return await Promise.all(
+    events.map(async (event) => {
+      const { id, ...data } = event;
+      return await apiClient.patch<ZetkinEvent>(
+        `/api/orgs/${orgId}/actions/${id}`,
+        data
+      );
+    })
+  );
 }

@@ -38,9 +38,18 @@ async function handle(params: Params, apiClient: IApiClient) {
     opensByDate: [],
   };
 
-  const recipients = await apiClient.get<ZetkinEmailRecipient[]>(
-    `/api/orgs/${orgId}/emails/${emailId}/recipients`
-  );
+  const [recipients, stats, links, email] = await Promise.all([
+    apiClient.get<ZetkinEmailRecipient[]>(
+      `/api/orgs/${orgId}/emails/${emailId}/recipients`
+    ),
+    apiClient.get<ZetkinEmailStats>(
+      `/api/orgs/${orgId}/emails/${emailId}/stats`
+    ),
+    apiClient.get<ZetkinEmailLink[]>(
+      `/api/orgs/${orgId}/emails/${emailId}/links`
+    ),
+    apiClient.get<ZetkinEmail>(`/api/orgs/${orgId}/emails/${emailId}`),
+  ]);
 
   const sortedOpens = recipients
     .filter((recipient) => !!recipient.opened)
@@ -70,18 +79,6 @@ async function handle(params: Params, apiClient: IApiClient) {
       }
     });
   }
-
-  const stats = await apiClient.get<ZetkinEmailStats>(
-    `/api/orgs/${orgId}/emails/${emailId}/stats`
-  );
-
-  const links = await apiClient.get<ZetkinEmailLink[]>(
-    `/api/orgs/${orgId}/emails/${emailId}/links`
-  );
-
-  const email = await apiClient.get<ZetkinEmail>(
-    `/api/orgs/${orgId}/emails/${emailId}`
-  );
 
   const linkTextByTag: Record<string, string | undefined> = {};
   const traverser = new EmailContentTraverser(

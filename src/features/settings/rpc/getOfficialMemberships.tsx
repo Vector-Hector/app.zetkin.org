@@ -27,16 +27,21 @@ async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
     `/api/orgs/${orgId}/officials`
   );
 
-  for (const official of officials) {
-    const membership = await apiClient.get<[ZetkinMembership]>(
-      `/api/orgs/${orgId}/people/${official.id}/connections`
-    );
+  (
+    await Promise.all(
+      officials.map((official) =>
+        apiClient.get<[ZetkinMembership]>(
+          `/api/orgs/${orgId}/people/${official.id}/connections`
+        )
+      )
+    )
+  ).forEach((membership) => {
     const orgMembership = membership.find((m) => m.organization.id == orgId);
 
     if (orgMembership) {
       memberships.push(orgMembership);
     }
-  }
+  });
 
   return memberships;
 }
