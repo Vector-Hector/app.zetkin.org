@@ -69,18 +69,20 @@ async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   let failedTargetId: number = 0;
 
   try {
-    for (const { surveyId, targetId, submission } of submissions) {
-      failedSurveyId = surveyId;
-      failedTargetId = targetId;
+    await Promise.all(
+      submissions.map(({ surveyId, targetId, submission }) => {
+        failedSurveyId = surveyId;
+        failedTargetId = targetId;
 
-      await apiClient.post(
-        `/api/orgs/${orgId}/surveys/${surveyId}/submissions`,
-        {
-          responses: submission.responses,
-          signature: targetId,
-        }
-      );
-    }
+        return apiClient.post(
+          `/api/orgs/${orgId}/surveys/${surveyId}/submissions`,
+          {
+            responses: submission.responses,
+            signature: targetId,
+          }
+        );
+      })
+    );
   } catch (err) {
     return {
       details: { surveyId: failedSurveyId, targetId: failedTargetId },

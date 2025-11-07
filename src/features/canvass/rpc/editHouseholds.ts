@@ -32,19 +32,17 @@ export default makeRPCDef<Params, Result>(editHouseholdsDef.name);
 async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { locationId, color, level, householdIds, orgId } = params;
 
-  const updatedHouseholds: HouseholdWithColor[] = [];
-
-  for (const householdId of householdIds) {
-    const updatedHousehold = await apiClient.patch<
-      HouseholdWithColor,
-      HouseholdPatchBody
-    >(`/beta/orgs/${orgId}/locations/${locationId}/households/${householdId}`, {
-      color: (color ?? 'clear') as HouseholdColor,
-      level,
-    });
-
-    updatedHouseholds.push(updatedHousehold);
-  }
-
-  return { updatedHouseholds };
+  return {
+    updatedHouseholds: await Promise.all(
+      householdIds.map((householdId) =>
+        apiClient.patch<HouseholdWithColor, HouseholdPatchBody>(
+          `/beta/orgs/${orgId}/locations/${locationId}/households/${householdId}`,
+          {
+            color: (color ?? 'clear') as HouseholdColor,
+            level,
+          }
+        )
+      )
+    ),
+  };
 }

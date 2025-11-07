@@ -32,14 +32,13 @@ export async function GET(
     .toISOString()
     .slice(0, 10);
 
-  const events = await apiClient.get<ZetkinEvent[]>(
-    `/api/orgs/${orgId}/campaigns/${projId}/actions?filter=start_time>=${startTime}`
-  );
-
-  const org = await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
-  const campaign = await apiClient.get<ZetkinCampaign>(
-    `/api/orgs/${orgId}/campaigns/${projId}`
-  );
+  const [events, org, campaign] = await Promise.all([
+    apiClient.get<ZetkinEvent[]>(
+      `/api/orgs/${orgId}/campaigns/${projId}/actions?filter=start_time>=${startTime}`
+    ),
+    apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`),
+    apiClient.get<ZetkinCampaign>(`/api/orgs/${orgId}/campaigns/${projId}`),
+  ]);
 
   return new Response(icsFromEvents(campaign.title, events, org), {
     headers: { 'Content-Type': 'text/calendar' },

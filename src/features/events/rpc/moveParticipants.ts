@@ -27,20 +27,22 @@ export default makeRPCDef<Params, void>(moveParticipantsDef.name);
 async function handle(params: Params, apiClient: IApiClient): Promise<void> {
   const { ops, orgId } = params;
 
-  for (const op of ops) {
-    const { eventId, kind, personId } = op;
-    try {
-      if (kind == 'add') {
-        await apiClient.put(
-          `/api/orgs/${orgId}/actions/${eventId}/participants/${personId}`
-        );
-      } else {
-        await apiClient.delete(
-          `/api/orgs/${orgId}/actions/${eventId}/participants/${personId}`
-        );
+  await Promise.all(
+    ops.map(async (op) => {
+      const { eventId, kind, personId } = op;
+      try {
+        if (kind == 'add') {
+          await apiClient.put(
+            `/api/orgs/${orgId}/actions/${eventId}/participants/${personId}`
+          );
+        } else {
+          await apiClient.delete(
+            `/api/orgs/${orgId}/actions/${eventId}/participants/${personId}`
+          );
+        }
+      } catch (err) {
+        // Just ignore
       }
-    } catch (err) {
-      // Just ignore
-    }
-  }
+    })
+  );
 }

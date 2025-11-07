@@ -22,40 +22,43 @@ async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
   const { folderId, orgId, oldViewId, title } = params;
 
   // Fetch info about column to copy
-  const oldView = await apiClient.get<ZetkinView>(
-    `/api/orgs/${orgId}/people/views/${oldViewId}`
-  );
-  const oldColumns = await apiClient.get<ZetkinViewColumn[]>(
-    `/api/orgs/${orgId}/people/views/${oldViewId}/columns`
-  );
+  const [oldView, oldColumns, newView] = await Promise.all([
+    apiClient.get<ZetkinView>(`/api/orgs/${orgId}/people/views/${oldViewId}`),
+    apiClient.get<ZetkinViewColumn[]>(
+      `/api/orgs/${orgId}/people/views/${oldViewId}/columns`
+    ),
 
-  // Create new table
-  const newView = await apiClient.post<ZetkinView, ZetkinViewPostBody>(
-    `/api/orgs/${orgId}/people/views`,
-    {
-      folder_id: folderId,
-      title,
-    }
-  );
+    // Create new table
+    apiClient.post<ZetkinView, ZetkinViewPostBody>(
+      `/api/orgs/${orgId}/people/views`,
+      {
+        folder_id: folderId,
+        title,
+      }
+    ),
+  ]);
 
   // Populate new table columns
-  for await (const column of oldColumns) {
-    await apiClient.post<ZetkinViewColumn, PendingZetkinViewColumn>(
-      `/api/orgs/${orgId}/people/views/${newView.id}/columns`,
-      {
-        config: column.config,
-        description: column.description,
-        title: column.title,
-        type: column.type,
-      }
-    );
-  }
+  await Promise.all(
+    oldColumns.map((column) =>
+      apiClient.post<ZetkinViewColumn, PendingZetkinViewColumn>(
+        `/api/orgs/${orgId}/people/views/${newView.id}/columns`,
+        {
+          config: column.config,
+          description: column.description,
+          title: column.title,
+          type: column.type,
+        }
+      )
+    )
+  );
 
   if (
     oldView.content_query != null &&
     oldView.content_query.filter_spec.length != 0
   ) {
     // Copy filters
+    // todo no await? is this intentional?
     apiClient.patch<ZetkinQuery[], Pick<ZetkinQuery, 'filter_spec'>>(
       `/api/orgs/${orgId}/people/views/${newView.id}/content_query`,
       {
@@ -68,11 +71,13 @@ async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
       `/api/orgs/${orgId}/people/views/${oldView.id}/rows`
     );
     if (rows.length != 0) {
-      for await (const person of rows) {
-        await apiClient.put(
-          `/api/orgs/${orgId}/people/views/${newView.id}/rows/${person.id}`
-        );
-      }
+      await Promise.all(
+        rows.map((person) =>
+          apiClient.put(
+            `/api/orgs/${orgId}/people/views/${newView.id}/rows/${person.id}`
+          )
+        )
+      );
     }
   }
 

@@ -28,11 +28,12 @@ export async function GET(
     .toISOString()
     .slice(0, 10);
 
-  const events = await apiClient.get<ZetkinEvent[]>(
-    `/api/orgs/${orgId}/actions?recursive&filter=start_time>=${startTime}`
-  );
-
-  const org = await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
+  const [events, org] = await Promise.all([
+    apiClient.get<ZetkinEvent[]>(
+      `/api/orgs/${orgId}/actions?recursive&filter=start_time>=${startTime}`
+    ),
+    apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`),
+  ]);
 
   return new Response(icsFromEvents(org.title, events, org), {
     headers: { 'Content-Type': 'text/calendar' },

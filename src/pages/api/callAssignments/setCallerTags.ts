@@ -67,15 +67,13 @@ async function updateTags(
   const newTagIds = requestedIds.filter(
     (tagId) => !existing.find((tag) => tag.id == tagId)
   );
-  for (const tagId of newTagIds) {
-    try {
+  await Promise.allSettled(
+    newTagIds.map(async (tagId) => {
       const addRes = await apiFetch(`${basePath}/${tagId}`, { method: 'PUT' });
       const addData = await addRes.json();
       newTags.push(addData.data as ZetkinTag);
-    } catch (err) {
-      // Supress errors
-    }
-  }
+    })
+  );
 
   // Find and remove tags that were assigned, but shouldn't be
   const removedTagIds: number[] = [];
@@ -83,14 +81,12 @@ async function updateTags(
     .filter((tag) => !requestedIds.includes(tag.id))
     .map((tag) => tag.id);
 
-  for (const tagId of removeTagIds) {
-    try {
+  await Promise.allSettled(
+    removeTagIds.map(async (tagId) => {
       await apiFetch(`${basePath}/${tagId}`, { method: 'DELETE' });
       removedTagIds.push(tagId);
-    } catch (err) {
-      // Supress errors
-    }
-  }
+    })
+  );
 
   // Return tags after changes
   return existing

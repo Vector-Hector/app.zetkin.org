@@ -34,14 +34,15 @@ export default async function handler(
 
   const client = new BackendApiClient(req.headers);
 
-  const stats = await client.get<ZetkinCallAssignmentStats>(
-    `/api/orgs/${org}/call_assignments/${assignment}/stats`
-  );
-
+  const [stats, calls] = await Promise.all([
+    client.get<ZetkinCallAssignmentStats>(
+      `/api/orgs/${org}/call_assignments/${assignment}/stats`
+    ),
+    client.get<{ allocation_time: string }[]>(
+      `/api/orgs/${org}/call_assignments/${assignment}/calls?pp=1&p=0`
+    ),
+  ]);
   let mostRecentCallTime: string | null = null;
-  const calls = await client.get<{ allocation_time: string }[]>(
-    `/api/orgs/${org}/call_assignments/${assignment}/calls?pp=1&p=0`
-  );
   if (calls.length) {
     mostRecentCallTime = calls[0].allocation_time;
   }

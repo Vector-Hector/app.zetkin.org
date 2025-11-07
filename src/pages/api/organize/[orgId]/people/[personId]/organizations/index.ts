@@ -28,13 +28,11 @@ const getOrganizationTrees = async (
   const apiFetch = createApiFetch(req.headers);
 
   try {
-    const requestOrgRes = await apiFetch(`/orgs/${orgId}`);
-    const subOrgRes = await apiFetch(
-      `/orgs/${orgId}/sub_organizations?recursive`
-    );
-    const connectionsRes = await apiFetch(
-      `/orgs/${orgId}/people/${personId}/connections`
-    );
+    const [requestOrgRes, subOrgRes, connectionsRes] = await Promise.all([
+      apiFetch(`/orgs/${orgId}`),
+      apiFetch(`/orgs/${orgId}/sub_organizations?recursive`),
+      apiFetch(`/orgs/${orgId}/people/${personId}/connections`),
+    ]);
 
     const { data: requestOrg } = await requestOrgRes.json();
     const { data: subOrgs } = await subOrgRes.json();
