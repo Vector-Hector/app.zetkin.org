@@ -16,12 +16,7 @@ import {
   useListRef,
 } from 'react-window';
 import Typography from '@mui/material/Typography';
-import {
-  AutocompleteProps,
-  Box,
-  SlotProps,
-  TextFieldProps,
-} from '@mui/material';
+import { Box, SlotProps } from '@mui/material';
 import {
   AutocompleteChangeDetails,
   AutocompleteChangeReason,
@@ -162,8 +157,8 @@ const StyledPopper = styled(Popper)({
       padding: 0,
     },
     boxSizing: 'border-box',
-    width: 'auto !important',
   },
+  minWidth: '400px',
 });
 
 type Item = {
@@ -177,7 +172,7 @@ type Props = {
   minWidth?: string;
   onChange?: (
     event: React.SyntheticEvent & { target: { value: string } },
-    value: AutocompleteValue<Item, false, false, false>,
+    value: AutocompleteValue<Item, false, true, false>,
     reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<Item>
   ) => void;
@@ -236,7 +231,7 @@ const StyledGroupedSelect: FC<Props> = (props) => {
   const onChange = useCallback(
     (
       event: React.SyntheticEvent,
-      value: AutocompleteValue<Item, false, false, false>,
+      value: AutocompleteValue<Item, false, true, false>,
       reason: AutocompleteChangeReason,
       details?: AutocompleteChangeDetails<Item>
     ) => {
@@ -291,8 +286,11 @@ const StyledGroupedSelect: FC<Props> = (props) => {
         } as SlotProps<
           ComponentType<HTMLAttributes<HTMLUListElement>>,
           unknown,
-          AutocompleteOwnerState<Item, false, false, false, 'div'>
+          AutocompleteOwnerState<Item, false, true, false, 'div'>
         >,
+        popper: {
+          placement: 'bottom-start',
+        },
       }}
       slots={{
         popper: StyledPopper,
@@ -315,7 +313,9 @@ const StyledGroupedSelect: FC<Props> = (props) => {
           fontSize: '34px',
           padding: 0,
         },
+        display: 'inline-block',
         minWidth: props.minWidth,
+        verticalAlign: 'bottom',
         width: 'fit-content',
       }}
       value={valueItem}
