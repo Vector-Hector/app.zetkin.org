@@ -1,89 +1,325 @@
+import * as React from 'react';
+import { ComponentType, FC, HTMLAttributes, useCallback, useMemo } from 'react';
+import TextField from '@mui/material/TextField';
+import Autocomplete, {
+  autocompleteClasses,
+  AutocompleteOwnerState,
+} from '@mui/material/Autocomplete';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import ListSubheader from '@mui/material/ListSubheader';
+import Popper from '@mui/material/Popper';
+import { styled, useTheme } from '@mui/material/styles';
 import {
-  ListSubheader,
-  MenuItem,
-  TextField,
+  List,
+  ListImperativeAPI,
+  RowComponentProps,
+  useListRef,
+} from 'react-window';
+import Typography from '@mui/material/Typography';
+import {
+  AutocompleteProps,
+  Box,
+  SlotProps,
   TextFieldProps,
-  Theme,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { FC, ReactElement } from 'react';
+import {
+  AutocompleteChangeDetails,
+  AutocompleteChangeReason,
+  AutocompleteValue,
+} from '@mui/material/useAutocomplete/useAutocomplete';
 
-import oldTheme from 'theme';
+const LISTBOX_PADDING = 8; // px
 
-interface StyleProps {
-  minWidth?: string;
+type ItemData = Array<
+  | {
+      children: React.ReactNode;
+      group: string;
+      key: number;
+    }
+  | [React.ReactElement, string, number]
+>;
+
+function RowComponent({
+  index,
+  itemData,
+  style,
+}: RowComponentProps & {
+  itemData: ItemData;
+}) {
+  const dataSet = itemData[index];
+  const inlineStyle = {
+    ...style,
+    top: ((style.top as number) ?? 0) + LISTBOX_PADDING,
+  };
+
+  if ('group' in dataSet) {
+    return (
+      <ListSubheader key={dataSet.key} component="div" style={inlineStyle}>
+        {dataSet.group}
+      </ListSubheader>
+    );
+  }
+
+  const { key, ...optionProps } = dataSet[0];
+
+  return (
+    <Typography
+      key={key}
+      component="li"
+      {...optionProps}
+      noWrap
+      style={inlineStyle}
+    >
+      {dataSet[1]}
+    </Typography>
+  );
 }
-const useStyles = makeStyles<Theme, StyleProps>(() => ({
-  MuiInput: {
-    fontSize: oldTheme.typography.h4.fontSize,
-    padding: 0,
-  },
-  MuiSelect: {
-    fontSize: oldTheme.typography.h4.fontSize,
-    minWidth: ({ minWidth }) => minWidth,
-    padding: 0,
-  },
-  MuiTextField: {
-    display: 'inline',
-    verticalAlign: 'inherit',
-  },
-}));
 
-type Props = TextFieldProps & {
-  items: {
-    group: string | null;
-    id: string | number;
-    label: string;
-  }[];
+// Adapter for react-window v2
+const ListboxComponent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLElement> & {
+    internalListRef: React.Ref<ListImperativeAPI>;
+    onItemsBuilt: (optionIndexMap: Map<string, number>) => void;
+  }
+>(function ListboxComponent(props, ref) {
+  const { children, internalListRef, onItemsBuilt, ...other } = props;
+  const itemData: ItemData = [];
+  const optionIndexMap = React.useMemo(() => new Map<string, number>(), []);
+
+  (children as ItemData).forEach((item) => {
+    if ('group' in item && item.group.trim() !== '') {
+      itemData.push(item);
+    }
+    if ('children' in item && Array.isArray(item.children)) {
+      itemData.push(...item.children);
+    }
+  });
+
+  // Map option values to their indices in the flattened array
+  itemData.forEach((item, index) => {
+    if (Array.isArray(item) && item[1]) {
+      optionIndexMap.set(item[1], index);
+    }
+  });
+
+  React.useEffect(() => {
+    if (onItemsBuilt) {
+      onItemsBuilt(optionIndexMap);
+    }
+  }, [onItemsBuilt, optionIndexMap]);
+
+  const theme = useTheme();
+  const smUp = useMediaQuery(theme.breakpoints.up('sm'), {
+    noSsr: true,
+  });
+  const itemCount = itemData.length;
+  const itemSize = smUp ? 36 : 48;
+
+  const getChildSize = (child: ItemData[number]) => {
+    if (Object.prototype.hasOwnProperty.call(child, 'group')) {
+      return 48;
+    }
+    return itemSize;
+  };
+
+  const getHeight = () => {
+    if (itemCount > 8) {
+      return 8 * itemSize;
+    }
+    return itemData.map(getChildSize).reduce((a, b) => a + b, 0);
+  };
+
+  // Separate className for List, other props for wrapper div (ARIA, handlers)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { className, style, ...otherProps } = other;
+
+  return (
+    <div ref={ref} {...otherProps}>
+      <List
+        key={itemCount}
+        className={className}
+        listRef={internalListRef}
+        overscanCount={5}
+        rowComponent={RowComponent}
+        rowCount={itemCount}
+        rowHeight={(index) => getChildSize(itemData[index])}
+        rowProps={{ itemData }}
+        style={{
+          height: getHeight() + 2 * LISTBOX_PADDING,
+          width: '100%',
+        }}
+        tagName="ul"
+      />
+    </div>
+  );
+});
+
+const StyledPopper = styled(Popper)({
+  [`& .${autocompleteClasses.listbox}`]: {
+    '& ul': {
+      margin: 0,
+      padding: 0,
+    },
+    boxSizing: 'border-box',
+    width: 'auto !important',
+  },
+});
+
+type Item = {
+  group: string | null;
+  id: string | number;
+  label: string;
+};
+
+type Props = {
+  items: Item[];
   minWidth?: string;
+  onChange?: (
+    event: React.SyntheticEvent & { target: { value: string } },
+    value: AutocompleteValue<Item, false, false, false>,
+    reason: AutocompleteChangeReason,
+    details?: AutocompleteChangeDetails<Item>
+  ) => void;
+  value?: string | number;
 };
 
 const StyledGroupedSelect: FC<Props> = (props) => {
-  const classes = useStyles({ minWidth: props.minWidth });
-  const groups = new Set(props.items.map((item) => item.group));
+  const options = useMemo(
+    () =>
+      props.items.sort((item0, item1) => {
+        const group0 = item0.group ?? '';
+        const group1 = item1.group ?? '';
 
-  const options: ReactElement[] = [];
-  Array.from(groups)
-    .sort((group0, group1) => (group0 || '').localeCompare(group1 || ''))
-    .map((groupTitle) => {
-      if (groupTitle) {
-        options.push(
-          <ListSubheader key={groupTitle}>{groupTitle}</ListSubheader>
-        );
+        const ret = group0.localeCompare(group1);
+        if (ret === 0) {
+          return item0.label.localeCompare(item1.label);
+        }
+
+        return ret;
+      }),
+    [props.items]
+  );
+
+  const valueItem = useMemo(
+    () =>
+      props.value === undefined
+        ? undefined
+        : options.find((item) => item.id === props.value),
+    [props.value, options]
+  );
+
+  // Use react-window v2's useListRef hook for imperative API access
+  const internalListRef = useListRef(null);
+  const optionIndexMapRef = React.useRef<Map<string, number>>(new Map());
+
+  const handleItemsBuilt = React.useCallback(
+    (optionIndexMap: Map<string, number>) => {
+      optionIndexMapRef.current = optionIndexMap;
+    },
+    []
+  );
+
+  // Handle keyboard navigation by scrolling to highlighted option
+  const handleHighlightChange = (
+    _event: React.SyntheticEvent,
+    option: Item | null
+  ) => {
+    if (option && internalListRef.current) {
+      const index = optionIndexMapRef.current.get(option.id.toString());
+      if (index !== undefined) {
+        internalListRef.current.scrollToRow({ align: 'auto', index });
       }
+    }
+  };
 
-      props.items
-        .filter((item) => item.group == groupTitle)
-        .sort((item0, item1) => item0.label.localeCompare(item1.label))
-        .forEach((item) => {
-          options.push(
-            <MenuItem
-              key={item.id}
-              sx={{ ml: groupTitle ? 2 : 0 }}
-              value={item.id}
-            >
-              {item.label}
-            </MenuItem>
-          );
-        });
-    });
+  const onChange = useCallback(
+    (
+      event: React.SyntheticEvent,
+      value: AutocompleteValue<Item, false, false, false>,
+      reason: AutocompleteChangeReason,
+      details?: AutocompleteChangeDetails<Item>
+    ) => {
+      props.onChange?.(
+        {
+          ...event,
+          target: {
+            ...event.target,
+            value: value ? value.id.toString() : '',
+          },
+        },
+        value,
+        reason,
+        details
+      );
+    },
+    [props.onChange]
+  );
 
   return (
-    <TextField
-      className={classes.MuiTextField}
-      inputProps={{ className: classes.MuiInput }}
-      select
-      {...props}
-      SelectProps={{
-        renderValue: (value) =>
-          props.items.find((item) => item.id == value)?.label ?? '',
-        ...props.SelectProps,
-        className: classes.MuiSelect,
+    <Autocomplete
+      disableClearable={true}
+      disableListWrap
+      groupBy={(option) => option.group ?? ''}
+      onChange={onChange}
+      onHighlightChange={handleHighlightChange}
+      options={options}
+      renderGroup={(params) => params as unknown as React.ReactNode}
+      renderInput={(params) => (
+        <Box>
+          <TextField {...params} />
+          <Typography
+            sx={{
+              fontSize: '34px',
+              height: 0,
+              opacity: 0,
+              paddingRight: '39px',
+            }}
+          >
+            {valueItem?.label}
+          </Typography>
+        </Box>
+      )}
+      renderOption={(props, option, state) =>
+        [props, option.label, state.index] as React.ReactNode
+      }
+      slotProps={{
+        listbox: {
+          component: ListboxComponent,
+          internalListRef,
+          onItemsBuilt: handleItemsBuilt,
+        } as SlotProps<
+          ComponentType<HTMLAttributes<HTMLUListElement>>,
+          unknown,
+          AutocompleteOwnerState<Item, false, false, false, 'div'>
+        >,
       }}
-      variant="standard"
-    >
-      {options}
-    </TextField>
+      slots={{
+        popper: StyledPopper,
+      }}
+      sx={{
+        '& .MuiInputBase-root': {
+          border: 'none',
+          borderBottom: `1px solid rgba(0, 0, 0, 0.42)`,
+          borderRadius: 0,
+          display: 'flex',
+          padding: 0,
+        },
+        '& .MuiInputBase-root:hover': {
+          borderBottom: `2px solid #ED1C55`,
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        },
+        '& .MuiOutlinedInput-root .MuiInputBase-input': {
+          fontSize: '34px',
+          padding: 0,
+        },
+        minWidth: props.minWidth,
+        width: 'fit-content',
+      }}
+      value={valueItem}
+    />
   );
 };
 
