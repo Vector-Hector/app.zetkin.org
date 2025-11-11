@@ -63,13 +63,11 @@ const AllCampaignsSummaryPage: PageWithLayout = () => {
   );
 
   return (
-    <>
+    <Suspense>
       <Head>
         <title>{messages.layout.allCampaigns()}</title>
       </Head>
-      <Suspense>
-        <ActivitiesOverview orgId={orgId} />
-      </Suspense>
+      <ActivitiesOverview orgId={orgId} />
       <Box mt={4}>
         <Typography mb={2} variant="h4">
           <Msg id={messageIds.all.heading} />
@@ -90,7 +88,7 @@ const AllCampaignsSummaryPage: PageWithLayout = () => {
           })}
         </Grid>
       </Box>
-    </>
+    </Suspense>
   );
 };
 
