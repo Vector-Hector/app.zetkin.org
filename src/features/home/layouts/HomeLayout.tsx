@@ -8,7 +8,7 @@ import NextLink from 'next/link';
 import { useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
 import ZUIPublicFooter from 'zui/components/ZUIPublicFooter';
-import ActivistPortalHeader from 'features/organizations/components/ActivistPortlHeader';
+import ActivistPortalHeader from 'features/organizations/components/ActivistPortalHeader';
 import ZUIText from 'zui/components/ZUIText';
 
 type Props = {
