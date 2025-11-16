@@ -1,14 +1,15 @@
 'use server';
 
 import Iron from '@hapi/iron';
+import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
-import { EmbeddedJoinFormData, EmbeddedJoinFormStatus } from '../types';
+import { EmbeddedJoinFormData } from '../types';
 
 export default async function submitJoinForm(
-  prevState: EmbeddedJoinFormStatus,
-  inputFormData: FormData
+  inputFormData: FormData,
+  stylesheet?: string
 ) {
   const headersList = headers();
   const headersEntries = headersList.entries();
@@ -41,5 +42,14 @@ export default async function submitJoinForm(
     }
   );
 
-  return 'submitted';
+  const redirectUrl = inputFormData.get('redirect')?.toString();
+  if (redirectUrl) {
+    redirect(redirectUrl);
+  }
+
+  return redirect(
+    `/o/${joinFormInfo.orgId}/embedjoinform/submitted${
+      stylesheet ? `?stylesheet=${encodeURIComponent(stylesheet)}` : ''
+    }`
+  );
 }
