@@ -86,6 +86,7 @@ const EmbeddedJoinForm: FC<Props> = ({ encrypted, fields }) => {
                     <div>
                       {field.s != 'gender' && (
                         <input
+                          className={'zetkin-joinform_text-input'}
                           name={field.s}
                           required={
                             field.s == 'first_name' || field.s == 'last_name'
