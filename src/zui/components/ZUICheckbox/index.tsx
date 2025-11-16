@@ -59,6 +59,9 @@ const ZUICheckbox: FC<ZUICheckboxProps> = ({
         <Checkbox
           checked={checked}
           onChange={(ev, newCheckedState) => onChange(newCheckedState)}
+          sx={{
+            paddingTop: 0,
+          }}
         />
       }
       disabled={disabled}
@@ -82,6 +85,7 @@ const ZUICheckbox: FC<ZUICheckboxProps> = ({
           '-webkit-user-select': 'none',
           userSelect: 'none',
         },
+        alignItems: 'flex-start',
         marginBottom:
           labelPlacement == 'top' || labelPlacement == 'bottom' ? '0.5rem' : '',
         marginLeft: labelPlacement != 'end' ? 0 : '',
