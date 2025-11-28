@@ -10,10 +10,10 @@ import messageIds from 'features/my/l10n/messageIds';
 import { getSeoTags } from '../../utils/seoTags';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const lang = getBrowserLanguage(headers().get('accept-language') || '');
+  const headersList = await headers();
+  const lang = getBrowserLanguage(headersList.get('accept-language') || '');
   const messages = await getServerMessages(lang, messageIds);
 
-  const headersList = headers();
   const pathname = headersList.get('x-requested-path') || '';
   const lastSegment = pathname.split('/').pop() ?? 'home';
 

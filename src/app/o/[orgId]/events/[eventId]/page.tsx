@@ -7,14 +7,15 @@ import { ZetkinEvent } from 'utils/types/zetkin';
 import { PublicEventPage } from 'features/public/pages/PublicEventPage';
 
 type Props = {
-  params: {
+  params: Promise<{
     eventId: string;
     orgId: number;
-  };
+  }>;
 };
 
-export default async function Page({ params: { eventId, orgId } }: Props) {
-  const headersList = headers();
+export default async function Page(props: Props) {
+  const { eventId, orgId } = await props.params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

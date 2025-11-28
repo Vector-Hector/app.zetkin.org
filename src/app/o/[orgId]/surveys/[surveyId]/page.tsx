@@ -10,15 +10,16 @@ import { ZetkinSurveyExtended, ZetkinUser } from 'utils/types/zetkin';
 import { ApiClientError } from 'core/api/errors';
 
 type Props = {
-  params: {
+  params: Promise<{
     orgId: string;
     surveyId: string;
-  };
+  }>;
 };
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
-const Page: FC<Props> = async ({ params }) => {
-  const headersList = headers();
+const Page: FC<Props> = async (props) => {
+  const params = await props.params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

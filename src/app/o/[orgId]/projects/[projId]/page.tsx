@@ -5,13 +5,14 @@ import { FC } from 'react';
 import PublicProjPage from 'features/public/pages/PublicProjPage';
 
 type Props = {
-  params: {
+  params: Promise<{
     orgId: number;
     projId: number;
-  };
+  }>;
 };
 
-const Page: FC<Props> = ({ params }) => {
+const Page = async (props: Props) => {
+  const params = await props.params;
   return <PublicProjPage campId={params.projId} orgId={params.orgId} />;
 };
 

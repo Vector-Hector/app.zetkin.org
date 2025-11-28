@@ -69,7 +69,7 @@ export const getOrganizationOpenGraphTags = (
   let regionNames: Intl.DisplayNames;
   try {
     regionNames = new Intl.DisplayNames(
-      [headers().get('accept-language')?.split('-')[0] || 'en'],
+      [(await headers()).get('accept-language')?.split('-')[0] || 'en'],
       { type: 'region' }
     );
   } catch (_e) {

@@ -6,16 +6,20 @@ import UnsubscribePage from 'features/public/pages/UnsubscribePage';
 import { ZetkinOrganization } from 'utils/types/zetkin';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     orgId: string;
-  };
+  }>;
   searchParams: {
     unsub?: string;
   };
 };
 
-export default async function Page({ params, searchParams }: PageProps) {
-  const headersList = headers();
+export default async function Page({
+  params: paramsPromise,
+  searchParams,
+}: PageProps) {
+  const params = await paramsPromise;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

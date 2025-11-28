@@ -20,6 +20,7 @@ module.exports = {
         canvas: 'util',
       },
     },
+    reactCompiler: true,
     serverComponentsExternalPackages: ['mjml', 'mongoose'],
   },
   images: {

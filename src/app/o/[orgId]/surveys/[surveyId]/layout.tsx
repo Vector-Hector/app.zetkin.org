@@ -14,13 +14,14 @@ import { getSeoTags } from 'utils/seoTags';
 
 type Props = {
   children: ReactNode;
-  params: {
+  params: Promise<{
     orgId: string;
     surveyId: string;
-  };
+  }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const { orgId, surveyId } = params;
   const apiClient = new BackendApiClient({});
 
@@ -47,9 +48,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
 const SurveyLayout: FC<Props> = async ({
   children,
-  params,
+  params: paramsPromise,
 }): Promise<ReactElement> => {
-  const headersList = headers();
+  const params = await paramsPromise;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

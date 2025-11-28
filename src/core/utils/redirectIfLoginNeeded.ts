@@ -7,7 +7,7 @@ import { ZetkinSession } from 'utils/types/zetkin';
 export default async function redirectIfLoginNeeded(
   requiredAuthLevel: number = 1
 ) {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
