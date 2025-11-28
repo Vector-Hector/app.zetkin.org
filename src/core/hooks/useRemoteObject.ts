@@ -1,15 +1,10 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { useContext, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { useAppDispatch } from './index';
-import shouldLoad from '../caching/shouldLoad';
 import { RemoteItem, RemoteList } from 'utils/storeUtils';
 import { AppDispatch } from 'core/store';
-import {
-  createResource,
-  ResourceCacheContext,
-  useResourceCache,
-} from 'core/hooks/ResourceCacheContext';
+import { useResourceCache } from 'core/hooks/ResourceCacheContext';
 
 export type Hooks<
   DataType,
@@ -84,12 +79,16 @@ export function useRemoteObject<
 
   const cacheKey = hooks.cacheKey || hooks.loader.toString();
 
-  const getResourceCache = useResourceCache(cacheKey, () =>
-    makePromise<DataType, LoaderPayload, OnLoadPayload, OnSuccessPayload>(
-      dispatch,
-      hooks
-    )
+  const fetchFunction = useCallback(
+    () =>
+      makePromise<DataType, LoaderPayload, OnLoadPayload, OnSuccessPayload>(
+        dispatch,
+        hooks
+      ),
+    [dispatch, hooks]
   );
+
+  const getResourceCache = useResourceCache(cacheKey, fetchFunction);
 
   useEffect(() => {
     if (!loadIsNecessary) {

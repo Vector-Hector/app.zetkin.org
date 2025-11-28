@@ -15,9 +15,10 @@ export function createResource<T>(fetchFn: () => Promise<T>) {
   let status = 'initial';
   let result: T | undefined;
   let error: unknown;
+  let fetchFunction = fetchFn;
 
   const sendPromise = () =>
-    fetchFn().then(
+    fetchFunction().then(
       (r) => {
         status = 'success';
         result = r;
@@ -45,7 +46,7 @@ export function createResource<T>(fetchFn: () => Promise<T>) {
     /**
      * Read reads out the current result if available. Otherwise suspends or throws an error.
      */
-    read(): T | undefined {
+    suspendIfNecessary(): T | undefined {
       if (status === 'pending-suspend') {
         throw promise;
       }
@@ -53,6 +54,12 @@ export function createResource<T>(fetchFn: () => Promise<T>) {
         throw error;
       }
       return result;
+    },
+    /*
+     * Update fetch function
+     */
+    updateFetchFunction(newFetchFunction: () => Promise<T>) {
+      fetchFunction = newFetchFunction;
     },
   };
 }
@@ -109,7 +116,7 @@ export const useResourceCache = (
   if (resourceCacheCtx.hasLoaded && resourceCacheCtx.cache.current) {
     const resource = resourceCacheCtx.cache.current.get(cacheKey);
     if (resource) {
-      resource.read(); // suspend if necessary
+      resource.suspendIfNecessary(); // suspend if necessary
     }
   }
 
@@ -118,8 +125,11 @@ export const useResourceCache = (
       return;
     }
 
-    if (!resourceCacheCtx.cache.current.get(cacheKey)) {
+    const current = resourceCacheCtx.cache.current.get(cacheKey);
+    if (!current) {
       resourceCacheCtx.cache.current.set(cacheKey, createResource(fetchFn));
+    } else {
+      current.updateFetchFunction(fetchFn);
     }
   }, [resourceCacheCtx.cache, cacheKey, fetchFn]);
 

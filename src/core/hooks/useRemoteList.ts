@@ -25,7 +25,8 @@ export default function useRemoteList<
       () => ({
         ...hooks,
         hasLoadedOnce: () => hasLoadedOnce(remoteList),
-        isNecessary: () => hooks.isNecessary?.() ?? shouldLoad(remoteList),
+        isNecessary: () =>
+          hooks.isNecessary ? hooks.isNecessary() : shouldLoad(remoteList),
       }),
       [hooks, remoteList]
     );
