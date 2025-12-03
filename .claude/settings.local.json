@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run generate-openapi:*)",
+      "Bash(npm install:*)",
+      "Bash(npx swagger-ui-watcher openapi.json)",
+      "Bash(timeout 5 npx swagger-ui-watcher:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
