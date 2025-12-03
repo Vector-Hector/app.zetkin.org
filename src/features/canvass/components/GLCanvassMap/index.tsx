@@ -176,7 +176,7 @@ const GLCanvassMap: FC<Props> = ({ assignment, selectedArea }) => {
     }
 
     return locations.data?.find((loc) => loc.id == selectedLocationId) || null;
-  }, [locations]);
+  }, [locations, selectedLocationId]);
 
   const locationTitles = useMemo(() => {
     const titles = locations.data?.map((l) => l.title) ?? [];
