@@ -3,12 +3,17 @@
   "info": {
     "title": "Zetkin App API",
     "version": "1.0.0",
-    "description": "Auto-generated API documentation from TypeScript codebase",
+    "description": "REST API for the Zetkin Platform - Combining auto-generated endpoints with official Zetkin API documentation",
     "contact": {
-      "name": "Zetkin Foundation"
+      "name": "Zetkin Foundation",
+      "url": "https://developer.zetkin.org"
     }
   },
   "servers": [
+    {
+      "url": "https://api.zetk.in",
+      "description": "Production Zetkin API"
+    },
     {
       "url": "http://localhost:3000",
       "description": "Development server"
@@ -13920,10 +13925,1363 @@
           }
         }
       }
+    },
+    "/api/orgs/{orgId}/avatar": {
+      "get": {
+        "summary": "Get organization avatar",
+        "description": "Retrieve organization avatar image",
+        "operationId": "getOrganizationAvatar",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar image",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {},
+              "image/gif": {}
+            }
+          },
+          "404": {
+            "description": "Organization or avatar not found"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/people/{personId}/avatar": {
+      "get": {
+        "summary": "Get person avatar",
+        "description": "Retrieve person avatar image",
+        "operationId": "getPersonAvatar",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar image",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {},
+              "image/gif": {}
+            }
+          },
+          "404": {
+            "description": "Person or avatar not found"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/people/{personId}/fields": {
+      "get": {
+        "summary": "Get person custom field values",
+        "description": "Get values for all fields that have been set on this person",
+        "operationId": "getPersonFields",
+        "tags": [
+          "People",
+          "Custom Fields"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of field values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "value": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/people/{personId}/fields/{fieldId}": {
+      "get": {
+        "summary": "Get person field value",
+        "description": "Get value for a specific field",
+        "operationId": "getPersonFieldValue",
+        "tags": [
+          "People",
+          "Custom Fields"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Field value",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Set person field value",
+        "description": "Set or update value for a specific field",
+        "operationId": "setPersonFieldValue",
+        "tags": [
+          "People",
+          "Custom Fields"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {}
+                },
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Field value updated"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete person field value",
+        "description": "Remove value for a specific field",
+        "operationId": "deletePersonFieldValue",
+        "tags": [
+          "People",
+          "Custom Fields"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Field value deleted"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/people/{personId}/notes": {
+      "get": {
+        "summary": "Get person notes",
+        "description": "Access all notes for this person",
+        "operationId": "getPersonNotes",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of notes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "created": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "author": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add person note",
+        "description": "Add a new note to this person",
+        "operationId": "addPersonNote",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Note created"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/people/{personId}/notes/{noteId}": {
+      "delete": {
+        "summary": "Delete person note",
+        "description": "Remove a note from this person",
+        "operationId": "deletePersonNote",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note deleted"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/people/{personId}/timeline": {
+      "get": {
+        "summary": "Get person timeline",
+        "description": "View person's activity history",
+        "operationId": "getPersonTimeline",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Timeline of activities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/groups": {
+      "get": {
+        "summary": "List groups",
+        "description": "List all groups in organization",
+        "operationId": "listGroups",
+        "tags": [
+          "People",
+          "Groups"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create group",
+        "description": "Create a new group",
+        "operationId": "createGroup",
+        "tags": [
+          "People",
+          "Groups"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Group created"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/groups/{groupId}/members": {
+      "get": {
+        "summary": "List group members",
+        "description": "Get all members of a group",
+        "operationId": "listGroupMembers",
+        "tags": [
+          "People",
+          "Groups"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of group members"
+          }
+        }
+      },
+      "put": {
+        "summary": "Set group members",
+        "description": "Replace all members of a group",
+        "operationId": "setGroupMembers",
+        "tags": [
+          "People",
+          "Groups"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "member_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "required": [
+                  "member_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Group members updated"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Add group members",
+        "description": "Add members to a group",
+        "operationId": "addGroupMembers",
+        "tags": [
+          "People",
+          "Groups"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "member_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "required": [
+                  "member_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Members added to group"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove group members",
+        "description": "Remove members from a group",
+        "operationId": "removeGroupMembers",
+        "tags": [
+          "People",
+          "Groups"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "member_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "required": [
+                  "member_ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Members removed from group"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/invites": {
+      "get": {
+        "summary": "List organization invitations",
+        "description": "Get all pending invitations for the organization",
+        "operationId": "listInvitations",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of invitations"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create invitation",
+        "description": "Create a new invitation to join the organization",
+        "operationId": "createInvitation",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invitation created"
+          }
+        }
+      }
+    },
+    "/api/orgs/{orgId}/invites/{inviteId}": {
+      "get": {
+        "summary": "Get invitation",
+        "description": "Retrieve details of a specific invitation",
+        "operationId": "getInvitation",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "inviteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation details"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete invitation",
+        "description": "Cancel/delete a pending invitation",
+        "operationId": "deleteInvitation",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "inviteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Invitation deleted"
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/invites": {
+      "get": {
+        "summary": "Get user invitations",
+        "description": "View all invitations for a user",
+        "operationId": "getUserInvitations",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user invitations"
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/profiles": {
+      "get": {
+        "summary": "Get user profiles",
+        "description": "Retrieve all profiles for a user across organizations",
+        "operationId": "getUserProfiles",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user profiles"
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/recommended_organizations": {
+      "get": {
+        "summary": "Get recommended organizations",
+        "description": "Get list of organizations recommended for this user",
+        "operationId": "getRecommendedOrganizations",
+        "tags": [
+          "Users",
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recommended organizations"
+          }
+        }
+      }
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "lang": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "is_open": {
+            "type": "boolean"
+          },
+          "is_public": {
+            "type": "boolean"
+          },
+          "parent": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "avatar_file": {
+            "nullable": true,
+            "$ref": "#/components/schemas/File"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "country",
+          "is_active",
+          "is_open",
+          "is_public"
+        ]
+      },
+      "Membership": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "follow": {
+            "type": "boolean"
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "inherited": {
+            "type": "boolean",
+            "default": false
+          },
+          "role": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "admin",
+              "organizer",
+              null
+            ]
+          }
+        },
+        "required": [
+          "organization",
+          "profile"
+        ]
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "alt_phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "street_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "co_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "gender": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "f",
+              "m",
+              "o",
+              null
+            ]
+          },
+          "ext_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_user": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "is_user"
+        ]
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
+          "value_type": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "text",
+              null
+            ]
+          },
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "group": {
+            "nullable": true,
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "hidden",
+          "organization"
+        ]
+      },
+      "CustomField": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "url",
+              "json",
+              "date",
+              "enum"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "org_read": {
+            "type": "string",
+            "enum": [
+              "sameorg",
+              "suborgs"
+            ]
+          },
+          "org_write": {
+            "type": "string",
+            "enum": [
+              "sameorg",
+              "suborgs"
+            ]
+          },
+          "enum_choices": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "type",
+          "organization",
+          "org_read",
+          "org_write"
+        ]
+      },
+      "Official": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "organizer",
+              "admin"
+            ]
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "first_name",
+          "last_name"
+        ]
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "original_name": {
+            "type": "string"
+          },
+          "uploaded": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "original_name",
+          "uploaded",
+          "url",
+          "mime_type",
+          "organization"
+        ]
+      }
+    },
     "securitySchemes": {
       "cookieAuth": {
         "type": "apiKey",
