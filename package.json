@@ -24,8 +24,7 @@
     "playwright:ci": "cross-env NODE_ENV=production playwright test",
     "storybook": "storybook dev -p 6006",
     "make-yaml": "ts-node src/tools/make-yaml.ts",
-    "generate-openapi": "ts-node scripts/generate-openapi.ts",
-    "openapi:view": "npx swagger-ui-watcher -p 8080 openapi.json"
+    "generate-openapi": "ts-node src/tools/generate-openapi.ts"
   },
   "dependencies": {
     "@date-io/date-fns": "1.x",

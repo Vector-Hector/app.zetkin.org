@@ -1,16 +1,5 @@
 #!/usr/bin/env ts-node
 
-/**
- * OpenAPI/Swagger Generator for Zetkin App
- *
- * This script parses the TypeScript codebase to extract all API calls
- * made through apiClient and generates an OpenAPI 3.0 specification.
- *
- * Usage:
- *   npm run generate-openapi
- *   npm run generate-openapi -- --output custom-output.json
- */
-
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -40,9 +29,14 @@ class OpenApiGenerator {
   private program: ts.Program;
 
   constructor(private rootDir: string) {
-    // Create TypeScript program for type checking
-    const configPath = ts.findConfigFile(rootDir, ts.sys.fileExists, 'tsconfig.json');
-    const configFile = configPath ? ts.readConfigFile(configPath, ts.sys.readFile) : undefined;
+    const configPath = ts.findConfigFile(
+      rootDir,
+      ts.sys.fileExists,
+      'tsconfig.json'
+    );
+    const configFile = configPath
+      ? ts.readConfigFile(configPath, ts.sys.readFile)
+      : undefined;
 
     const compilerOptions: ts.CompilerOptions = {
       target: ts.ScriptTarget.ES2020,
@@ -54,7 +48,6 @@ class OpenApiGenerator {
       noEmit: true,
     };
 
-    // Get all TypeScript files
     const files = glob.sync('**/*.{ts,tsx}', {
       cwd: rootDir,
       ignore: ['node_modules/**', '.next/**', 'dist/**', 'build/**'],
@@ -64,12 +57,10 @@ class OpenApiGenerator {
     this.program = ts.createProgram(files, compilerOptions);
   }
 
-  /**
-   * Parse all files and extract API calls
-   */
   public async parse(): Promise<void> {
-    const sourceFiles = this.program.getSourceFiles()
-      .filter(sf => !sf.fileName.includes('node_modules'));
+    const sourceFiles = this.program
+      .getSourceFiles()
+      .filter((sf) => !sf.fileName.includes('node_modules'));
 
     console.log(`Parsing ${sourceFiles.length} source files...`);
 
@@ -81,16 +72,11 @@ class OpenApiGenerator {
     console.log(`Found ${this.rpcEndpoints.length} RPC endpoints`);
   }
 
-  /**
-   * Visit AST nodes recursively
-   */
   private visitNode(node: ts.Node, sourceFile: ts.SourceFile): void {
-    // Look for apiClient method calls
     if (ts.isCallExpression(node)) {
       this.processCallExpression(node, sourceFile);
     }
 
-    // Look for RPC definitions
     if (ts.isVariableDeclaration(node)) {
       this.processRpcDefinition(node, sourceFile);
     }
@@ -98,18 +84,16 @@ class OpenApiGenerator {
     ts.forEachChild(node, (child) => this.visitNode(child, sourceFile));
   }
 
-  /**
-   * Process apiClient.method() calls
-   */
-  private processCallExpression(node: ts.CallExpression, sourceFile: ts.SourceFile): void {
+  private processCallExpression(
+    node: ts.CallExpression,
+    sourceFile: ts.SourceFile
+  ): void {
     const expression = node.expression;
 
-    // Check if it's a property access (e.g., apiClient.get)
     if (!ts.isPropertyAccessExpression(expression)) {
       return;
     }
 
-    // Check if the method is one of our API methods
     const methodName = expression.name.text;
     const httpMethods = ['get', 'post', 'patch', 'put', 'delete'];
 
@@ -117,7 +101,6 @@ class OpenApiGenerator {
       return;
     }
 
-    // Get the path argument (first argument)
     const pathArg = node.arguments[0];
     if (!pathArg) {
       return;
@@ -128,16 +111,21 @@ class OpenApiGenerator {
       return;
     }
 
-    // Extract types from generics
     const typeArguments = node.typeArguments;
-    const responseType = typeArguments?.[0] ? this.typeToString(typeArguments[0], sourceFile) : undefined;
-    const requestType = typeArguments?.[1] ? this.typeToString(typeArguments[1], sourceFile) : undefined;
+    const responseType = typeArguments?.[0]
+      ? this.typeToString(typeArguments[0], sourceFile)
+      : undefined;
+    const requestType = typeArguments?.[1]
+      ? this.typeToString(typeArguments[1], sourceFile)
+      : undefined;
 
-    // Get file location
-    const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
-    const relativeFile = sourceFile.fileName.replace(this.rootDir, '').replace(/^[\\\/]/, '');
+    const { line } = sourceFile.getLineAndCharacterOfPosition(
+      node.getStart(sourceFile)
+    );
+    const relativeFile = sourceFile.fileName
+      .replace(this.rootDir, '')
+      .replace(/^[\\\/]/, '');
 
-    // Extract path parameters
     const pathParams = this.extractPathParams(path);
     const queryParams = this.extractQueryParams(path);
 
@@ -152,7 +140,6 @@ class OpenApiGenerator {
       queryParams,
     };
 
-    // Normalize the path for grouping
     const normalizedPath = this.normalizePath(path);
 
     if (!this.endpoints.has(normalizedPath)) {
@@ -161,24 +148,24 @@ class OpenApiGenerator {
     this.endpoints.get(normalizedPath)!.push(endpoint);
   }
 
-  /**
-   * Process RPC definition exports
-   */
-  private processRpcDefinition(node: ts.VariableDeclaration, sourceFile: ts.SourceFile): void {
+  private processRpcDefinition(
+    node: ts.VariableDeclaration,
+    sourceFile: ts.SourceFile
+  ): void {
     if (!ts.isIdentifier(node.name)) {
       return;
     }
 
     const name = node.name.getText(sourceFile);
 
-    // Look for pattern like: export const someRpcDef = { handler, name, schema }
     if (!name.endsWith('Def')) {
       return;
     }
 
-    const relativeFile = sourceFile.fileName.replace(this.rootDir, '').replace(/^[\\\/]/, '');
+    const relativeFile = sourceFile.fileName
+      .replace(this.rootDir, '')
+      .replace(/^[\\\/]/, '');
 
-    // Check if it's in an RPC directory
     if (!relativeFile.includes('/rpc/') && !relativeFile.includes('\\rpc\\')) {
       return;
     }
@@ -191,26 +178,31 @@ class OpenApiGenerator {
     });
   }
 
-  /**
-   * Extract path string from various node types
-   */
+  private readonly VALID_API_PREFIXES = ['/api', '/api2', '/beta'];
+
   private extractPathString(node: ts.Node): string | null {
-    // String literal: '/api/orgs/1'
+    let path: string | null = null;
+
     if (ts.isStringLiteral(node)) {
-      return node.text;
+      path = node.text;
+    } else if (
+      ts.isTemplateExpression(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node)
+    ) {
+      path = this.templateToPath(node);
     }
 
-    // Template literal: `/api/orgs/${orgId}`
-    if (ts.isTemplateExpression(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
-      return this.templateToPath(node);
+    if (path && this.isValidApiPath(path)) {
+      return path;
     }
 
     return null;
   }
 
-  /**
-   * Convert template literal to path with parameters
-   */
+  private isValidApiPath(path: string): boolean {
+    return this.VALID_API_PREFIXES.some((prefix) => path.startsWith(prefix));
+  }
+
   private templateToPath(node: ts.TemplateLiteral): string {
     if (ts.isNoSubstitutionTemplateLiteral(node)) {
       return node.text;
@@ -219,7 +211,6 @@ class OpenApiGenerator {
     let result = node.head.text;
 
     for (const span of (node as ts.TemplateExpression).templateSpans) {
-      // Replace expression with parameter placeholder
       const expression = span.expression;
       const paramName = this.getParameterName(expression);
       result += `{${paramName}}`;
@@ -229,9 +220,6 @@ class OpenApiGenerator {
     return result;
   }
 
-  /**
-   * Get parameter name from expression
-   */
   private getParameterName(expression: ts.Expression): string {
     if (ts.isIdentifier(expression)) {
       return expression.text;
@@ -244,20 +232,14 @@ class OpenApiGenerator {
     return 'param';
   }
 
-  /**
-   * Extract path parameters from path string
-   */
   private extractPathParams(path: string): string[] {
     const matches = path.match(/\{([^}]+)\}/g);
     if (!matches) {
       return [];
     }
-    return matches.map(m => m.slice(1, -1));
+    return matches.map((m) => m.slice(1, -1));
   }
 
-  /**
-   * Extract query parameters from path string
-   */
   private extractQueryParams(path: string): string[] {
     const queryIndex = path.indexOf('?');
     if (queryIndex === -1) {
@@ -268,15 +250,11 @@ class OpenApiGenerator {
     const params = queryString.split('&');
 
     return params
-      .map(p => p.split('=')[0])
-      .filter(p => !p.includes('%3E') && !p.includes('%3C')); // Filter out encoded operators
+      .map((p) => p.split('=')[0])
+      .filter((p) => !p.includes('%3E') && !p.includes('%3C'));
   }
 
-  /**
-   * Normalize path for grouping (remove query strings, etc.)
-   */
   private normalizePath(path: string): string {
-    // Remove query string
     const queryIndex = path.indexOf('?');
     if (queryIndex !== -1) {
       path = path.slice(0, queryIndex);
@@ -285,16 +263,10 @@ class OpenApiGenerator {
     return path;
   }
 
-  /**
-   * Convert TypeScript type to string
-   */
   private typeToString(type: ts.TypeNode, sourceFile?: ts.SourceFile): string {
     return type.getText(sourceFile);
   }
 
-  /**
-   * Get total number of endpoints
-   */
   private getTotalEndpoints(): number {
     let total = 0;
     for (const endpoints of this.endpoints.values()) {
@@ -303,14 +275,14 @@ class OpenApiGenerator {
     return total;
   }
 
-  /**
-   * Generate OpenAPI 3.0 specification
-   */
   public generateOpenApi(): object {
     const paths: Record<string, any> = {};
 
-    // Process REST endpoints
-    for (const [pathKey, endpoints] of this.endpoints.entries()) {
+    const sortedPaths = Array.from(this.endpoints.entries()).sort((a, b) =>
+      a[0].localeCompare(b[0])
+    );
+
+    for (const [pathKey, endpoints] of sortedPaths) {
       const pathItem: any = {};
 
       for (const endpoint of endpoints) {
@@ -320,20 +292,20 @@ class OpenApiGenerator {
           tags: this.extractTags(endpoint.path),
         };
 
-        // Add parameters
         const parameters: any[] = [];
 
-        // Path parameters
         for (const param of endpoint.pathParams) {
           parameters.push({
             name: param,
             in: 'path',
             required: true,
-            schema: { type: this.guessParamType(param) },
+            schema: {
+              type: this.guessParamType(param),
+              example: this.getExampleValue(param),
+            },
           });
         }
 
-        // Query parameters
         for (const param of endpoint.queryParams) {
           parameters.push({
             name: param,
@@ -347,8 +319,10 @@ class OpenApiGenerator {
           operation.parameters = parameters;
         }
 
-        // Add request body for POST/PATCH/PUT
-        if (['POST', 'PATCH', 'PUT'].includes(endpoint.method) && endpoint.requestType) {
+        if (
+          ['POST', 'PATCH', 'PUT'].includes(endpoint.method) &&
+          endpoint.requestType
+        ) {
           operation.requestBody = {
             required: true,
             content: {
@@ -361,7 +335,6 @@ class OpenApiGenerator {
           };
         }
 
-        // Add response
         operation.responses = {
           200: {
             description: 'Successful response',
@@ -395,7 +368,6 @@ class OpenApiGenerator {
       paths[pathKey] = pathItem;
     }
 
-    // Add RPC endpoint
     if (this.rpcEndpoints.length > 0) {
       paths['/api/rpc'] = {
         post: {
@@ -411,7 +383,7 @@ class OpenApiGenerator {
                   properties: {
                     func: {
                       type: 'string',
-                      enum: this.rpcEndpoints.map(rpc => rpc.name),
+                      enum: this.rpcEndpoints.map((rpc) => rpc.name),
                     },
                     params: {
                       type: 'object',
@@ -448,10 +420,8 @@ class OpenApiGenerator {
       info: {
         title: 'Zetkin App API',
         version: '1.0.0',
-        description: 'Auto-generated API documentation from TypeScript codebase',
-        contact: {
-          name: 'Zetkin Foundation',
-        },
+        description:
+          'Auto-generated API documentation from the https://github.com/zetkin/app.zetkin.org repo',
       },
       servers: [
         {
@@ -459,22 +429,20 @@ class OpenApiGenerator {
           description: 'Development server',
         },
         {
-          url: 'https://organize.zetk.in',
+          url: '',
           description: 'Production server',
         },
       ],
       paths,
       components: {
-        schemas: {
-          // Note: Type schemas would need to be extracted separately
-          // For now, we just reference the TypeScript type names
-        },
+        schemas: {},
         securitySchemes: {
           cookieAuth: {
             type: 'apiKey',
             in: 'cookie',
             name: 'zsid',
-            description: 'Session cookie (zsid). Log in at the app to get this cookie.',
+            description:
+              'Session cookie (zsid). Log in at the app to get this cookie.',
           },
         },
       },
@@ -489,9 +457,6 @@ class OpenApiGenerator {
     return openapi;
   }
 
-  /**
-   * Generate a human-readable summary for an endpoint
-   */
   private generateSummary(endpoint: ApiEndpoint): string {
     const resource = this.extractResourceName(endpoint.path);
     const action = this.getActionFromMethod(endpoint.method);
@@ -499,24 +464,17 @@ class OpenApiGenerator {
     return `${action} ${resource}`;
   }
 
-  /**
-   * Extract resource name from path
-   */
   private extractResourceName(path: string): string {
-    const parts = path.split('/').filter(p => p && !p.startsWith('{'));
+    const parts = path.split('/').filter((p) => p && !p.startsWith('{'));
     const resourcePart = parts[parts.length - 1];
 
     if (!resourcePart || resourcePart === 'api') {
       return 'resource';
     }
 
-    // Capitalize and singularize
     return resourcePart.charAt(0).toUpperCase() + resourcePart.slice(1);
   }
 
-  /**
-   * Get action description from HTTP method
-   */
   private getActionFromMethod(method: string): string {
     const actions: Record<string, string> = {
       GET: 'Get',
@@ -528,33 +486,24 @@ class OpenApiGenerator {
     return actions[method] || method;
   }
 
-  /**
-   * Extract tags from path for grouping
-   */
   private extractTags(path: string): string[] {
-    const parts = path.split('/').filter(p => p && !p.startsWith('{'));
-
-    // Skip 'api' and 'orgs'
-    const relevantParts = parts.filter(p => p !== 'api' && p !== 'orgs');
+    const parts = path.split('/').filter((p) => p && !p.startsWith('{'));
+    const relevantParts = parts.filter((p) => p !== 'api' && p !== 'orgs');
 
     if (relevantParts.length === 0) {
       return ['General'];
     }
 
-    // Use the first meaningful part as tag
     return [this.capitalizeFirst(relevantParts[0])];
   }
 
-  /**
-   * Generate list of all tags
-   */
   private generateTags(): Array<{ name: string; description: string }> {
     const tagSet = new Set<string>();
 
     for (const endpoints of this.endpoints.values()) {
       for (const endpoint of endpoints) {
         const tags = this.extractTags(endpoint.path);
-        tags.forEach(tag => tagSet.add(tag));
+        tags.forEach((tag) => tagSet.add(tag));
       }
     }
 
@@ -564,15 +513,12 @@ class OpenApiGenerator {
 
     return Array.from(tagSet)
       .sort()
-      .map(tag => ({
+      .map((tag) => ({
         name: tag,
         description: `${tag} related endpoints`,
       }));
   }
 
-  /**
-   * Guess parameter type from name
-   */
   private guessParamType(paramName: string): string {
     if (paramName.toLowerCase().includes('id')) {
       return 'integer';
@@ -580,16 +526,60 @@ class OpenApiGenerator {
     return 'string';
   }
 
-  /**
-   * Capitalize first letter
-   */
+  private getExampleValue(paramName: string): string | number {
+    const exampleValues: Record<string, string | number> = {
+      orgId: 2,
+      personId: 2,
+      userId: 2,
+      campId: 1,
+      projId: 1,
+      campaignId: 1,
+      projectId: 1,
+      eventId: 1,
+      surveyId: 1,
+      taskId: 1,
+      viewId: 1,
+      emailId: 1,
+      callId: 1,
+      canvassId: 1,
+      assignmentId: 1,
+      callAssId: 1,
+      canvassAssId: 1,
+      areaId: 1,
+      areaAssId: 1,
+      locationId: 1,
+      householdId: 1,
+      submissionId: 1,
+      folderId: 1,
+      columnId: 1,
+      tagId: 1,
+      groupId: 1,
+      roleId: 1,
+      fileId: 1,
+      journeyId: 1,
+      instanceId: 1,
+      milestoneId: 1,
+    };
+
+    const lowerParam = paramName.toLowerCase();
+
+    for (const [key, value] of Object.entries(exampleValues)) {
+      if (lowerParam === key.toLowerCase()) {
+        return value;
+      }
+    }
+
+    if (paramName.toLowerCase().includes('id')) {
+      return 1;
+    }
+
+    return 'example';
+  }
+
   private capitalizeFirst(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  /**
-   * Save OpenAPI spec to file
-   */
   public saveToFile(outputPath: string): void {
     const spec = this.generateOpenApi();
     const content = JSON.stringify(spec, null, 2);
@@ -598,20 +588,17 @@ class OpenApiGenerator {
     console.log(`\nOpenAPI specification saved to: ${outputPath}`);
   }
 
-  /**
-   * Print statistics
-   */
   public printStats(): void {
     console.log('\n=== OpenAPI Generation Statistics ===');
     console.log(`Total REST endpoints: ${this.getTotalEndpoints()}`);
     console.log(`Unique paths: ${this.endpoints.size}`);
     console.log(`RPC endpoints: ${this.rpcEndpoints.length}`);
 
-    // Group by method
     const methodCounts: Record<string, number> = {};
     for (const endpoints of this.endpoints.values()) {
       for (const endpoint of endpoints) {
-        methodCounts[endpoint.method] = (methodCounts[endpoint.method] || 0) + 1;
+        methodCounts[endpoint.method] =
+          (methodCounts[endpoint.method] || 0) + 1;
       }
     }
 
@@ -631,15 +618,15 @@ class OpenApiGenerator {
   }
 }
 
-// Main execution
 async function main() {
   const args = process.argv.slice(2);
   const outputIndex = args.indexOf('--output');
-  const outputPath = outputIndex !== -1 && args[outputIndex + 1]
-    ? args[outputIndex + 1]
-    : path.join(process.cwd(), 'openapi.json');
+  const outputPath =
+    outputIndex !== -1 && args[outputIndex + 1]
+      ? args[outputIndex + 1]
+      : path.join(process.cwd(), 'openapi.json');
 
-  console.log('🚀 Zetkin OpenAPI Generator\n');
+  console.log('Zetkin OpenAPI Generator\n');
   console.log(`Root directory: ${process.cwd()}`);
   console.log(`Output file: ${outputPath}\n`);
 
@@ -649,12 +636,10 @@ async function main() {
   generator.printStats();
   generator.saveToFile(outputPath);
 
-  console.log('\n✅ Done! You can now:');
+  console.log('\n Done! You can now:');
   console.log('  1. View the spec in Swagger UI: https://editor.swagger.io/');
   console.log('  2. Import into Postman');
   console.log('  3. Generate client SDKs using openapi-generator');
-  console.log('\nTo view locally with Swagger UI:');
-  console.log('  npx swagger-ui-watcher openapi.json');
 }
 
 main().catch(console.error);
