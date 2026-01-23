@@ -56,10 +56,10 @@ test.describe('Creating a journey instance from journey instance page', () => {
     await page.locator('[data-testid=page-title] input').press('Enter');
     await page.locator('data-testid=AutoTextArea-textarea').type('Some info');
 
-    await Promise.all([
-      page.waitForResponse((res) => res.url().includes('api')),
-      page.locator('data-testid=SubmitCancelButtons-submitButton').click(),
-    ]);
+    await page.locator('data-testid=SubmitCancelButtons-submitButton').click();
+    await page.waitForResponse((res) =>
+      res.url().includes('api/journeyInstances/createNew')
+    );
 
     const requests = instMock.log<ZetkinJourneyInstance>();
     await expect(() => {
