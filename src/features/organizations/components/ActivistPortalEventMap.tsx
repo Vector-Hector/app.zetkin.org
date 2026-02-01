@@ -1,7 +1,7 @@
-import { Box, SxProps } from '@mui/material';
+import { Box } from '@mui/material';
 import { Layer, Map, Source } from '@vis.gl/react-maplibre';
 import { Map as MapType } from 'maplibre-gl';
-import { FC, PropsWithChildren, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 
 import notEmpty from 'utils/notEmpty';
 import ZUIMapControls from 'zui/ZUIMapControls';
@@ -13,41 +13,43 @@ import { Latitude, Longitude } from 'features/areas/types';
 import { getGeoJSONFeaturesAtLocations } from '../../map/utils/locationFiltering';
 import useMapMarkerClick from '../hooks/useMapMarkerClick';
 
-export const ActivistPortalEventMap: FC<
-  PropsWithChildren<{
-    events: ZetkinEventWithStatus[];
-    locationFilter: GeoJSON.Feature[];
-    setLocationFilter: (geojsonToFilterBy: GeoJSON.Feature[]) => void;
-    sx?: SxProps;
-  }>
-> = ({ children, events, locationFilter, setLocationFilter, sx }) => {
+export const ActivistPortalEventMap: FC<{
+  events: ZetkinEventWithStatus[];
+  locationFilter: GeoJSON.Feature[];
+  setLocationFilter: (geojsonToFilterBy: GeoJSON.Feature[]) => void;
+}> = ({ events, locationFilter, setLocationFilter }) => {
   const [map, setMap] = useState<MapType | null>(null);
 
-  useMapMarkerClick(map, (geojsonFeatures) => {
-    const bounds = pointsToBounds(
-      geojsonFeatures.map((feature) => {
-        if (feature.geometry.type === 'Point') {
-          return [
-            feature.geometry.coordinates[1] as Longitude,
-            feature.geometry.coordinates[0] as Latitude,
-          ];
-        } else {
-          return [0 as Longitude, 0 as Latitude];
-        }
-      })
-    );
+  const onMarkerClick = useCallback(
+    (geojsonFeatures: GeoJSON.Feature[]) => {
+      const bounds = pointsToBounds(
+        geojsonFeatures.map((feature) => {
+          if (feature.geometry.type === 'Point') {
+            return [
+              feature.geometry.coordinates[1] as Longitude,
+              feature.geometry.coordinates[0] as Latitude,
+            ];
+          } else {
+            return [0 as Longitude, 0 as Latitude];
+          }
+        })
+      );
 
-    if (map && bounds) {
-      map.fitBounds(bounds, {
-        animate: true,
-        duration: 1200,
-        maxZoom: 16,
-        padding: 20,
-      });
-    }
+      if (map && bounds) {
+        map.fitBounds(bounds, {
+          animate: true,
+          duration: 1200,
+          maxZoom: 16,
+          padding: 20,
+        });
+      }
 
-    setLocationFilter(geojsonFeatures);
-  });
+      setLocationFilter(geojsonFeatures);
+    },
+    [map, setLocationFilter]
+  );
+
+  useMapMarkerClick(map, onMarkerClick);
 
   const env = useEnv();
   const bounds = useMemo(
@@ -113,7 +115,7 @@ export const ActivistPortalEventMap: FC<
 
   return (
     <Box
-      sx={{ flexGrow: 1, height: '100px', position: 'relative', ...(sx ?? {}) }}
+      sx={{ flexGrow: 1, height: '100%', position: 'relative', width: '100%' }}
     >
       <ZUIMapControls
         onFitBounds={() => {
@@ -173,7 +175,6 @@ export const ActivistPortalEventMap: FC<
           />
         </Source>
       </Map>
-      {children}
     </Box>
   );
 };

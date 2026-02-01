@@ -1,4 +1,4 @@
-import { ColumnKind } from './types';
+import { ColumnKind } from '../types';
 import hasWrongIDFormat from './hasWrongIDFormat';
 
 describe('hasWrongIDFormat()', () => {
@@ -16,17 +16,37 @@ describe('hasWrongIDFormat()', () => {
     expect(wrongIDFormat).toBe(false);
   });
 
-  it('returns false if column is ID_FIELD, but config is unfinished', () => {
+  it('returns false for email columns', () => {
     const wrongIDFormat = hasWrongIDFormat(
       {
-        idField: null,
+        idField: 'email',
         kind: ColumnKind.ID_FIELD,
         selected: true,
       },
-      [],
+      [
+        'Email',
+        'clara@zetkin.org',
+        'not-an-email',
+        null,
+        '',
+        'angela@zetkin.org',
+      ],
       true
     );
 
+    expect(wrongIDFormat).toBe(false);
+  });
+
+  it('returns false for empty Zetkin IDs', () => {
+    const wrongIDFormat = hasWrongIDFormat(
+      {
+        idField: 'id',
+        kind: ColumnKind.ID_FIELD,
+        selected: true,
+      },
+      ['Zetkin IDs', 1, 2, null, '', 4],
+      true
+    );
     expect(wrongIDFormat).toBe(false);
   });
 

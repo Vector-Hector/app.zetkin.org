@@ -30,9 +30,14 @@ export default makeMessages('feat.organizations', {
     cancelledParagraph: m(
       'You can no longer sign up for it and if you were signed up, you are no longer expected to attend.'
     ),
-    contactPerson: m<{ name: string }>('{name} is the contact person'),
+    contactPerson: {
+      default: m<{ name: string }>('{name} is the contact person'),
+      you: m('You are the contact person'),
+    },
     defaultTitle: m('Untitled event'),
+    haveAccount: m('I have an account'),
     loading: m('Loading...'),
+    noDescription: m('This event has no description'),
     noLocation: m('No physical location'),
     partOfProject: m<{ projectLink: ReactElement }>('Part of {projectLink}'),
     participatingInfo: m<{ participatingCount: number }>(
@@ -57,6 +62,7 @@ export default makeMessages('feat.organizations', {
       copyIcsUrl: m('Copy calendar subscription URL'),
       follow: m('Follow'),
       login: m('Login & connect'),
+      organize: m('Organize'),
       unfollow: m('Unfollow'),
     },
     map: {
@@ -64,8 +70,11 @@ export default makeMessages('feat.organizations', {
       viewInMap: m('View in map'),
     },
     menu: {
+      allEvents: m('All events'),
       logout: m('Logout'),
+      myActivities: m('My activities'),
       myZetkin: m('My Zetkin'),
+      settings: m('Settings'),
     },
     tabs: {
       calendar: m('Calendar'),
@@ -102,6 +111,14 @@ export default makeMessages('feat.organizations', {
       clear: m('Clear'),
       title: m('Recent organizations'),
     },
+  },
+  signupChoiceModal: {
+    description: m(
+      "Use your Zetkin account to sign up to an event. If you don't have an account, don't worry you can still sign up without one."
+    ),
+    title: m('How do you want to sign up?'),
+    withAccount: m('With an account'),
+    withoutAccount: m('Without an account'),
   },
   subOrgEventBlurb: {
     description: m<{

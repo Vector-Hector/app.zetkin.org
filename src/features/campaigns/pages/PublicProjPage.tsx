@@ -6,6 +6,7 @@ import { FC, useState } from 'react';
 import { DateRangeCalendar, DateRangePickerDay } from '@mui/x-date-pickers-pro';
 import { useIntl } from 'react-intl';
 import { Clear, CalendarMonthOutlined, Search } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
 import EventListItem from 'features/home/components/EventListItem';
 import { ZetkinEventWithStatus } from 'features/home/types';
@@ -15,7 +16,6 @@ import { ZetkinEvent } from 'utils/types/zetkin';
 import useUser from 'core/hooks/useUser';
 import { Msg, useMessages } from 'core/i18n';
 import ZUIText from 'zui/components/ZUIText';
-import ZUIModal from 'zui/components/ZUIModal';
 import ZUIFilterButton from 'zui/components/ZUIFilterButton';
 import ZUIButton from '../../../zui/components/ZUIButton';
 import ZUIDrawerModal from '../../../zui/components/ZUIDrawerModal';
@@ -26,7 +26,9 @@ import NoEventsBlurb from 'features/organizations/components/NoEventsBlurb';
 import { filtersUpdated } from '../store';
 import messageIds from '../l10n/messageIds';
 import useCampaign from '../hooks/useCampaign';
-import orgMessageIds from 'features/organizations/l10n/messageIds';
+import SignupChoiceModal from 'features/organizations/components/SignupChoiceModal';
+import useFeatureWithOrg from 'utils/featureFlags/useFeatureWithOrg';
+import { UNAUTH_EVENT_SIGNUP } from 'utils/featureFlags';
 
 type Props = {
   campId: number;
@@ -35,12 +37,13 @@ type Props = {
 
 const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
   const intl = useIntl();
-  const orgMessages = useMessages(orgMessageIds);
+  const router = useRouter();
   const messages = useMessages(messageIds);
   const nextDelay = useIncrementalDelay();
   const user = useUser();
   const dispatch = useAppDispatch();
   const campaign = useCampaign(orgId, campId).campaignFuture.data;
+  const hasUnauthSignup = useFeatureWithOrg(UNAUTH_EVENT_SIGNUP, orgId);
 
   const {
     allEvents,
@@ -250,7 +253,7 @@ const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
                     geojsonToFilterBy: [],
                   })
                 );
-                eventTypeFilter.clearEventTypes();
+                eventTypeFilter.clearEventTypeFilter();
               }}
             />
           )}
@@ -290,7 +293,7 @@ const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
                     dateFilterState: null,
                   })
                 );
-                eventTypeFilter.clearEventTypes();
+                eventTypeFilter.clearEventTypeFilter();
               }}
               variant="secondary"
             />
@@ -315,8 +318,14 @@ const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
                   href={`/o/${event.organization.id}/events/${event.id}`}
                   onClickSignUp={(ev) => {
                     if (!user) {
-                      setPostAuthEvent(event);
-                      ev.preventDefault();
+                      if (hasUnauthSignup) {
+                        setPostAuthEvent(event);
+                        ev.preventDefault();
+                      } else {
+                        router.push(
+                          `/o/${event.organization.id}/events/${event.id}`
+                        );
+                      }
                     }
                   }}
                 />
@@ -394,46 +403,28 @@ const PublicProjectPage: FC<Props> = ({ campId, orgId }) => {
         open={drawerContent == 'eventTypes'}
       >
         <List>
-          {eventTypeFilter.eventTypes.map((eventType) => (
-            <ListItem
-              key={eventTypeFilter.getLabelFromEventType(eventType)}
-              sx={{ justifyContent: 'space-between' }}
-            >
+          {eventTypeFilter.eventTypeLabels.map((eventType) => (
+            <ListItem key={eventType} sx={{ justifyContent: 'space-between' }}>
               <Box alignItems="center" display="flex">
-                <ZUIText>
-                  {eventTypeFilter.getLabelFromEventType(eventType)}
-                </ZUIText>
+                <ZUIText>{eventType}</ZUIText>
               </Box>
               <Switch
-                checked={eventTypeFilter.getIsCheckedEventType(eventType)}
+                checked={eventTypeFilter.getIsCheckedEventTypeLabel(eventType)}
                 onChange={() => {
-                  eventTypeFilter.toggleEventType(eventType);
+                  eventTypeFilter.toggleEventTypeLabel(eventType);
                 }}
               />
             </ListItem>
           ))}
         </List>
       </ZUIDrawerModal>
-      <ZUIModal
-        onClose={() => setPostAuthEvent(null)}
-        open={!!postAuthEvent}
-        primaryButton={{
-          href: `/login?redirect=${encodeURIComponent(`/o/${orgId}`)}`,
-          label: orgMessages.authDialog.loginButton(),
-        }}
-        secondaryButton={{
-          label: orgMessages.authDialog.cancelButton(),
-          onClick: () => setPostAuthEvent(null),
-        }}
-        size="small"
-        title={orgMessages.authDialog.label()}
-      >
-        <Box sx={{ paddingTop: '0.75rem' }}>
-          <ZUIText>
-            <Msg id={orgMessageIds.authDialog.content} />
-          </ZUIText>
-        </Box>
-      </ZUIModal>
+      {postAuthEvent && (
+        <SignupChoiceModal
+          eventId={postAuthEvent.id}
+          onClose={() => setPostAuthEvent(null)}
+          orgId={postAuthEvent.organization.id}
+        />
+      )}
     </Box>
   );
 };

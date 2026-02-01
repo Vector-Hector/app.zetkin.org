@@ -56,6 +56,7 @@ export default function mockState(overrides?: RootState) {
       visitsByAssignmentId: {},
     },
     duplicates: {
+      detailedPersonsList: {},
       potentialDuplicatesList: remoteList(),
     },
     emails: {
@@ -85,12 +86,14 @@ export default function mockState(overrides?: RootState) {
       selectedEventIds: [],
       statsByEventId: {},
       typeList: remoteList(),
+      unverifiedParticipantsByEventId: {},
       userEventList: remoteList(),
     },
     files: {
       fileList: remoteList(),
     },
     import: {
+      importID: null,
       importResult: null,
       pendingFile: {
         selectedSheetIndex: 0,
@@ -129,6 +132,7 @@ export default function mockState(overrides?: RootState) {
     },
     profiles: {
       fieldsList: remoteList(),
+      notesByPersonId: {},
       orgsByPersonId: {},
       personById: {},
     },
@@ -144,6 +148,8 @@ export default function mockState(overrides?: RootState) {
     },
     surveys: {
       elementsBySurveyId: {},
+      extendedSurveyBySurveyId: {},
+      responseStatsBySurveyId: {},
       statsBySurveyId: {},
       submissionList: remoteList(),
       submissionsBySurveyId: {},

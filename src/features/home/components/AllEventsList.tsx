@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -16,6 +16,7 @@ import {
 } from '@mui/x-date-pickers-pro';
 import dayjs, { Dayjs } from 'dayjs';
 import { useIntl } from 'react-intl';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import useAllEvents from 'features/events/hooks/useAllEvents';
 import EventListItem from './EventListItem';
@@ -31,31 +32,98 @@ import ZUIText from 'zui/components/ZUIText';
 import ZUIDrawerModal from 'zui/components/ZUIDrawerModal';
 import { useEventTypeFilter } from 'features/events/hooks/useEventTypeFilter';
 
-const initializeEventTypesToFilterBy = () => [] as (string | null)[];
-
 const AllEventsList: FC = () => {
   const intl = useIntl();
   const messages = useMessages(messageIds);
   const allEvents = useAllEvents();
   const nextDelay = useIncrementalDelay();
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [drawerContent, setDrawerContent] = useState<
     'orgs' | 'calendar' | 'eventTypes' | null
   >(null);
-  const [orgIdsToFilterBy, setOrgIdsToFilterBy] = useState<number[]>([]);
-  const [eventTypesToFilterBy, setEventTypesToFilterBy] = useState(
-    initializeEventTypesToFilterBy()
+
+  const orgIdsToFilterBy = useMemo(
+    () => searchParams?.get('orgs')?.split(',').map(Number) || [],
+    [searchParams]
   );
-  const [customDatesToFilterBy, setCustomDatesToFilterBy] = useState<
-    DateRange<Dayjs>
-  >([null, null]);
-  const [dateFilterState, setDateFilterState] = useState<
-    'today' | 'tomorrow' | 'thisWeek' | 'custom' | null
-  >(null);
+  const eventTypesToFilterBy = useMemo(
+    () => searchParams?.get('types')?.split(',').filter(Boolean) || [],
+    [searchParams]
+  );
+  const dateFilterState = useMemo(
+    () =>
+      (searchParams?.get('date') as
+        | 'today'
+        | 'tomorrow'
+        | 'thisWeek'
+        | 'custom'
+        | null) || null,
+    [searchParams]
+  );
+
+  const customDatesToFilterBy: DateRange<Dayjs> = useMemo(() => {
+    const rangeParam = searchParams?.get('range');
+    if (rangeParam) {
+      return rangeParam.split(',').map((d) => (d ? dayjs(d) : null)) as [
+        Dayjs | null,
+        Dayjs | null
+      ];
+    }
+    return [null, null];
+  }, [searchParams]);
+
+  const setFilters = useCallback(
+    (filters: {
+      date?: string | null;
+      orgs?: number[] | null;
+      range?: DateRange<Dayjs> | null;
+      types?: string[] | null;
+    }) => {
+      const params = new URLSearchParams(searchParams?.toString());
+
+      if (filters.orgs === null) {
+        params.delete('orgs');
+      } else if (filters.orgs) {
+        params.set('orgs', filters.orgs.join(','));
+      }
+
+      if (filters.types === null) {
+        params.delete('types');
+      } else if (filters.types) {
+        params.set('types', filters.types.join(','));
+      }
+
+      if (filters.date === null) {
+        params.delete('date');
+      } else if (filters.date !== undefined) {
+        params.set('date', filters.date);
+      }
+
+      if (filters.range !== undefined) {
+        if (filters.range === null) {
+          params.delete('range');
+        } else {
+          params.set(
+            'range',
+            filters.range
+              .map((d) => (d ? d.format('YYYY-MM-DD') : ''))
+              .join(',')
+          );
+        }
+      }
+
+      router.push(pathname + '?' + params.toString());
+    },
+    [pathname, router, searchParams, dateFilterState]
+  );
 
   const eventTypeFilter = useEventTypeFilter(allEvents, {
-    eventTypesToFilterBy,
-    setEventTypesToFilterBy,
+    eventTypeLabelsToFilterBy: eventTypesToFilterBy,
+    setEventTypeLabelsToFilterBy: (types: string[]) => setFilters({ types }),
   });
 
   const orgs = [
@@ -166,14 +234,24 @@ const AllEventsList: FC = () => {
   const isFiltered =
     orgIdsToFilterBy.length || !!dateFilterState || eventTypeFilter.isFiltered;
 
+  const clearFilters = () =>
+    setFilters({
+      date: null,
+      orgs: null,
+      range: null,
+      types: null,
+    });
+
   const filters = [
     {
       active: dateFilterState == 'today',
       key: 'today',
       label: messages.allEventsList.filterButtonLabels.today(),
       onClick: () => {
-        setCustomDatesToFilterBy([null, null]);
-        setDateFilterState('today');
+        setFilters({
+          date: 'today',
+          range: null,
+        });
       },
     },
     {
@@ -181,8 +259,10 @@ const AllEventsList: FC = () => {
       key: 'tomorrow',
       label: messages.allEventsList.filterButtonLabels.tomorrow(),
       onClick: () => {
-        setCustomDatesToFilterBy([null, null]);
-        setDateFilterState('tomorrow');
+        setFilters({
+          date: 'tomorrow',
+          range: null,
+        });
       },
     },
     {
@@ -190,8 +270,10 @@ const AllEventsList: FC = () => {
       key: 'thisWeek',
       label: messages.allEventsList.filterButtonLabels.thisWeek(),
       onClick: () => {
-        setCustomDatesToFilterBy([null, null]);
-        setDateFilterState('thisWeek');
+        setFilters({
+          date: 'thisWeek',
+          range: null,
+        });
       },
     },
     {
@@ -262,12 +344,7 @@ const AllEventsList: FC = () => {
               active={true}
               circular
               label={Clear}
-              onClick={() => {
-                setDateFilterState(null);
-                setCustomDatesToFilterBy([null, null]);
-                setOrgIdsToFilterBy([]);
-                eventTypeFilter.clearEventTypes();
-              }}
+              onClick={clearFilters}
             />
           )}
           {filters.map((filter) => (
@@ -297,12 +374,7 @@ const AllEventsList: FC = () => {
           {isFiltered && (
             <ZUIButton
               label={messages.allEventsList.emptyList.removeFiltersButton()}
-              onClick={() => {
-                setCustomDatesToFilterBy([null, null]);
-                setOrgIdsToFilterBy([]);
-                eventTypeFilter.clearEventTypes();
-                setDateFilterState(null);
-              }}
+              onClick={clearFilters}
               variant="secondary"
             />
           )}
@@ -344,8 +416,10 @@ const AllEventsList: FC = () => {
             calendars={1}
             disablePast
             onChange={(newDateRange) => {
-              setDateFilterState('custom');
-              setCustomDatesToFilterBy(newDateRange);
+              setFilters({
+                date: 'custom',
+                range: newDateRange,
+              });
             }}
             slots={{
               day: (props) => {
@@ -407,11 +481,11 @@ const AllEventsList: FC = () => {
                 checked={orgIdsToFilterBy.includes(org.id)}
                 onChange={(_event, checked) => {
                   if (checked) {
-                    setOrgIdsToFilterBy([...orgIdsToFilterBy, org.id]);
+                    setFilters({ orgs: [...orgIdsToFilterBy, org.id] });
                   } else {
-                    setOrgIdsToFilterBy(
-                      orgIdsToFilterBy.filter((id) => id != org.id)
-                    );
+                    setFilters({
+                      orgs: orgIdsToFilterBy.filter((id) => id != org.id),
+                    });
                   }
                 }}
               />
@@ -424,20 +498,15 @@ const AllEventsList: FC = () => {
         open={drawerContent == 'eventTypes'}
       >
         <List>
-          {eventTypeFilter.eventTypes.map((eventType) => (
-            <ListItem
-              key={eventTypeFilter.getLabelFromEventType(eventType)}
-              sx={{ justifyContent: 'space-between' }}
-            >
+          {eventTypeFilter.eventTypeLabels.map((eventType) => (
+            <ListItem key={eventType} sx={{ justifyContent: 'space-between' }}>
               <Box alignItems="center" display="flex">
-                <ZUIText>
-                  {eventTypeFilter.getLabelFromEventType(eventType)}
-                </ZUIText>
+                <ZUIText>{eventType}</ZUIText>
               </Box>
               <Switch
-                checked={eventTypeFilter.getIsCheckedEventType(eventType)}
+                checked={eventTypeFilter.getIsCheckedEventTypeLabel(eventType)}
                 onChange={() => {
-                  eventTypeFilter.toggleEventType(eventType);
+                  eventTypeFilter.toggleEventTypeLabel(eventType);
                 }}
               />
             </ListItem>
