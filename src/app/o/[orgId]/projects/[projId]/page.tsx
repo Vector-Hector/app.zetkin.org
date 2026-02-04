@@ -1,7 +1,5 @@
 'use server';
 
-import { FC } from 'react';
-
 import PublicProjPage from 'features/public/pages/PublicProjPage';
 
 type Props = {
