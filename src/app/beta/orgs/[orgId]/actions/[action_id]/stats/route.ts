@@ -6,22 +6,24 @@ import { EventSignupModel } from 'features/events/models';
 import asOrgAuthorized from 'utils/api/asOrgAuthorized';
 
 type RouteMeta = {
-  params: {
+  params: Promise<{
     action_id: string;
     orgId: string;
-  };
+  }>;
 };
 
 const actionIdSchema = z.coerce.number().int().positive();
 const orgIdSchema = z.coerce.number().int().positive();
 
 export async function GET(request: NextRequest, { params }: RouteMeta) {
-  const actionIdResult = actionIdSchema.safeParse(params.action_id);
+  const { action_id, orgId: paramsOrgId } = await params;
+
+  const actionIdResult = actionIdSchema.safeParse(action_id);
   if (!actionIdResult.success) {
     return NextResponse.json({ error: 'Invalid action_id' }, { status: 400 });
   }
 
-  const orgIdResult = orgIdSchema.safeParse(params.orgId);
+  const orgIdResult = orgIdSchema.safeParse(paramsOrgId);
   if (!orgIdResult.success) {
     return NextResponse.json({ error: 'Invalid orgId' }, { status: 400 });
   }

@@ -63,7 +63,7 @@ export const getSeoTags = (
   };
 };
 
-export const getOrganizationOpenGraphTags = (
+export const getOrganizationOpenGraphTags = async (
   org: ZetkinOrganization
 ): OpenGraph => {
   let regionNames: Intl.DisplayNames;

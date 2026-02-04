@@ -6,10 +6,10 @@ import { EventSignupModel } from 'features/events/models';
 import asOrgAuthorized from 'utils/api/asOrgAuthorized';
 
 type RouteMeta = {
-  params: {
+  params: Promise<{
     eventId: string;
     orgId: string;
-  };
+  }>;
 };
 
 type EventSignupBody = {
@@ -21,9 +21,11 @@ type EventSignupBody = {
 };
 
 export async function GET(request: NextRequest, { params }: RouteMeta) {
+  const { eventId, orgId } = await params;
+
   return asOrgAuthorized(
     {
-      orgId: params.orgId,
+      orgId: orgId,
       request,
       roles: ['organizer', 'admin'],
     },
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteMeta) {
       await mongoose.connect(process.env.MONGODB_URL || '');
 
       const eventSignups = await EventSignupModel.find({
-        eventId: parseInt(params.eventId),
+        eventId: parseInt(eventId),
         orgId,
       });
 
@@ -41,6 +43,8 @@ export async function GET(request: NextRequest, { params }: RouteMeta) {
 }
 
 export async function POST(request: NextRequest, { params }: RouteMeta) {
+  const { eventId, orgId } = await params;
+
   await mongoose.connect(process.env.MONGODB_URL || '');
 
   const body: EventSignupBody = await request.json();
@@ -69,11 +73,11 @@ export async function POST(request: NextRequest, { params }: RouteMeta) {
   const eventSignup = await EventSignupModel.create({
     created: new Date(),
     email: body.email,
-    eventId: parseInt(params.eventId),
+    eventId: parseInt(eventId),
     first_name: body.first_name,
     gdpr_consent: body.gdpr_consent,
     last_name: body.last_name,
-    orgId: parseInt(params.orgId),
+    orgId: parseInt(orgId),
     phone: body.phone,
   });
 
@@ -81,9 +85,11 @@ export async function POST(request: NextRequest, { params }: RouteMeta) {
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteMeta) {
+  const { orgId } = await params;
+
   return asOrgAuthorized(
     {
-      orgId: params.orgId,
+      orgId,
       request,
       roles: ['organizer', 'admin'],
     },
