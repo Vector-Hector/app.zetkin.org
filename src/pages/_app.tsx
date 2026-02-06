@@ -13,6 +13,7 @@ import BrowserApiClient from 'core/api/client/BrowserApiClient';
 import Environment from 'core/env/Environment';
 import { PageWithLayout } from '../utils/types';
 import Providers from 'core/Providers';
+import { ResolvedParams } from 'core/env/ResolvedParamsContext';
 
 // Progress bar
 NProgress.configure({ showSpinner: false });
@@ -65,11 +66,14 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     }
   }, []);
 
+  const resolvedParams: ResolvedParams = pageProps.resolvedParams ?? {};
+
   return (
     <Providers
       env={env}
       lang={lang}
       messages={messages}
+      resolvedParams={resolvedParams}
       store={storeRef.current}
       user={pageProps.user}
     >

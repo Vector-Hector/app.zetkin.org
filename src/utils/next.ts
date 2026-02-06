@@ -4,6 +4,7 @@ import {
   GetServerSideProps,
   GetServerSidePropsContext,
   GetServerSidePropsResult,
+  Redirect,
 } from 'next';
 
 import { AppSession } from './types';
@@ -82,6 +83,51 @@ const hasOrg = (session: AppSession | undefined, orgId: string) => {
   return Boolean(session?.memberships?.find((org) => org === parseInt(orgId)));
 };
 
+const handleOrgIdentifier = async (
+  ctx: ScaffoldedContext
+): Promise<[string | null, Redirect | null]> => {
+  if (!ctx.query.orgId) {
+    return [null, null];
+  }
+  const orgParamStr = ctx.query.orgId as string;
+
+  const orgResult = await ctx.z.resource('orgs', orgParamStr).get();
+  const org = orgResult.data.data as ZetkinOrganization;
+  const orgId = String(org.id);
+
+  if (!org || !org.slug) {
+    return [orgId, null];
+  }
+
+  const isOrgPath =
+    ctx.resolvedUrl.startsWith('/organize/') ||
+    ctx.resolvedUrl.startsWith('/o/');
+  const isParamNumeric = /^\d+/.test(orgParamStr);
+
+  if (isParamNumeric && isOrgPath) {
+    const parts = ctx.resolvedUrl.split('/');
+    parts[2] = org.slug;
+    const redirect = parts.join('/');
+    return [
+      orgId,
+      {
+        destination: redirect,
+        permanent: false,
+      },
+    ];
+  }
+
+  if (!ctx.params) {
+    ctx.params = {};
+  }
+  ctx.params.orgId = orgId;
+  ctx.params.orgSlug = orgParamStr;
+  ctx.query.orgId = orgId;
+  ctx.query.orgSlug = orgParamStr;
+
+  return [orgId, null];
+};
+
 export const scaffold =
   (
     wrapped: ScaffoldedGetServerSideProps,
@@ -146,27 +192,11 @@ export const scaffold =
       }
     }
 
-    let orgId: string | null = null;
-
-    if (ctx.query.orgId) {
-      const orgParamStr = ctx.query.orgId as string;
-      const isNumeric = /^\d+/.test(orgParamStr);
-      if (isNumeric) {
-        orgId = ctx.query.orgId as string;
-      } else {
-        const orgResult = await ctx.z.resource('orgs', orgParamStr).get();
-        const org = orgResult.data.data as ZetkinOrganization;
-        orgId = String(org.id);
-
-        if (!ctx.params) {
-          ctx.params = {};
-        }
-        ctx.params.orgId = orgId;
-        ctx.params.orgSlug = orgParamStr;
-        ctx.query.orgId = orgId;
-        ctx.params.orgSlug = orgParamStr;
-        res.setHeader('x-org-id', orgId);
-      }
+    const [orgId, redirect] = await handleOrgIdentifier(ctx);
+    if (redirect) {
+      return {
+        redirect: redirect,
+      };
     }
 
     if (options?.featuresRequired) {
@@ -246,6 +276,9 @@ export const scaffold =
         }),
         lang,
         messages,
+        resolvedParams: {
+          orgId: orgId,
+        },
         user: ctx.user,
       };
     }

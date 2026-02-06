@@ -20,11 +20,16 @@ import { ZetkinUser } from 'utils/types/zetkin';
 import { ZUIConfirmDialogProvider } from 'zui/ZUIConfirmDialogProvider';
 import { ZUISnackbarProvider } from 'zui/ZUISnackbarContext';
 import { UserProvider } from './env/UserContext';
+import {
+  ResolvedParams,
+  ResolvedParamsContext,
+} from 'core/env/ResolvedParamsContext';
 
 type ProviderData = {
   env: Environment;
   lang: string;
   messages: MessageList;
+  resolvedParams: ResolvedParams;
   store: Store;
   user: ZetkinUser;
 };
@@ -44,6 +49,7 @@ const Providers: FC<ProvidersProps> = ({
   env,
   lang,
   messages,
+  resolvedParams,
   store,
   user,
 }) => {
@@ -54,6 +60,7 @@ const Providers: FC<ProvidersProps> = ({
       env,
       lang,
       messages,
+      resolvedParams,
       store,
       user,
     };
@@ -82,7 +89,11 @@ const Providers: FC<ProvidersProps> = ({
                       <ZUIConfirmDialogProvider>
                         <EventPopperProvider>
                           <DndProvider backend={HTML5Backend}>
-                            <Suspense>{children}</Suspense>
+                            <ResolvedParamsContext.Provider
+                              value={resolvedParams}
+                            >
+                              <Suspense>{children}</Suspense>
+                            </ResolvedParamsContext.Provider>
                           </DndProvider>
                         </EventPopperProvider>
                       </ZUIConfirmDialogProvider>
