@@ -13,7 +13,7 @@ import requiredEnvVar from './requiredEnvVar';
 import { stringToBool } from './stringUtils';
 import { ZetkinZ } from './types/sdk';
 import { ApiFetch, createApiFetch } from './apiFetch';
-import { ZetkinSession, ZetkinUser } from './types/zetkin';
+import { ZetkinOrganization, ZetkinSession, ZetkinUser } from './types/zetkin';
 import { hasFeature } from './featureFlags';
 import { EnvVars } from 'core/env/Environment';
 import { omitUndefined } from './omitUndefined';
@@ -146,12 +146,35 @@ export const scaffold =
       }
     }
 
-    const orgId = ctx.query.orgId as string;
+    let orgId: string | null = null;
+
+    if (ctx.query.orgId) {
+      const orgParamStr = ctx.query.orgId as string;
+      const isNumeric = /^\d+/.test(orgParamStr);
+      if (isNumeric) {
+        orgId = ctx.query.orgId as string;
+      } else {
+        const orgResult = await ctx.z.resource('orgs', orgParamStr).get();
+        const org = orgResult.data.data as ZetkinOrganization;
+        orgId = String(org.id);
+
+        if (!ctx.params) {
+          ctx.params = {};
+        }
+        ctx.params.orgId = orgId;
+        ctx.params.orgSlug = orgParamStr;
+        ctx.query.orgId = orgId;
+        ctx.params.orgSlug = orgParamStr;
+        res.setHeader('x-org-id', orgId);
+      }
+    }
 
     if (options?.featuresRequired) {
-      const isMissingFeature = options.featuresRequired.some(
-        (feature) => !hasFeature(feature, parseInt(orgId), process.env)
-      );
+      const isMissingFeature =
+        !!orgId &&
+        options.featuresRequired.some(
+          (feature) => !hasFeature(feature, parseInt(orgId), process.env)
+        );
 
       if (isMissingFeature) {
         return {
