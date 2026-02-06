@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
-import { useRouter } from 'next/router';
 
 import CampaignsActionButtons from '../components/CampaignsActionButtons';
 import TabbedLayout from '../../../utils/layout/TabbedLayout';
 import { useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
+import { useOrgPathParam } from 'core/hooks/useOrgPathParam';
 
 interface AllCampaignsLayoutProps {
   children: React.ReactNode;
@@ -15,13 +15,13 @@ const AllCampaignsLayout: FunctionComponent<AllCampaignsLayoutProps> = ({
   children,
   fixedHeight,
 }) => {
-  const { orgId } = useRouter().query;
+  const orgPathParam = useOrgPathParam();
   const messages = useMessages(messageIds);
 
   return (
     <TabbedLayout
       actionButtons={<CampaignsActionButtons />}
-      baseHref={`/organize/${orgId}/projects`}
+      baseHref={`/organize/${orgPathParam}/projects`}
       defaultTab="/"
       fixedHeight={fixedHeight}
       tabs={[

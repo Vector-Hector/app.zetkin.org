@@ -122,8 +122,6 @@ const handleOrgIdentifier = async (
   }
   ctx.params.orgId = orgId;
   ctx.params.orgSlug = orgParamStr;
-  ctx.query.orgId = orgId;
-  ctx.query.orgSlug = orgParamStr;
 
   return [orgId, null];
 };

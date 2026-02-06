@@ -8,6 +8,7 @@ import TabbedLayout from 'utils/layout/TabbedLayout';
 import useItemSummary from '../hooks/useItemSummary';
 import useJoinSubmissions from 'features/joinForms/hooks/useJoinSubmissions';
 import { useNumericRouteParams } from 'core/hooks';
+import { useOrgPathParam } from 'core/hooks/useOrgPathParam';
 
 interface PeopleLayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ const PeopleLayout: React.FunctionComponent<PeopleLayoutProps> = ({
   const { orgId } = useNumericRouteParams();
   const messages = useMessages(messageIds);
   const itemSummaryFuture = useItemSummary(orgId, null);
+  const orgPathParam = useOrgPathParam();
 
   const { data: submissions } = useJoinSubmissions(orgId);
   const pendingSubmissions = submissions?.filter(
@@ -33,7 +35,7 @@ const PeopleLayout: React.FunctionComponent<PeopleLayoutProps> = ({
   return (
     <TabbedLayout
       actionButtons={<PeopleActionButton folderId={null} orgId={orgId} />}
-      baseHref={`/organize/${orgId}/people`}
+      baseHref={`/organize/${orgPathParam}/people`}
       defaultTab="/"
       noPad
       subtitle={

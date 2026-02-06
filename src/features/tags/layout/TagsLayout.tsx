@@ -9,6 +9,7 @@ import { useNumericRouteParams } from 'core/hooks';
 import useTagGroups from '../hooks/useTagGroups';
 import { ZetkinTag } from 'utils/types/zetkin';
 import { Msg, useMessages } from 'core/i18n';
+import { useOrgPathParam } from 'core/hooks/useOrgPathParam';
 
 interface TagsLayoutProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ const TagsLayout: FC<TagsLayoutProps> = ({ children }) => {
   const [pendingTag, setPendingTag] = useState<
     Pick<ZetkinTag, 'title'> | undefined
   >(undefined);
+  const orgPathParam = useOrgPathParam();
 
   const tagGroups = useTagGroups(orgId).data || [];
 
@@ -35,7 +37,7 @@ const TagsLayout: FC<TagsLayoutProps> = ({ children }) => {
             <Msg id={messageIds.tagsPage.createTagButton} />
           </Button>
         }
-        baseHref={`/organize/${orgId}/tags`}
+        baseHref={`/organize/${orgPathParam}/tags`}
         defaultTab="/"
         tabs={[{ href: '/', label: messages.tagsPage.overviewTabLabel() }]}
         title={messages.tagsPage.title()}
