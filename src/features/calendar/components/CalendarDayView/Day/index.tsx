@@ -19,14 +19,24 @@ const Day = ({ date, dayInfo }: { date: Date; dayInfo: DaySummary }) => {
       gap={4}
       padding={1}
       sx={{
-        backgroundColor: '#eeeeee',
+        backgroundColor:
+          oldTheme.palette.mode === 'dark'
+            ? oldTheme.palette.grey[900]
+            : '#eeeeee',
       }}
     >
       <Box display="flex" flexDirection="column" width={'200px'}>
         <DateLabel date={date} />
         {dstChange !== undefined && (
           <Box padding="8px 12px">
-            <Typography color={oldTheme.palette.grey[600]} variant="body2">
+            <Typography
+              color={
+                oldTheme.palette.mode === 'dark'
+                  ? oldTheme.palette.grey[800]
+                  : oldTheme.palette.grey[600]
+              }
+              variant="body2"
+            >
               <Msg
                 id={
                   dstChange === 'summertime'

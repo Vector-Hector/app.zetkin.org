@@ -38,9 +38,21 @@ const Day = ({
   return (
     <Box
       alignItems="stretch"
-      bgcolor={isInFocusMonth ? '#eee' : 'none'}
+      bgcolor={
+        isInFocusMonth
+          ? oldTheme.palette.mode === 'dark'
+            ? oldTheme.palette.grey[900]
+            : '#eee'
+          : 'none'
+      }
       border="2px solid #eeeeee"
-      borderColor={isToday ? oldTheme.palette.primary.main : 'eee'}
+      borderColor={
+        isToday
+          ? oldTheme.palette.primary.main
+          : oldTheme.palette.mode === 'dark'
+          ? oldTheme.palette.grey[800]
+          : 'eee'
+      }
       display="flex"
       flexDirection="column"
       height="100%"

@@ -118,8 +118,16 @@ const Event = ({
           cancelled || draft
             ? oldTheme.palette.secondary.main
             : oldTheme.palette.primary.main
-        } 4px, white 4px)`,
-        border: `1px solid ${oldTheme.palette.grey[300]}`,
+        } 4px, ${
+          oldTheme.palette.mode === 'dark'
+            ? oldTheme.palette.grey[800]
+            : 'white'
+        } 4px)`,
+        border: `1px solid ${
+          oldTheme.palette.mode === 'dark'
+            ? oldTheme.palette.grey[700]
+            : oldTheme.palette.grey[300]
+        }`,
         borderBottomLeftRadius: 4,
         borderBottomRightRadius: 4,
         borderTopLeftRadius: topBadge ? '0px' : '4px',
