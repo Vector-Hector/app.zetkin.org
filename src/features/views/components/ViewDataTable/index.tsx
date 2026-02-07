@@ -25,7 +25,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Box, Link, useTheme } from '@mui/material';
+import { Box, Link, Theme, useTheme } from '@mui/material';
 import { GridCellEditStartParams } from '@mui/x-data-grid/models/params/gridEditCellParams';
 
 import columnTypes from './columnTypes';
@@ -160,7 +160,13 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
   rowSelection: selectionModel,
   view,
 }) => {
-  const theme = useTheme();
+  const theme = useTheme<
+    Theme & {
+      components?: {
+        MuiDataGrid?: { defaultProps?: { localeText?: object } };
+      };
+    }
+  >();
   const messages = useMessages(messageIds);
   const dispatch = useAppDispatch();
   const apiClient = useApiClient();
@@ -580,7 +586,7 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
 
   const localeText = useMemo(
     () => ({
-      ...theme.components?.MuiDataGrid?.defaultProps?.localeText,
+      ...(theme.components?.MuiDataGrid?.defaultProps?.localeText ?? {}),
       noRowsLabel: messages.empty.notice[contentSource](),
     }),
     [theme.components, messages.empty.notice]

@@ -1,5 +1,12 @@
 import { AutoAwesome } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, Link, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Link,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import NextLink from 'next/link';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
@@ -24,6 +31,7 @@ export const getServerSideProps: GetServerSideProps = scaffold(async () => {
 }, scaffoldOptions);
 
 const OrganizePage: PageWithLayout = () => {
+  const theme = useTheme();
   const messages = useMessages(messageIds);
   const env = useEnv();
 
@@ -34,7 +42,10 @@ const OrganizePage: PageWithLayout = () => {
       </Head>
       <Box maxWidth={800} mx="auto" my={2}>
         <Box textAlign="center">
-          <ZUILogo htmlColor="black" size={100} />
+          <ZUILogo
+            htmlColor={theme.palette.mode === 'dark' ? 'white' : 'black'}
+            size={100}
+          />
         </Box>
         <Box my={1}>
           <Alert icon={<AutoAwesome fontSize="inherit" />} severity="info">

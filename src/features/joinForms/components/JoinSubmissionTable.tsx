@@ -33,7 +33,10 @@ const JoinSubmissionTable: FC<Props> = ({ onSelect, orgId, submissions }) => {
               return (
                 <Box
                   sx={{
-                    backgroundColor: oldTheme.palette.grey[300],
+                    backgroundColor:
+                      oldTheme.palette.mode === 'dark'
+                        ? oldTheme.palette.grey[800]
+                        : oldTheme.palette.grey[300],
                     borderRadius: '1em',
                     color: oldTheme.palette.text.secondary,
                     fontSize: 'xs',

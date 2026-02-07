@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 import HouseholdVisitPage from './pages/HouseholdVisitPage';
 import EditLocationPage from './pages/EditLocationPage';
@@ -62,6 +62,8 @@ const LocationDialog: FC<LocationDialogProps> = ({
   orgId,
   location,
 }) => {
+  const theme = useTheme();
+
   const [dialogStep, setDialogStep] = useState<LocationDialogStep>('location');
   const [showSparkle, setShowSparkle] = useState(false);
   const metricsList = useAreaAssignmentMetrics(
@@ -133,7 +135,12 @@ const LocationDialog: FC<LocationDialogProps> = ({
       {showSparkle && (
         <EncouragingSparkle onComplete={() => setShowSparkle(false)} />
       )}
-      <ZUINavStack bgcolor="white" currentPage={dialogStep}>
+      <ZUINavStack
+        bgcolor={
+          theme.palette.mode === 'dark' ? theme.palette.grey[800] : 'white'
+        }
+        currentPage={dialogStep}
+      >
         <LocationPage
           key="location"
           assignment={assignment}

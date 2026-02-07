@@ -16,6 +16,7 @@ import { Map, Marker } from '@vis.gl/react-maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '@mui/material';
 
 import ZUIText from 'zui/components/ZUIText';
 import ZUIIcon from 'zui/components/ZUIIcon';
@@ -203,7 +204,11 @@ export const PublicEventPage: FC<Props> = ({ eventId, orgId }) => {
                 {showDescriptionSection &&
                   (hasInfoText ? (
                     <Box
-                      bgcolor="white"
+                      bgcolor={(theme) =>
+                        theme.palette.mode === 'dark'
+                          ? theme.palette.grey[900]
+                          : 'white'
+                      }
                       borderRadius={2}
                       minHeight={isFullScreen ? 400 : ''}
                       padding={2}
@@ -219,7 +224,11 @@ export const PublicEventPage: FC<Props> = ({ eventId, orgId }) => {
                     </Box>
                   ) : (
                     <Box
-                      bgcolor="white"
+                      bgcolor={(theme) =>
+                        theme.palette.mode === 'dark'
+                          ? theme.palette.grey[900]
+                          : 'white'
+                      }
                       borderRadius={2}
                       minHeight={isFullScreen ? 400 : ''}
                       padding={2}
@@ -397,6 +406,7 @@ const SignUpSection: FC<{
 const DateAndLocation: FC<{
   event: ZetkinEventWithStatus;
 }> = ({ event }) => {
+  const theme = useTheme();
   const env = useEnv();
   const isMobile = useIsMobile();
   const startTime = useMemo(
@@ -451,7 +461,11 @@ const DateAndLocation: FC<{
               longitude: event.location.lng,
               zoom: 14,
             }}
-            mapStyle={env.vars.MAPLIBRE_STYLE}
+            mapStyle={
+              theme.palette.mode === 'dark'
+                ? env.vars.MAPLIBRE_STYLE_DARK
+                : env.vars.MAPLIBRE_STYLE
+            }
             onClick={(ev) => {
               ev.target.panTo(ev.lngLat, { animate: true });
             }}

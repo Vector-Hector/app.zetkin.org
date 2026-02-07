@@ -22,7 +22,10 @@ const AddBlocks: FC<AddBlocksProps> = ({ orgId, surveyId }) => {
   return (
     <Card
       sx={{
-        backgroundColor: oldTheme.palette.grey[200],
+        backgroundColor:
+          oldTheme.palette.mode === 'dark'
+            ? oldTheme.palette.grey[900]
+            : oldTheme.palette.grey[200],
         border: 'none',
         padding: 2,
       }}
