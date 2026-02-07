@@ -292,7 +292,11 @@ const GLGeographyMapInner: FC<Props> = ({ areas, orgId }) => {
           ref={(map) => setMap(map?.getMap() ?? null)}
           cursor={drawingPoints ? 'crosshair' : undefined}
           initialViewState={{ bounds }}
-          mapStyle={env.vars.MAPLIBRE_STYLE}
+          mapStyle={
+            theme.palette.mode === 'dark'
+              ? env.vars.MAPLIBRE_STYLE_DARK
+              : env.vars.MAPLIBRE_STYLE
+          }
           RTLTextPlugin="/mapbox-gl-rtl-text-0.3.0.js"
         >
           <Areas areas={visibleAreas} />

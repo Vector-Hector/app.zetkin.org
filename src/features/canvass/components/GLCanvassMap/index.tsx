@@ -362,7 +362,11 @@ const GLCanvassMap: FC<Props> = ({ assignment, selectedArea }) => {
         initialViewState={{
           ...initialBounds,
         }}
-        mapStyle={env.vars.MAPLIBRE_STYLE}
+        mapStyle={
+          oldTheme.palette.mode === 'dark'
+            ? env.vars.MAPLIBRE_STYLE_DARK
+            : env.vars.MAPLIBRE_STYLE
+        }
         onClick={(ev) => {
           ev.target.panTo(ev.lngLat, { animate: true });
         }}

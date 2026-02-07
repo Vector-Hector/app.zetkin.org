@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { Layer, Map, Source } from '@vis.gl/react-maplibre';
 import { Map as MapType } from 'maplibre-gl';
 import { FC, useCallback, useMemo, useState } from 'react';
@@ -18,6 +18,7 @@ export const ActivistPortalEventMap: FC<{
   locationFilter: GeoJSON.Feature[];
   setLocationFilter: (geojsonToFilterBy: GeoJSON.Feature[]) => void;
 }> = ({ events, locationFilter, setLocationFilter }) => {
+  const theme = useTheme();
   const [map, setMap] = useState<MapType | null>(null);
 
   const onMarkerClick = useCallback(
@@ -139,7 +140,11 @@ export const ActivistPortalEventMap: FC<{
           bounds,
           fitBoundsOptions: { padding: 200 },
         }}
-        mapStyle={env.vars.MAPLIBRE_STYLE}
+        mapStyle={
+          theme.palette.mode === 'dark'
+            ? env.vars.MAPLIBRE_STYLE_DARK
+            : env.vars.MAPLIBRE_STYLE
+        }
         onClick={(ev) => {
           ev.target.panTo(ev.lngLat, { animate: true });
         }}
