@@ -15,35 +15,37 @@ import {
 import { daDK, deDE, Localization, nbNO, svSE } from '@mui/material/locale';
 
 import './types';
-import palette from './palette';
+import { darkPalette, palette } from './palette';
 import typography from './typography';
+import { ResolvedThemeMode } from './themeMode';
 
-const theme = createTheme({
-  elevation: {
-    bottom: {
-      big: {
-        light: '0rem 0.25rem 2.5rem 0rem #00000014',
-        medium: '0rem 0.25rem 2.5rem 0rem #0000001F',
+const theme = (themeMode: ResolvedThemeMode) =>
+  createTheme({
+    elevation: {
+      bottom: {
+        big: {
+          light: '0rem 0.25rem 2.5rem 0rem #00000014',
+          medium: '0rem 0.25rem 2.5rem 0rem #0000001F',
+        },
+        small: {
+          light: '0rem 0.25rem 1.25rem 0rem #00000014',
+          medium: '0rem 0.25rem 1.25rem 0rem #0000001F',
+        },
       },
-      small: {
-        light: '0rem 0.25rem 1.25rem 0rem #00000014',
-        medium: '0rem 0.25rem 1.25rem 0rem #0000001F',
+      top: {
+        big: {
+          light: '0.rem -0.25rem 2.25rem 0rem #00000014',
+          medium: '0rem -0.25rem 2.25rem 0rem #0000001F',
+        },
+        small: {
+          light: '0rem -0.25rem 1.25rem 0rem #00000014',
+          medium: '0rem -0.25rem 1.25rem 0rem #0000001F',
+        },
       },
     },
-    top: {
-      big: {
-        light: '0.rem -0.25rem 2.25rem 0rem #00000014',
-        medium: '0rem -0.25rem 2.25rem 0rem #0000001F',
-      },
-      small: {
-        light: '0rem -0.25rem 1.25rem 0rem #00000014',
-        medium: '0rem -0.25rem 1.25rem 0rem #0000001F',
-      },
-    },
-  },
-  palette: palette,
-  typography: typography,
-});
+    palette: themeMode === 'dark' ? darkPalette : palette,
+    typography: typography,
+  });
 
 //MUI Material localizations
 const coreLocales: Record<string, Localization> = {};
@@ -66,9 +68,9 @@ pickersLocales['de'] = pickersDeDE;
 pickersLocales['nn'] = pickersNbNO;
 pickersLocales['sv'] = pickersSvSE;
 
-export const themeWithLocale = (lang: string) => {
+export const themeWithLocale = (lang: string, themeMode: ResolvedThemeMode) => {
   return createTheme(
-    theme,
+    theme(themeMode),
     coreLocales[lang],
     dataGridLocales[lang],
     pickersLocales[lang]

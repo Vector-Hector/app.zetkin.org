@@ -1,10 +1,11 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import ClientContext from 'core/env/ClientContext';
 import { ZetkinUser } from 'utils/types/zetkin';
 import { getBrowserLanguage, getMessages } from 'utils/locale';
+import { ResolvedThemeMode } from 'zui/theme/themeMode';
 
 export default async function RootLayout({
   children,
@@ -27,8 +28,16 @@ export default async function RootLayout({
     user?.lang || getBrowserLanguage(headers().get('accept-language') || '');
   const messages = await getMessages(lang);
 
+  const themeMode =
+    (cookies().get('theme')?.value as ResolvedThemeMode) || 'light';
+
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      style={{
+        backgroundColor: themeMode === 'dark' ? '#151515' : undefined,
+      }}
+    >
       <body>
         <AppRouterCacheProvider>
           <ClientContext
@@ -51,6 +60,7 @@ export default async function RootLayout({
             headers={headersObject}
             lang={lang}
             messages={messages}
+            themeMode={themeMode}
             user={user}
           >
             {children}

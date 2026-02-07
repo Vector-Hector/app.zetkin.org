@@ -72,6 +72,12 @@ export default makeMessages('feat.home', {
       header: m('Account settings'),
     },
     appPreferences: {
+      darkMode: {
+        auto: m('Automatic (configured in  browser)'),
+        dark: m('Dark'),
+        label: m('Dark mode'),
+        light: m('Light'),
+      },
       header: m('App preferences'),
       lang: {
         auto: m('Automatic (configured in  browser)'),

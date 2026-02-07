@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { ZetkinUser } from 'utils/types/zetkin';
@@ -9,6 +9,13 @@ import ZUISection from 'zui/components/ZUISection';
 import ZUISelect from 'zui/components/ZUISelect';
 import ZUIButton from 'zui/components/ZUIButton';
 import { SupportedLanguage } from 'core/i18n/languages';
+import {
+  getModeSettingFromLocalStorage,
+  getResolvedMode,
+  setModeToLocalStorage,
+  ThemeMode,
+  updateThemeModeCookie,
+} from 'zui/theme/themeMode';
 
 export type ZetkinUserLanguage = SupportedLanguage | null;
 
@@ -31,6 +38,17 @@ const AppPreferences: FC<Props> = ({ user }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<ZetkinUserLanguage>(
     user?.lang as ZetkinUserLanguage
   );
+  const setDarkModeSetting = useCallback((mode: ThemeMode) => {
+    setModeToLocalStorage(mode);
+    const resolvedMode = getResolvedMode(mode);
+    if (resolvedMode) {
+      updateThemeModeCookie(resolvedMode, true);
+    }
+  }, []);
+  const darkModeSetting = useMemo(() => getModeSettingFromLocalStorage(), []);
+
+  const [selectedDarkModeSetting, setSelectedDarkModeSetting] =
+    useState<ThemeMode>(darkModeSetting);
 
   return (
     <Box
@@ -77,11 +95,46 @@ const AppPreferences: FC<Props> = ({ user }) => {
                 selectedOption={selectedLanguage || 'auto'}
                 size="large"
               />
+              <ZUISelect
+                fullWidth
+                items={[
+                  {
+                    label: messages.settings.appPreferences.darkMode.auto(),
+                    value: 'auto',
+                  },
+                  {
+                    label: messages.settings.appPreferences.darkMode.dark(),
+                    value: 'dark',
+                  },
+                  {
+                    label: messages.settings.appPreferences.darkMode.light(),
+                    value: 'light',
+                  },
+                ]}
+                label={messages.settings.appPreferences.darkMode.label()}
+                onChange={(newValue) => {
+                  if (newValue == 'auto') {
+                    setSelectedDarkModeSetting('auto');
+                  } else {
+                    setSelectedDarkModeSetting(newValue as ThemeMode);
+                  }
+                }}
+                selectedOption={selectedDarkModeSetting + ''}
+                size="large"
+              />
               <ZUIButton
-                disabled={selectedLanguage == user.lang}
+                disabled={
+                  selectedLanguage == user.lang &&
+                  darkModeSetting === selectedDarkModeSetting
+                }
                 label={messages.settings.appPreferences.lang.saveButton()}
                 onClick={async () => {
-                  await updateUser({ lang: selectedLanguage });
+                  if (selectedLanguage !== user.lang) {
+                    await updateUser({ lang: selectedLanguage });
+                  }
+                  if (darkModeSetting !== selectedDarkModeSetting) {
+                    setDarkModeSetting(selectedDarkModeSetting);
+                  }
                   location.reload();
                 }}
                 size="large"

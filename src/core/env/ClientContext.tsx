@@ -6,7 +6,7 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
-import { FC, ReactNode, Suspense, useRef } from 'react';
+import { FC, ReactNode, Suspense, useEffect, useRef } from 'react';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { LicenseInfo, LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
@@ -23,6 +23,11 @@ import { ZetkinUser } from 'utils/types/zetkin';
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZUIConfirmDialogProvider } from 'zui/ZUIConfirmDialogProvider';
 import { ZUISnackbarProvider } from 'zui/ZUISnackbarContext';
+import {
+  getResolvedModeSettingFromLocalStorage,
+  ResolvedThemeMode,
+  updateThemeModeCookie,
+} from 'zui/theme/themeMode';
 
 type ClientContextProps = {
   children: ReactNode;
@@ -30,6 +35,7 @@ type ClientContextProps = {
   headers: Record<string, string>;
   lang: string;
   messages: MessageList;
+  themeMode: ResolvedThemeMode;
   user: ZetkinUser | null;
 };
 
@@ -39,6 +45,7 @@ const ClientContext: FC<ClientContextProps> = ({
   headers,
   lang,
   messages,
+  themeMode,
   user,
 }) => {
   const onServer = typeof window == 'undefined';
@@ -65,11 +72,18 @@ const ClientContext: FC<ClientContextProps> = ({
     LicenseInfo.setLicenseKey(env.vars.MUIX_LICENSE_KEY);
   }
 
+  useEffect(() => {
+    const themeMode = getResolvedModeSettingFromLocalStorage();
+    if (themeMode) {
+      updateThemeModeCookie(themeMode);
+    }
+  }, []);
+
   return (
     <ReduxProvider store={storeRef.current}>
       <StyledEngineProvider injectFirst>
         <CacheProvider value={cache.current}>
-          <ThemeProvider theme={oldThemeWithLocale(lang)}>
+          <ThemeProvider theme={oldThemeWithLocale(lang, themeMode)}>
             <EnvProvider env={env}>
               <UserProvider user={user}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
