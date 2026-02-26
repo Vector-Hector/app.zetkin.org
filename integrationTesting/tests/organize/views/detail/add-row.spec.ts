@@ -98,8 +98,7 @@ test.describe('View detail page', () => {
         .log()
         .filter(
           (req) =>
-            req.method === 'GET' &&
-            req.path === '/v2/orgs/1/lists/1/rows'
+            req.method === 'GET' && req.path === '/v2/orgs/1/lists/1/rows'
         ).length
     ).toBeGreaterThan(1);
   });
