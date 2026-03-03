@@ -33,6 +33,7 @@ import { surveyToListDef } from 'features/surveys/rpc/surveyToList';
 import { duplicateSurveyDef } from 'features/surveys/rpc/duplicateSurvey';
 import { loadPersonFieldsDef } from 'features/duplicates/rpc/loadPersonFields';
 import { getSurveyResponseStatsDef } from 'features/surveys/rpc/getSurveyResponseStats';
+import { findEventByIdDef } from 'features/smartSearch/rpc/findEventById';
 
 export function createRPCRouter() {
   const rpcRouter = new RPCRouter();
@@ -47,6 +48,7 @@ export function createRPCRouter() {
   rpcRouter.register(surveyToListDef);
   rpcRouter.register(getTaskStatsRouteDef);
   rpcRouter.register(addBulkOptionsDef);
+  rpcRouter.register(findEventByIdDef);
   rpcRouter.register(getEventStatsDef);
   rpcRouter.register(getPrevEventDayDef);
   rpcRouter.register(getNextEventDayDef);
