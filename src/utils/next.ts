@@ -5,6 +5,7 @@ import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
 } from 'next';
+import { deflate } from 'pako';
 
 import { AppSession } from './types';
 import { getBrowserLanguage, getMessages } from './locale';
@@ -30,7 +31,7 @@ type RegularProps = {
 export type ScaffoldedProps = RegularProps & {
   envVars: EnvVars;
   lang: string;
-  messages: Record<string, string>;
+  messages: string;
   user: ZetkinUser | null;
 };
 
@@ -241,7 +242,9 @@ export const scaffold =
           ZETKIN_PRIVACY_POLICY_LINK: process.env.ZETKIN_PRIVACY_POLICY_LINK,
         }),
         lang,
-        messages,
+        messages: Buffer.from(deflate(JSON.stringify(messages))).toString(
+          'base64'
+        ),
         user: ctx.user,
       };
     }

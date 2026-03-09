@@ -7,6 +7,7 @@ import { NoSsr } from '@mui/base';
 import NProgress from 'nprogress';
 import Router from 'next/router';
 import { useEffect, useRef } from 'react';
+import { inflate } from 'pako';
 
 import createStore, { Store } from 'core/store';
 import BrowserApiClient from 'core/api/client/BrowserApiClient';
@@ -36,7 +37,18 @@ declare global {
 }
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
-  const { envVars, lang, messages, ...restProps } = pageProps;
+  const {
+    envVars,
+    lang,
+    messages: messagesCompressed,
+    ...restProps
+  } = pageProps;
+  const messages = JSON.parse(
+    inflate(
+      Uint8Array.from(atob(messagesCompressed), (c) => c.charCodeAt(0)),
+      { to: 'string' }
+    )
+  );
   const c = Component as PageWithLayout;
   const getLayout = c.getLayout || ((page) => page);
 
