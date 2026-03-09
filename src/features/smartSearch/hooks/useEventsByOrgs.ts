@@ -1,46 +1,49 @@
-import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
+import {
+  useApiClient,
+  useAppDispatch,
+  useAppSelector,
+  useNumericRouteParams,
+} from 'core/hooks';
 import { ZetkinEvent } from 'utils/types/zetkin';
-import shouldLoad from 'core/caching/shouldLoad';
-import { IFuture, LoadingFuture, ResolvedFuture } from 'core/caching/futures';
-import { RemoteItem } from 'utils/storeUtils';
+import {
+  ErrorFuture,
+  IFuture,
+  LoadingFuture,
+  ResolvedFuture,
+} from 'core/caching/futures';
 import { eventsByOrgLoad, eventsByOrgLoaded } from '../store';
+import { loadListIfNecessary } from 'core/caching/cacheUtils';
 
 export default function useEventsByOrgs(
-  orgIds: number[]
+  orgIds?: number[]
 ): IFuture<ZetkinEvent[]> {
   const apiClient = useApiClient();
-  const events = useAppSelector((state) => state.smartSearch);
+  const { orgId } = useNumericRouteParams();
+  const eventsState = useAppSelector(
+    (state) => state.smartSearch.eventsByOrgId[orgId]
+  );
   const dispatch = useAppDispatch();
 
-  const missingOrgIds = orgIds.filter((orgId) =>
-    shouldLoad(events.eventsByOrgId[orgId])
-  );
-  const loadingOrgIds = orgIds.filter(
-    (orgId) => events.eventsByOrgId[orgId]?.isLoading
-  );
+  const eventsFuture = loadListIfNecessary(eventsState, dispatch, {
+    actionOnLoad: () => eventsByOrgLoad(orgId),
+    actionOnSuccess: (data) => eventsByOrgLoaded([orgId, data]),
+    loader: () => apiClient.get(`/api/orgs/${orgId}/actions?recursive`),
+  });
 
-  if (missingOrgIds.length > 0) {
-    missingOrgIds.forEach((orgId) => {
-      dispatch(eventsByOrgLoad(orgId));
-      apiClient
-        .get<ZetkinEvent[]>(`/api/orgs/${orgId}/actions`)
-        .then((items) => {
-          dispatch(eventsByOrgLoaded([orgId, items]));
-        });
-    });
+  if (!orgIds) {
+    return eventsFuture;
   }
 
-  if (loadingOrgIds.length > 0 || missingOrgIds.length > 0) {
+  if (eventsFuture.isLoading) {
     return new LoadingFuture();
+  } else if (eventsFuture.error) {
+    return new ErrorFuture(eventsFuture.error);
   } else {
-    const zetkinEvents: ZetkinEvent[] = orgIds
-      .flatMap(
-        (orgId: number): RemoteItem<ZetkinEvent>[] =>
-          events.eventsByOrgId[orgId].items
+    const orgIdSet = new Set(orgIds);
+    return new ResolvedFuture(
+      (eventsFuture.data || []).filter((event) =>
+        orgIdSet.has(event.organization.id)
       )
-      .map((item: RemoteItem<ZetkinEvent>): ZetkinEvent | null => item.data)
-      .filter((data: ZetkinEvent | null): data is ZetkinEvent => !!data);
-
-    return new ResolvedFuture(zetkinEvents);
+    );
   }
 }
