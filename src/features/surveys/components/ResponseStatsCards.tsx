@@ -71,6 +71,7 @@ import { usePanes } from 'utils/panes';
 import useResizeObserver from 'zui/hooks/useResizeObserver';
 import ZUIText from 'zui/components/ZUIText';
 import {
+  isOptionsQuestion,
   isOptionsStats,
   isTextResponse,
   isTextStats,
@@ -297,24 +298,6 @@ const ChartWrapper = (props: BoxOwnProps) => {
   );
 };
 
-const getOptionText = (
-  question: ZetkinSurveyQuestionElement,
-  optionId: number
-) => {
-  if (!('options' in question.question) || !question.question.options) {
-    return '';
-  }
-
-  const option = question.question.options.find(
-    (option) => option.id === optionId
-  );
-  if (!option) {
-    return '';
-  }
-
-  return option.text;
-};
-
 const QuestionStatsBarPlot = ({
   exportApi,
   question,
@@ -328,9 +311,14 @@ const QuestionStatsBarPlot = ({
 
   const data = useMemo(() => {
     const bars = isOptionsStats(questionStats)
-      ? questionStats.options.map((o) => ({
-          count: o.count,
-          option: getOptionText(question, o.option_id),
+      ? (isOptionsQuestion(question.question)
+          ? question.question.options || []
+          : []
+        ).map((option) => ({
+          count:
+            questionStats.options.find((c) => c.option_id === option.id)
+              ?.count || 0,
+          option: option.text,
         }))
       : Object.entries(questionStats.top_word_frequencies).map(
           ([word, count]) => ({
@@ -418,9 +406,14 @@ const QuestionStatsPie = ({
 }) => {
   const data = useMemo(() => {
     const items = isOptionsStats(questionStats)
-      ? questionStats.options.map((o) => ({
-          label: getEllipsedString(getOptionText(question, o.option_id), 60),
-          value: o.count,
+      ? (isOptionsQuestion(question.question)
+          ? question.question.options || []
+          : []
+        ).map((option) => ({
+          label: getEllipsedString(option.text, 60),
+          value:
+            questionStats.options.find((c) => c.option_id === option.id)
+              ?.count || 0,
         }))
       : Object.entries(questionStats.top_word_frequencies).map(
           ([word, count]) => ({
