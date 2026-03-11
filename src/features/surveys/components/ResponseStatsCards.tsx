@@ -54,18 +54,12 @@ import { BoxOwnProps } from '@mui/system';
 import ZUICard from 'zui/ZUICard';
 import ZUIFuture from 'zui/ZUIFuture';
 import {
-  isOptionsStats,
-  isTextResponse,
-  isTextStats,
-  OptionsQuestionStats,
-  QuestionStats,
-  SubmissionStats,
-  SurveyResponseStats,
-  TextQuestionStats,
-} from 'features/surveys/rpc/getSurveyResponseStats';
-import { ZetkinSurveySubmission } from 'utils/types/zetkin';
+  ELEMENT_TYPE,
+  ZetkinSurveyQuestionElement,
+  ZetkinSurveySubmission,
+} from 'utils/types/zetkin';
 import range from 'utils/range';
-import useSurveyResponseStats from 'features/surveys/hooks/useSurveyResponseStats';
+import useSurveyInsights from 'features/surveys/hooks/useSurveyResponseStats';
 import { useMessages } from 'core/i18n';
 import messageIds from 'features/surveys/l10n/messageIds';
 import useSurveySubmission from 'features/surveys/hooks/useSurveySubmission';
@@ -76,6 +70,17 @@ import SurveySubmissionPane from 'features/surveys/panes/SurveySubmissionPane';
 import { usePanes } from 'utils/panes';
 import useResizeObserver from 'zui/hooks/useResizeObserver';
 import ZUIText from 'zui/components/ZUIText';
+import {
+  isOptionsStats,
+  isTextResponse,
+  isTextStats,
+  Zetkin2OptionsQuestionStats,
+  Zetkin2QuestionStats,
+  Zetkin2TextAnswerListPerQuestion,
+  Zetkin2TextQuestionStats,
+} from 'features/surveys/types';
+import useSurveyElements from 'features/surveys/hooks/useSurveyElements';
+import ZUIFutures from 'zui/ZUIFutures';
 
 const TEXT_RESPONSE_CARD_HEIGHT = 150;
 const CHART_HEIGHT = 400;
@@ -100,12 +105,12 @@ export interface UseChartProExportPublicApi {
   exportAsImage: (options?: ChartImageExportOptions) => Promise<void>;
 }
 
-const ResponseStatsCard = ({
+const InsightsCard = ({
   children,
   exportApi,
   exportDisabled,
   onTabChange,
-  questionStats,
+  question,
   subheader,
   tabOptions,
   tabValue,
@@ -114,7 +119,7 @@ const ResponseStatsCard = ({
   exportApi: MutableRefObject<UseChartProExportPublicApi | undefined>;
   exportDisabled: boolean;
   onTabChange: (tab: string) => void;
-  questionStats: QuestionStats;
+  question: ZetkinSurveyQuestionElement;
   subheader: string;
   tabOptions: { label: string; value: string }[];
   tabValue: string;
@@ -137,9 +142,7 @@ const ResponseStatsCard = ({
 
         if (format === 'png') {
           await exportApi.current.exportAsImage({
-            fileName: sanitizeFileName(
-              questionStats.question.question.question
-            ),
+            fileName: sanitizeFileName(question.question.question),
             onBeforeExport: (iframe) => {
               const doc = iframe.contentDocument;
               if (!doc || !containerRef.current) {
@@ -170,12 +173,7 @@ const ResponseStatsCard = ({
         document.body.style.overflow = docOverflow;
       }
     },
-    [
-      showSnackbar,
-      containerRef,
-      exportApi,
-      questionStats.question.question.question,
-    ]
+    [showSnackbar, containerRef, exportApi, question.question.question]
   );
 
   const exportMenuItems = useMemo(
@@ -207,7 +205,7 @@ const ResponseStatsCard = ({
 
   return (
     <ZUICard
-      header={questionStats.question.question.question}
+      header={question.question.question}
       status={
         <Box
           sx={{
@@ -299,12 +297,32 @@ const ChartWrapper = (props: BoxOwnProps) => {
   );
 };
 
+const getOptionText = (
+  question: ZetkinSurveyQuestionElement,
+  optionId: number
+) => {
+  if (!('options' in question.question) || !question.question.options) {
+    return '';
+  }
+
+  const option = question.question.options.find(
+    (option) => option.id === optionId
+  );
+  if (!option) {
+    return '';
+  }
+
+  return option.text;
+};
+
 const QuestionStatsBarPlot = ({
   exportApi,
+  question,
   questionStats,
 }: {
   exportApi: MutableRefObject<UseChartProExportPublicApi | undefined>;
-  questionStats: QuestionStats;
+  question: ZetkinSurveyQuestionElement;
+  questionStats: Zetkin2QuestionStats;
 }) => {
   const theme = useTheme();
 
@@ -312,9 +330,9 @@ const QuestionStatsBarPlot = ({
     const bars = isOptionsStats(questionStats)
       ? questionStats.options.map((o) => ({
           count: o.count,
-          option: o.option.text,
+          option: getOptionText(question, o.option_id),
         }))
-      : Object.entries(questionStats.topWordFrequencies).map(
+      : Object.entries(questionStats.top_word_frequencies).map(
           ([word, count]) => ({
             count: count,
             option: word,
@@ -325,7 +343,7 @@ const QuestionStatsBarPlot = ({
       sorted = sorted.slice(0, 10);
     }
     return sorted;
-  }, [questionStats]);
+  }, [questionStats, question]);
 
   return (
     <ChartWrapper>
@@ -391,18 +409,20 @@ const QuestionStatsBarPlot = ({
 
 const QuestionStatsPie = ({
   exportApi,
+  question,
   questionStats,
 }: {
   exportApi: MutableRefObject<UseChartProExportPublicApi | undefined>;
-  questionStats: QuestionStats;
+  question: ZetkinSurveyQuestionElement;
+  questionStats: Zetkin2QuestionStats;
 }) => {
   const data = useMemo(() => {
     const items = isOptionsStats(questionStats)
       ? questionStats.options.map((o) => ({
-          label: getEllipsedString(o.option.text, 60),
+          label: getEllipsedString(getOptionText(question, o.option_id), 60),
           value: o.count,
         }))
-      : Object.entries(questionStats.topWordFrequencies).map(
+      : Object.entries(questionStats.top_word_frequencies).map(
           ([word, count]) => ({
             label: getEllipsedString(word, 60),
             value: count,
@@ -416,7 +436,7 @@ const QuestionStatsPie = ({
         label,
         value,
       }));
-  }, [questionStats]);
+  }, [questionStats, question]);
   const messages = useMessages(messageIds);
   const [hasSeenPieInaccuracyWarning, setHasSeenPieInaccuracyWarning] =
     useState(false);
@@ -424,7 +444,7 @@ const QuestionStatsPie = ({
   return (
     <>
       {isOptionsStats(questionStats) &&
-        !!questionStats.multipleSelectedOptionsCount && (
+        !!questionStats.multiple_selected_options_count && (
           <Collapse in={!hasSeenPieInaccuracyWarning}>
             <Alert
               action={
@@ -439,7 +459,8 @@ const QuestionStatsPie = ({
             >
               {messages.insights.optionsFields.warningMultipleSelectedOptionsPie(
                 {
-                  respondentCount: questionStats.multipleSelectedOptionsCount,
+                  respondentCount:
+                    questionStats.multiple_selected_options_count,
                 }
               )}
             </Alert>
@@ -482,9 +503,11 @@ const QuestionStatsPie = ({
 };
 
 const OptionsStatsCard = ({
+  question,
   questionStats,
 }: {
-  questionStats: OptionsQuestionStats;
+  question: ZetkinSurveyQuestionElement;
+  questionStats: Zetkin2OptionsQuestionStats;
 }) => {
   const [tab, setTab] = useState('bar-plot');
   const messages = useMessages(messageIds);
@@ -492,8 +515,8 @@ const OptionsStatsCard = ({
   const subheader = useMemo(
     () =>
       messages.insights.optionsFields.subheader({
-        answerCount: questionStats.answerCount,
-        totalSelectedOptionsCount: questionStats.totalSelectedOptionsCount,
+        answerCount: questionStats.answer_count,
+        totalSelectedOptionsCount: questionStats.total_selected_options_count,
       }),
     [questionStats, messages.insights.optionsFields.subheader]
   );
@@ -501,11 +524,11 @@ const OptionsStatsCard = ({
   const exportApi = useRef<UseChartProExportPublicApi>();
 
   return (
-    <ResponseStatsCard
+    <InsightsCard
       exportApi={exportApi}
       exportDisabled={false}
       onTabChange={(selected) => setTab(selected)}
-      questionStats={questionStats}
+      question={question}
       subheader={subheader}
       tabOptions={[
         {
@@ -522,13 +545,18 @@ const OptionsStatsCard = ({
       {tab === 'bar-plot' && (
         <QuestionStatsBarPlot
           exportApi={exportApi}
+          question={question}
           questionStats={questionStats}
         />
       )}
       {tab === 'pie-chart' && (
-        <QuestionStatsPie exportApi={exportApi} questionStats={questionStats} />
+        <QuestionStatsPie
+          exportApi={exportApi}
+          question={question}
+          questionStats={questionStats}
+        />
       )}
-    </ResponseStatsCard>
+    </InsightsCard>
   );
 };
 
@@ -568,17 +596,17 @@ const TextResponseWordCloud = ({
   questionStats,
 }: {
   exportApi: MutableRefObject<UseChartProExportPublicApi | undefined>;
-  questionStats: TextQuestionStats;
+  questionStats: Zetkin2TextQuestionStats;
 }) => {
   const words: WordData[] = useMemo(
     () =>
-      Object.entries(questionStats.topWordFrequencies).map(
+      Object.entries(questionStats.top_word_frequencies).map(
         ([word, frequency]) => ({
           text: word,
           value: frequency,
         })
       ),
-    [questionStats.topWordFrequencies]
+    [questionStats.top_word_frequencies]
   );
 
   const containerRef = useRef<HTMLDivElement>();
@@ -676,7 +704,7 @@ const TextResponseWordCloud = ({
                     key={w.text}
                     title={
                       w.text &&
-                      `${w.text}: ${questionStats.topWordFrequencies[w.text]}`
+                      `${w.text}: ${questionStats.top_word_frequencies[w.text]}`
                     }
                   >
                     <text
@@ -702,16 +730,13 @@ const TextResponseWordCloud = ({
 
 const TextResponseCard = ({
   questionId,
-  submission,
+  submissionId,
 }: {
   questionId: number;
-  submission: SubmissionStats;
+  submissionId: number;
 }) => {
   const { orgId } = useNumericRouteParams();
-  const extendedSubmissionFuture = useSurveySubmission(
-    orgId,
-    submission.submissionId
-  );
+  const extendedSubmissionFuture = useSurveySubmission(orgId, submissionId);
   const { openPane } = usePanes();
 
   return (
@@ -724,11 +749,11 @@ const TextResponseCard = ({
           return null;
         }
 
-        const questionResponse = extendedSubmission.responses.find(
+        const submission = extendedSubmission.responses.find(
           (response) => response.question_id === questionId
         );
 
-        if (!questionResponse || !isTextResponse(questionResponse)) {
+        if (!submission || !isTextResponse(submission)) {
           return null;
         }
 
@@ -772,7 +797,7 @@ const TextResponseCard = ({
                     wordBreak: 'break-word',
                   }}
                 >
-                  {questionResponse.response}
+                  {submission.response}
                 </Typography>
               </CardContent>
             </Card>
@@ -786,7 +811,7 @@ const TextResponseCard = ({
 type TextResponseListRowProps = {
   columnCount: number;
   questionId: number;
-  rows: SubmissionStats[][];
+  rows: number[][];
 };
 
 const TextResponseListRow = ({
@@ -811,7 +836,7 @@ const TextResponseListRow = ({
         width: '100%',
       }}
     >
-      {row.map((submission, colIndex) => {
+      {row.map((submissionId, colIndex) => {
         return (
           <Box
             key={colIndex}
@@ -822,7 +847,10 @@ const TextResponseListRow = ({
               width: `${100.0 / columnCount}%`,
             }}
           >
-            <TextResponseCard questionId={questionId} submission={submission} />
+            <TextResponseCard
+              questionId={questionId}
+              submissionId={submissionId}
+            />
           </Box>
         );
       })}
@@ -840,10 +868,10 @@ function chunk<T>(xs: T[], size: number): T[][] {
 
 const TextResponseList = ({
   questionStats,
-  submissionStats,
+  responseStats,
 }: {
-  questionStats: TextQuestionStats;
-  submissionStats: SubmissionStats[];
+  questionStats: Zetkin2TextQuestionStats;
+  responseStats: Zetkin2TextAnswerListPerQuestion;
 }) => {
   const theme = useTheme();
   const singleColumnLayout = useMediaQuery(theme.breakpoints.down('lg'));
@@ -852,24 +880,17 @@ const TextResponseList = ({
 
   const rows = useMemo(
     () =>
-      chunk(
-        submissionStats.filter((submission) =>
-          submission.answeredTextQuestions.some(
-            (questionId) => questionId === questionStats.question.id
-          )
-        ),
-        columnCount
-      ),
-    [submissionStats, columnCount, questionStats.question.id]
+      chunk(responseStats[questionStats.question_id.toString()], columnCount),
+    [responseStats, columnCount, questionStats.question_id]
   );
 
   const rowProps = useMemo(
     () => ({
       columnCount,
-      questionId: questionStats.question.id,
+      questionId: questionStats.question_id,
       rows,
     }),
-    [columnCount, questionStats.question.id, rows]
+    [columnCount, questionStats.question_id, rows]
   );
 
   if (!rows) {
@@ -890,11 +911,13 @@ const TextResponseList = ({
 };
 
 const TextStatsCard = ({
+  question,
   questionStats,
-  submissionStats,
+  responseStats,
 }: {
-  questionStats: TextQuestionStats;
-  submissionStats: SubmissionStats[];
+  question: ZetkinSurveyQuestionElement;
+  questionStats: Zetkin2TextQuestionStats;
+  responseStats: Zetkin2TextAnswerListPerQuestion;
 }) => {
   const [tab, setTab] = useState('word-cloud');
   const messages = useMessages(messageIds);
@@ -902,9 +925,9 @@ const TextStatsCard = ({
   const subheader = useMemo(
     () =>
       messages.insights.textFields.subheader({
-        answerCount: questionStats.answerCount,
-        totalUniqueWordCount: questionStats.totalUniqueWordCount,
-        totalWordCount: questionStats.totalWordCount,
+        answerCount: questionStats.answer_count,
+        totalUniqueWordCount: questionStats.total_unique_word_count,
+        totalWordCount: questionStats.total_word_count,
       }),
     [questionStats, messages.insights.textFields.subheader]
   );
@@ -912,11 +935,11 @@ const TextStatsCard = ({
   const exportApi = useRef<UseChartProExportPublicApi>();
 
   return (
-    <ResponseStatsCard
+    <InsightsCard
       exportApi={exportApi}
       exportDisabled={tab === 'responses'}
       onTabChange={(selected) => setTab(selected)}
-      questionStats={questionStats}
+      question={question}
       subheader={subheader}
       tabOptions={[
         {
@@ -944,17 +967,18 @@ const TextStatsCard = ({
         {tab === 'word-frequency-bars' && (
           <QuestionStatsBarPlot
             exportApi={exportApi}
+            question={question}
             questionStats={questionStats}
           />
         )}
         {tab === 'responses' && (
           <TextResponseList
             questionStats={questionStats}
-            submissionStats={submissionStats}
+            responseStats={responseStats}
           />
         )}
       </Box>
-    </ResponseStatsCard>
+    </InsightsCard>
   );
 };
 
@@ -987,17 +1011,18 @@ const ResponseStatsCards: FC<ResponseStatsChartCardProps> = ({
   orgId,
   surveyId,
 }) => {
-  const responseStatsFuture = useSurveyResponseStats(orgId, surveyId);
+  const insightsFuture = useSurveyInsights(orgId, surveyId);
+  const elementsFuture = useSurveyElements(orgId, surveyId);
   const messages = useMessages(messageIds);
 
-  if (responseStatsFuture.error) {
+  if (insightsFuture.error || elementsFuture.error) {
     return <ZUIText variant="headingMd">{messages.insights.error()}</ZUIText>;
   }
 
   return (
-    <ZUIFuture<SurveyResponseStats | null>
-      future={responseStatsFuture}
-      skeleton={
+    <ZUIFutures
+      futures={{ elements: elementsFuture, insights: insightsFuture }}
+      loadingIndicator={
         <>
           {range(3).map((_, index) => (
             <LoadingStatsCard key={index} />
@@ -1005,28 +1030,34 @@ const ResponseStatsCards: FC<ResponseStatsChartCardProps> = ({
         </>
       }
     >
-      {(data: SurveyResponseStats | null) => {
-        if (!data) {
-          return null;
-        }
+      {({ data: { elements, insights } }) => (
+        <>
+          {insights.questions.map((questionStats, index) => {
+            const question = elements.find(
+              (question) => question.id === questionStats.question_id
+            );
+            if (!question || question.type === ELEMENT_TYPE.TEXT) {
+              return null;
+            }
 
-        return (
-          <>
-            {data.questions.map((questionStats, index) =>
-              'options' in questionStats ? (
-                <OptionsStatsCard key={index} questionStats={questionStats} />
-              ) : (
-                <TextStatsCard
-                  key={index}
-                  questionStats={questionStats}
-                  submissionStats={data.submissionStats}
-                />
-              )
-            )}
-          </>
-        );
-      }}
-    </ZUIFuture>
+            return 'options' in questionStats ? (
+              <OptionsStatsCard
+                key={index}
+                question={question}
+                questionStats={questionStats}
+              />
+            ) : (
+              <TextStatsCard
+                key={index}
+                question={question}
+                questionStats={questionStats}
+                responseStats={insights.response_stats}
+              />
+            );
+          })}
+        </>
+      )}
+    </ZUIFutures>
   );
 };
 
