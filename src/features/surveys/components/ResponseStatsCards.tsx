@@ -23,6 +23,7 @@ import {
   Link,
   Menu,
   MenuItem,
+  Select,
   Skeleton,
   ToggleButton,
   ToggleButtonGroup,
@@ -289,13 +290,63 @@ const InsightsCard = ({
   );
 };
 
-const ChartWrapper = (props: BoxOwnProps) => {
-  const { children, ...other } = props;
+const ChartWrapper = (
+  props: BoxOwnProps & {
+    analysisType: NLPAnalysisType;
+    setAnalysisType: (typ: NLPAnalysisType) => void;
+  }
+) => {
+  const { analysisType, setAnalysisType, children, ...other } = props;
   return (
-    <Box className={'zetkin-chart-content'} {...other}>
-      {children}
+    <Box
+      sx={{
+        position: 'relative',
+      }}
+    >
+      <Box
+        sx={{
+          left: 0,
+          position: 'absolute',
+          top: 0,
+          zIndex: 10,
+        }}
+      >
+        <Select
+          onChange={(e) => setAnalysisType(e.target.value as NLPAnalysisType)}
+          size={'small'}
+          value={analysisType}
+          variant={'standard'}
+        >
+          <MenuItem value={'word-frequency'}>Words</MenuItem>
+          <MenuItem value={'verb-frequency'}>Verbs</MenuItem>
+          <MenuItem value={'entity-frequency'}>Entities</MenuItem>
+        </Select>
+      </Box>
+      <Box className={'zetkin-chart-content'} {...other}>
+        {children}
+      </Box>
     </Box>
   );
+};
+
+type NLPAnalysisType = 'word-frequency' | 'verb-frequency' | 'entity-frequency';
+
+const useFrequencyData = (
+  questionStats: Zetkin2QuestionStats,
+  analysisType: NLPAnalysisType
+): Record<string, number> => {
+  return useMemo(() => {
+    if (!isTextStats(questionStats)) {
+      return {};
+    }
+
+    if (analysisType === 'verb-frequency') {
+      return questionStats.top_verb_frequencies;
+    } else if (analysisType === 'entity-frequency') {
+      return questionStats.top_entity_frequencies;
+    }
+    return questionStats.top_word_frequencies;
+  }, [questionStats, analysisType]);
 };
 
 const QuestionStatsBarPlot = ({
@@ -307,6 +358,11 @@ const QuestionStatsBarPlot = ({
   question: ZetkinSurveyQuestionElement;
   questionStats: Zetkin2QuestionStats;
 }) => {
+  const [analysisType, setAnalysisType] =
+    useState<NLPAnalysisType>('word-frequency');
+
+  const freqData = useFrequencyData(questionStats, analysisType);
+
   const theme = useTheme();
 
   const data = useMemo(() => {
@@ -320,21 +376,19 @@ const QuestionStatsBarPlot = ({
               ?.count || 0,
           option: option.text,
         }))
-      : Object.entries(questionStats.top_word_frequencies).map(
-          ([word, count]) => ({
-            count: count,
-            option: word,
-          })
-        );
+      : Object.entries(freqData).map(([word, count]) => ({
+          count: count,
+          option: word,
+        }));
     let sorted = bars.sort((a, b) => b.count - a.count);
     if (isTextStats(questionStats)) {
       sorted = sorted.slice(0, 10);
     }
     return sorted;
-  }, [questionStats, question]);
+  }, [questionStats, question, freqData]);
 
   return (
-    <ChartWrapper>
+    <ChartWrapper analysisType={analysisType} setAnalysisType={setAnalysisType}>
       <BarChartPro
         apiRef={
           exportApi as unknown as RefObject<
@@ -404,6 +458,11 @@ const QuestionStatsPie = ({
   question: ZetkinSurveyQuestionElement;
   questionStats: Zetkin2QuestionStats;
 }) => {
+  const [analysisType, setAnalysisType] =
+    useState<NLPAnalysisType>('word-frequency');
+
+  const freqData = useFrequencyData(questionStats, analysisType);
+
   const data = useMemo(() => {
     const items = isOptionsStats(questionStats)
       ? (isOptionsQuestion(question.question)
@@ -415,12 +474,10 @@ const QuestionStatsPie = ({
             questionStats.options.find((c) => c.option_id === option.id)
               ?.count || 0,
         }))
-      : Object.entries(questionStats.top_word_frequencies).map(
-          ([word, count]) => ({
-            label: getEllipsedString(word, 60),
-            value: count,
-          })
-        );
+      : Object.entries(freqData).map(([word, count]) => ({
+          label: getEllipsedString(word, 60),
+          value: count,
+        }));
     return items
       .sort((a, b) => b.value - a.value)
       .slice(0, 10)
@@ -429,7 +486,7 @@ const QuestionStatsPie = ({
         label,
         value,
       }));
-  }, [questionStats, question]);
+  }, [questionStats, question, freqData]);
   const messages = useMessages(messageIds);
   const [hasSeenPieInaccuracyWarning, setHasSeenPieInaccuracyWarning] =
     useState(false);
@@ -459,7 +516,10 @@ const QuestionStatsPie = ({
             </Alert>
           </Collapse>
         )}
-      <ChartWrapper>
+      <ChartWrapper
+        analysisType={analysisType}
+        setAnalysisType={setAnalysisType}
+      >
         <PieChartPro
           apiRef={
             exportApi as unknown as MutableRefObject<UseChartProExportPublicApi>
@@ -591,16 +651,17 @@ const TextResponseWordCloud = ({
   exportApi: MutableRefObject<UseChartProExportPublicApi | undefined>;
   questionStats: Zetkin2TextQuestionStats;
 }) => {
-  const words: WordData[] = useMemo(
-    () =>
-      Object.entries(questionStats.top_word_frequencies).map(
-        ([word, frequency]) => ({
-          text: word,
-          value: frequency,
-        })
-      ),
-    [questionStats.top_word_frequencies]
-  );
+  const [analysisType, setAnalysisType] =
+    useState<NLPAnalysisType>('word-frequency');
+
+  const srcData = useFrequencyData(questionStats, analysisType);
+
+  const words: WordData[] = useMemo(() => {
+    return Object.entries(srcData).map(([word, frequency]) => ({
+      text: word,
+      value: frequency,
+    }));
+  }, [srcData]);
 
   const containerRef = useRef<HTMLDivElement>();
   const svgRef = useRef<SVGSVGElement>();
@@ -670,7 +731,11 @@ const TextResponseWordCloud = ({
       }}
     >
       <Box ref={containerRef} sx={{ height: '100%', width: '100%' }}>
-        <ChartWrapper sx={{ height: '100%', width: '100%' }}>
+        <ChartWrapper
+          analysisType={analysisType}
+          setAnalysisType={setAnalysisType}
+          sx={{ height: '100%', width: '100%' }}
+        >
           <Box
             ref={resizeObserverRef}
             sx={{
@@ -695,10 +760,7 @@ const TextResponseWordCloud = ({
                 cloudWords.map((w, i) => (
                   <Tooltip
                     key={w.text}
-                    title={
-                      w.text &&
-                      `${w.text}: ${questionStats.top_word_frequencies[w.text]}`
-                    }
+                    title={w.text && `${w.text}: ${srcData[w.text]}`}
                   >
                     <text
                       fill={COLORS[i % COLORS.length]}
