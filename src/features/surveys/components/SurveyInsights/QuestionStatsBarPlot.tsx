@@ -1,4 +1,4 @@
-import React, { MutableRefObject, RefObject, useMemo, useState } from 'react';
+import React, { MutableRefObject, RefObject, useMemo } from 'react';
 import { useTheme } from '@mui/material';
 import {
   BarChartPro,
@@ -13,10 +13,7 @@ import {
   isTextStats,
   Zetkin2QuestionStats,
 } from 'features/surveys/types';
-import {
-  NLPAnalysisType,
-  useFrequencyData,
-} from 'features/surveys/hooks/useSurveyFrequencyData';
+import { useSurveyAnalysisTypeSelection } from 'features/surveys/hooks/useSurveyAnalysisTypeSelection';
 import {
   CHART_HEIGHT,
   ChartWrapper,
@@ -33,10 +30,7 @@ export const QuestionStatsBarPlot = ({
   question: ZetkinSurveyQuestionElement;
   questionStats: Zetkin2QuestionStats;
 }) => {
-  const [analysisType, setAnalysisType] =
-    useState<NLPAnalysisType>('word-frequency');
-
-  const freqData = useFrequencyData(questionStats, analysisType);
+  const typeSelection = useSurveyAnalysisTypeSelection(questionStats);
 
   const theme = useTheme();
 
@@ -51,7 +45,7 @@ export const QuestionStatsBarPlot = ({
               ?.count || 0,
           option: option.text,
         }))
-      : Object.entries(freqData).map(([word, count]) => ({
+      : Object.entries(typeSelection.freqData).map(([word, count]) => ({
           count: count,
           option: word,
         }));
@@ -60,10 +54,10 @@ export const QuestionStatsBarPlot = ({
       sorted = sorted.slice(0, 10);
     }
     return sorted;
-  }, [questionStats, question, freqData]);
+  }, [questionStats, question, typeSelection.freqData]);
 
   return (
-    <ChartWrapper analysisType={analysisType} setAnalysisType={setAnalysisType}>
+    <ChartWrapper typeSelection={typeSelection}>
       <BarChartPro
         apiRef={
           exportApi as unknown as RefObject<

@@ -18,10 +18,7 @@ import {
   COLORS,
   UseChartProExportPublicApi,
 } from './InsightsCard';
-import {
-  NLPAnalysisType,
-  useFrequencyData,
-} from 'features/surveys/hooks/useSurveyFrequencyData';
+import { useSurveyAnalysisTypeSelection } from 'features/surveys/hooks/useSurveyAnalysisTypeSelection';
 
 export const QuestionStatsPiePlot = ({
   exportApi,
@@ -32,10 +29,7 @@ export const QuestionStatsPiePlot = ({
   question: ZetkinSurveyQuestionElement;
   questionStats: Zetkin2QuestionStats;
 }) => {
-  const [analysisType, setAnalysisType] =
-    useState<NLPAnalysisType>('word-frequency');
-
-  const freqData = useFrequencyData(questionStats, analysisType);
+  const typeSelection = useSurveyAnalysisTypeSelection(questionStats);
 
   const data = useMemo(() => {
     const items = isOptionsStats(questionStats)
@@ -48,7 +42,7 @@ export const QuestionStatsPiePlot = ({
             questionStats.options.find((c) => c.option_id === option.id)
               ?.count || 0,
         }))
-      : Object.entries(freqData).map(([word, count]) => ({
+      : Object.entries(typeSelection.freqData).map(([word, count]) => ({
           label: getEllipsedString(word, 60),
           value: count,
         }));
@@ -60,7 +54,7 @@ export const QuestionStatsPiePlot = ({
         label,
         value,
       }));
-  }, [questionStats, question, freqData]);
+  }, [questionStats, question, typeSelection.freqData]);
   const messages = useMessages(messageIds);
   const [hasSeenPieInaccuracyWarning, setHasSeenPieInaccuracyWarning] =
     useState(false);
@@ -90,10 +84,7 @@ export const QuestionStatsPiePlot = ({
             </Alert>
           </Collapse>
         )}
-      <ChartWrapper
-        analysisType={analysisType}
-        setAnalysisType={setAnalysisType}
-      >
+      <ChartWrapper typeSelection={typeSelection}>
         <PieChartPro
           apiRef={
             exportApi as unknown as MutableRefObject<UseChartProExportPublicApi>
