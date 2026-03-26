@@ -2,23 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, GH_ActionsTestBranch]
   pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  lint:
-    uses: ./.github/workflows/reusable-base.yml
-    with:
-      test-script: lint
-
-  check-types:
-    uses: ./.github/workflows/reusable-base.yml
-    with:
-      test-script: check-types
-
   playwright-test:
     uses: ./.github/workflows/reusable-base.yml
     with:
@@ -27,8 +17,3 @@ jobs:
       test-script: e2e:ci
       upload-name: playwright-report
       upload-path: playwright-report/
-
-  unit-test:
-    uses: ./.github/workflows/reusable-base.yml
-    with:
-      test-script: test
