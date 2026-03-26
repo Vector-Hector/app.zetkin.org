@@ -23,6 +23,7 @@ jobs:
     uses: ./.github/workflows/reusable-base.yml
     with:
       build-script: npx playwright install chromium
+      setup-build-cache: true
       test-script: e2e:ci
       upload-name: playwright-report
       upload-path: playwright-report/
