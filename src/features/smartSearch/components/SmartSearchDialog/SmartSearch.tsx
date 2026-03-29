@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import FilterEditor from './FilterEditor';
 import FilterGallery from './FilterGallery';
@@ -14,6 +14,7 @@ import {
   FILTER_TYPE,
   OPERATION,
   SelectedSmartSearchFilter,
+  SmartSearchFilterWithId,
   ZetkinQuery,
   ZetkinSmartSearchFilter,
 } from '../types';
@@ -65,6 +66,13 @@ const SmartSearch = ({
 
   const [searchState, setSearchState] = useState(STATE.PREVIEW);
 
+  const onInsertFilterBelow = useCallback(
+    (filter: SmartSearchFilterWithId, belowIndex: number) => {
+      addFilter(filter, belowIndex);
+    },
+    [addFilter]
+  );
+
   return (
     <>
       <Typography variant="h5">{smartSearchMessages.smartSearch()}</Typography>
@@ -81,6 +89,7 @@ const SmartSearch = ({
             setSelectedFilter(filter);
             setSearchState(STATE.EDIT);
           }}
+          onInsertFilterBelow={onInsertFilterBelow}
           onOpenFilterGallery={() => setSearchState(STATE.GALLERY)}
           onOpenStartsWithEditor={() => setSearchState(STATE.START_WITH)}
           onReorderFilters={(filters) => update(filters)}

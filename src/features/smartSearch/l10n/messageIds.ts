@@ -8,6 +8,18 @@ export default makeMessages('feat.smartSearch', {
     addNewFilter: m('Add / remove people'),
     cancel: m('Cancel'),
     close: m('Close'),
+    filterActions: {
+      actionResults: {
+        copyError: m('Failed to copy filter config.'),
+        copySuccess: m('Copied filter config to clipboard.'),
+        pasteError: m('Failed to paste filter config.'),
+      },
+      copy: m('Copy'),
+      delete: m('Delete'),
+      duplicate: m('Duplicate'),
+      edit: m('Edit'),
+      pasteBelow: m('Paste below'),
+    },
     goBack: m('Go back to query'),
     save: m('Save'),
   },

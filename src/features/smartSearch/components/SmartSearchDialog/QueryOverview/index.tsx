@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { Alert, Divider, Typography, useTheme } from '@mui/material';
 import {
   ArrowForwardOutlined,
@@ -9,7 +9,7 @@ import {
 import { Box, Button, DialogActions, List } from '@mui/material';
 
 import DisplayStartsWith from '../../StartsWith/DisplayStartsWith';
-import { Msg } from 'core/i18n';
+import { Msg, useMessages } from 'core/i18n';
 import useSmartSearchStats from 'features/smartSearch/hooks/useSmartSearchStats';
 import {
   AnyFilterConfig,
@@ -26,6 +26,7 @@ import {
   SmartSearchSankeyProvider,
 } from '../../sankeyDiagram';
 import ZUIReorderable, { ZUIReorderableWidget } from 'zui/ZUIReorderable';
+import ZUISnackbarContext from 'zui/ZUISnackbarContext';
 
 interface QueryOverviewProps {
   filters: SmartSearchFilterWithId<AnyFilterConfig>[];
@@ -35,6 +36,10 @@ interface QueryOverviewProps {
   onReorderFilters: (filters: SmartSearchFilterWithId[]) => void;
   onEditFilter: (filter: SmartSearchFilterWithId) => void;
   onDeleteFilter: (filter: SmartSearchFilterWithId) => void;
+  onInsertFilterBelow: (
+    filter: SmartSearchFilterWithId,
+    belowIndex: number
+  ) => void;
   onOpenStartsWithEditor: () => void;
   startsWithAll: boolean;
   readOnly?: boolean;
@@ -50,12 +55,15 @@ const QueryOverview = ({
   onOpenFilterGallery,
   onEditFilter,
   onDeleteFilter,
+  onInsertFilterBelow,
   onOpenStartsWithEditor,
   onReorderFilters,
   startsWithAll,
 }: QueryOverviewProps): JSX.Element => {
   const [dragging, setDragging] = useState(false);
   const theme = useTheme();
+  const { showSnackbar } = useContext(ZUISnackbarContext);
+  const messages = useMessages(messageIds);
   const stats = useSmartSearchStats(filters);
   const resultCount = stats?.length ? stats[stats.length - 1].result : 0;
 
@@ -75,12 +83,31 @@ const QueryOverview = ({
             filterIndex={index}
             onDeleteFilter={onDeleteFilter}
             onEditFilter={onEditFilter}
+            onInsertFilterBelow={(filter) => onInsertFilterBelow(filter, index)}
             readOnly={readOnly}
             showDiagram={!dragging}
           />
         );
       },
     }));
+
+  const onPasteStartBlock = useCallback(() => {
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        onInsertFilterBelow(JSON.parse(text), 0);
+      })
+      .catch(() => {
+        showSnackbar(
+          'error',
+          messages.buttonLabels.filterActions.actionResults.pasteError()
+        );
+      });
+  }, [
+    messages.buttonLabels.filterActions.actionResults,
+    onInsertFilterBelow,
+    showSnackbar,
+  ]);
 
   return (
     <Box
@@ -134,6 +161,7 @@ const QueryOverview = ({
                 />
               }
               onClickEdit={onOpenStartsWithEditor}
+              onClickPaste={onPasteStartBlock}
             />
             <ZUIReorderable
               centerWidgets

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
   FILTER_TYPE,
@@ -10,7 +10,7 @@ import {
 type InitialFilters = ZetkinSmartSearchFilter[];
 
 type UseSmartSearch = {
-  addFilter: (filter: ZetkinSmartSearchFilter) => void; // addSmartSearchFilter
+  addFilter: (filter: ZetkinSmartSearchFilter, belowIndex?: number) => void; // addSmartSearchFilter
   deleteFilter: (id: number) => void; // removeSmartSearchFilter
   editFilter: (id: number, newFilterValue: SmartSearchFilterWithId) => void; // editSmartSearchFilter
   filters: ZetkinSmartSearchFilter[];
@@ -42,13 +42,20 @@ const useSmartSearch = (
     SmartSearchFilterWithId[]
   >(normalizedFiltersWithIds);
 
-  const addFilter = (filter: ZetkinSmartSearchFilter) => {
-    const newFilterWithId: SmartSearchFilterWithId = {
-      ...filter,
-      id: filtersWithIds.length,
-    };
-    setFiltersWithIds([...filtersWithIds, newFilterWithId]);
-  };
+  const addFilter = useCallback(
+    (filter: ZetkinSmartSearchFilter, belowIndex?: number) => {
+      const newFilterWithId: SmartSearchFilterWithId = {
+        ...filter,
+        id: filtersWithIds.length,
+      };
+      setFiltersWithIds([
+        ...filtersWithIds.slice(0, belowIndex),
+        newFilterWithId,
+        ...filtersWithIds.slice(belowIndex),
+      ]);
+    },
+    [filtersWithIds]
+  );
 
   const editFilter = (id: number, newFilterValue: SmartSearchFilterWithId) => {
     const filtersWithEditedFilter = filtersWithIds.map((filter) => {
