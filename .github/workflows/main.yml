@@ -10,10 +10,39 @@ permissions:
 
 jobs:
   playwright-test:
-    uses: ./.github/workflows/reusable-base.yml
-    with:
-      build-script: npx playwright install chromium
-      setup-build-cache: true
-      test-script: e2e:ci
-      upload-name: playwright-report
-      upload-path: playwright-report/
+    name: Test
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version: ['22']
+        os: ['ubuntu-latest']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node_version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Install Chromium
+        run: npx playwright install chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Test (run 20 times)
+        run: |
+          for i in {1..20}
+          do
+            echo "Run #$i"
+            npm run e2e:skipbuild || exit 1
+          done
