@@ -43,7 +43,7 @@ const useSmartSearch = (
   >(normalizedFiltersWithIds);
 
   const addFilter = useCallback(
-    (filter: ZetkinSmartSearchFilter, belowIndex?: number) => {
+    (filter: ZetkinSmartSearchFilter, belowIndex: number = 0) => {
       const newFilterWithId: SmartSearchFilterWithId = {
         ...filter,
         id: filtersWithIds.length,
