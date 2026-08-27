@@ -1,7 +1,6 @@
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
-import { FormattedTime } from 'react-intl';
 import MapIcon from '@mui/icons-material/Map';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { TimeField } from '@mui/x-date-pickers-pro';
@@ -20,6 +19,7 @@ import {
 } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
 
+import { FormattedTime } from 'core/i18n/reactIntl';
 import { getWorkingUrl } from 'features/events/utils/getWorkingUrl';
 import LocationModal from '../LocationModal';
 import messageIds from 'features/events/l10n/messageIds';

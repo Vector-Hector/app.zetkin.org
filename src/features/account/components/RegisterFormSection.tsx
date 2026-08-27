@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import { Box, Collapse } from '@mui/material';
-import { useIntl } from 'react-intl';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import isEmail from 'validator/lib/isEmail';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import ZUIButton from 'zui/components/ZUIButton';
 import ZUITextField from 'zui/components/ZUITextField';
 import { useMessages } from 'core/i18n';

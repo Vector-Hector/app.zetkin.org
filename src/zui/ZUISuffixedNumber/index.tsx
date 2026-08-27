@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { FormattedNumber } from 'react-intl';
 import { Tooltip } from '@mui/material';
 
+import { FormattedNumber } from 'core/i18n/reactIntl';
 import { useMessages } from 'core/i18n';
 import messageIds from 'zui/l10n/messageIds';
 

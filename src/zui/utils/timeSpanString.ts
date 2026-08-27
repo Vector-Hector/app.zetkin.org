@@ -1,8 +1,6 @@
-import { IntlShape } from 'react-intl';
-
+import { injectIntl, IntlShape } from 'core/i18n/reactIntl';
 import messageIds from 'zui/l10n/messageIds';
 import { isAllDay } from 'features/calendar/components/utils';
-import { injectIntl } from 'core/i18n/useMessages';
 
 export function timeSpanToString(
   start: Date,

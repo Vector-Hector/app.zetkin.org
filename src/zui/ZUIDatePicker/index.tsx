@@ -12,9 +12,9 @@ import {
 } from '@mui/material';
 import { Clear, Schedule, VisibilityOutlined } from '@mui/icons-material';
 import dayjs, { Dayjs } from 'dayjs';
-import { IntlShape, useIntl } from 'react-intl';
 import React, { FC, MouseEvent, useEffect, useState } from 'react';
 
+import { IntlShape, useIntl } from 'core/i18n/reactIntl';
 import { EyeClosed } from 'zui/icons/EyeClosed';
 import messageIds from 'zui/l10n/messageIds';
 import { useMessages, UseMessagesMap } from 'core/i18n';

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import { FormattedDate } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import oldTheme from 'theme';
 
 const DateLabel = ({ date }: { date: Date }) => {

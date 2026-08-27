@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
-import { useIntl } from 'react-intl';
 import { useMemo } from 'react';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import oldTheme from 'theme';
 import { getDstChangeAtDate } from '../utils';
 import { Msg } from 'core/i18n';

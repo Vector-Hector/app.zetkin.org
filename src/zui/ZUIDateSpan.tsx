@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { FormattedDate } from 'react-intl';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import messageIds from './l10n/messageIds';
 import { Msg } from 'core/i18n';
 

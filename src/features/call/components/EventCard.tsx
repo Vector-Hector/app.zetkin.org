@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { useIntl } from 'react-intl';
 import {
   Event,
   GroupWorkOutlined,
@@ -7,6 +6,7 @@ import {
   WatchLaterOutlined,
 } from '@mui/icons-material';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import MyActivityListItem from 'features/my/components/MyActivityListItem';
 import { timeSpanToString } from 'zui/utils/timeSpanString';
 import { removeOffset } from 'utils/dateUtils';

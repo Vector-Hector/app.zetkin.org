@@ -1,5 +1,4 @@
-import { useIntl } from 'react-intl';
-
+import { Msg } from 'core/i18n';
 import UnderlinedText from './UnderlinedText';
 import {
   InterpolatedMessage,
@@ -17,32 +16,30 @@ type UnderlinedInterpolatedMsgProps<Values extends ValueRecord> = {
   values: Values;
 };
 
-type UnderlinedMsgProps<Values extends ValueRecord> = {
-  id: PlainMessage | InterpolatedMessage<Values>;
-  values?: Values;
-};
+type UnderlinedMsgProps<Values extends ValueRecord> =
+  | UnderlinedInterpolatedMsgProps<Values>
+  | UnderlinedPlainMsgProps;
 
-function UnderlinedMsg({ id, values }: UnderlinedPlainMsgProps): JSX.Element;
-function UnderlinedMsg<Values extends ValueRecord>({
-  id,
-  values,
-}: UnderlinedInterpolatedMsgProps<Values>): JSX.Element;
-function UnderlinedMsg<Values extends ValueRecord>({
-  id,
-  values,
-}: UnderlinedMsgProps<Values>): JSX.Element {
-  const intl = useIntl();
+function hasValues<Values extends ValueRecord>(
+  props: UnderlinedMsgProps<Values>
+): props is UnderlinedInterpolatedMsgProps<Values> {
+  return props.values !== undefined;
+}
 
-  const descriptor = {
-    defaultMessage: id._defaultMessage,
-    id: id._id,
-  };
+function UnderlinedMsg(props: UnderlinedPlainMsgProps): JSX.Element;
+function UnderlinedMsg<Values extends ValueRecord>(
+  props: UnderlinedInterpolatedMsgProps<Values>
+): JSX.Element;
+function UnderlinedMsg<Values extends ValueRecord>(
+  props: UnderlinedMsgProps<Values>
+): JSX.Element {
+  const text = hasValues(props) ? (
+    <Msg id={props.id} values={props.values} />
+  ) : (
+    <Msg id={props.id} />
+  );
 
-  const str = values
-    ? intl.formatMessage(descriptor, values)
-    : intl.formatMessage(descriptor);
-
-  return <UnderlinedText text={str} />;
+  return <UnderlinedText text={text} />;
 }
 
 export default UnderlinedMsg;

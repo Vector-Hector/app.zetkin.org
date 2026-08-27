@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { FormattedDate, FormattedTime } from 'react-intl';
 
+import { FormattedDate, FormattedTime } from 'core/i18n/reactIntl';
 import { isAllDay } from 'features/calendar/components/utils';
 import messageIds from '../l10n/messageIds';
 import { Msg } from 'core/i18n';

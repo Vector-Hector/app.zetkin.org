@@ -1,5 +1,4 @@
 import { Box, lighten } from '@mui/system';
-import { useIntl } from 'react-intl';
 import { Event, SplitscreenOutlined } from '@mui/icons-material';
 import {
   ListItemIcon,
@@ -10,6 +9,7 @@ import {
 } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import DayHeader from './DayHeader';
 import EventCluster from '../EventCluster';
 import EventDayLane from './EventDayLane';

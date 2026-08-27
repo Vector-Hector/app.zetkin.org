@@ -1,4 +1,3 @@
-import { FormattedDate } from 'react-intl';
 import { Forward, Delete } from '@mui/icons-material';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { useRouter } from 'next/router';
@@ -6,6 +5,7 @@ import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useContext } from 'react';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import { ZUIConfirmDialogContext } from 'zui/ZUIConfirmDialogProvider';
 import JourneyStatusChip from '../components/JourneyStatusChip';
 import messageIds from '../l10n/messageIds';

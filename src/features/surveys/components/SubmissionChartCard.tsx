@@ -1,9 +1,9 @@
 import { FC } from 'react';
-import { FormattedDate } from 'react-intl';
 import { linearGradientDef } from '@nivo/core';
 import { ResponsiveLine } from '@nivo/line';
 import { Box, Paper, Typography, useTheme } from '@mui/material';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import useSurveyStats from '../hooks/useSurveyStats';
 import ZUICard from 'zui/ZUICard';
 import ZUIFuture from 'zui/ZUIFuture';

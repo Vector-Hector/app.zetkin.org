@@ -12,10 +12,10 @@ import {
 } from '@mui/material';
 import { FC, useState } from 'react';
 import { DateRangeCalendar, DateRangePickerDay } from '@mui/x-date-pickers-pro';
-import { useIntl } from 'react-intl';
 import { Clear, CalendarMonthOutlined, Search } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import EventListItem from 'features/public/components/EventListItem';
 import { ZetkinEventWithStatus } from 'features/public/types';
 import useIncrementalDelay from 'features/public/hooks/useIncrementalDelay';

@@ -15,9 +15,9 @@ import {
   DateRangePickerDay,
 } from '@mui/x-date-pickers-pro';
 import dayjs, { Dayjs } from 'dayjs';
-import { useIntl } from 'react-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import useAllEvents from 'features/my/hooks/useAllEvents';
 import EventListItem from 'features/public/components/EventListItem';
 import { Msg, useMessages } from 'core/i18n';

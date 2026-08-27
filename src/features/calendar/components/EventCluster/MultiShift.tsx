@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { FormattedTime } from 'react-intl';
 import { ScheduleOutlined } from '@mui/icons-material';
 
+import { FormattedTime } from 'core/i18n/reactIntl';
 import calendarMessageIds from 'features/calendar/l10n/messageIds';
 import eventMessageIds from 'features/events/l10n/messageIds';
 import { EventState } from 'features/events/hooks/useEventState';

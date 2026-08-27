@@ -1,8 +1,8 @@
-import { FormattedTime } from 'react-intl';
 import NextLink from 'next/link';
 import { Box, Link, Typography } from '@mui/material';
 import { People, PlaceOutlined, Schedule } from '@mui/icons-material';
 
+import { FormattedTime } from 'core/i18n/reactIntl';
 import EventSelectionCheckBox from 'features/events/components/EventSelectionCheckBox';
 import EventWarningIcons from 'features/events/components/EventWarningIcons';
 import getEventState from 'features/events/utils/getEventState';

@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { FormattedTime } from 'react-intl';
 import { Box, Divider, Paper, Typography } from '@mui/material';
 
+import { FormattedTime } from 'core/i18n/reactIntl';
 import { Msg } from 'core/i18n';
 import ZUIDuration from 'zui/ZUIDuration';
 import messageIds from '../l10n/messageIds';

@@ -8,7 +8,6 @@ import {
   Switch,
 } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
-import { useIntl } from 'react-intl';
 import {
   CalendarMonthOutlined,
   Close,
@@ -22,6 +21,7 @@ import { DateRangeCalendar, DateRangePickerDay } from '@mui/x-date-pickers-pro';
 import { partition } from 'lodash';
 import Fuse from 'fuse.js';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import EventCard from './EventCard';
 import { LaneStep, ZetkinCallTarget } from '../types';
 import { ZetkinCallAssignment } from 'utils/types/zetkin';

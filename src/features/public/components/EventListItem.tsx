@@ -1,4 +1,3 @@
-import { useIntl } from 'react-intl';
 import { FC, MouseEvent } from 'react';
 import {
   GroupWorkOutlined,
@@ -6,6 +5,7 @@ import {
   WatchLaterOutlined,
 } from '@mui/icons-material';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import MyActivityListItem from 'features/my/components/MyActivityListItem';
 import { useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';

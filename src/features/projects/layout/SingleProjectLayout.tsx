@@ -1,7 +1,7 @@
-import { FormattedDate } from 'react-intl';
 import { FunctionComponent } from 'react';
 import { Box } from '@mui/material';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import ProjectActionButtons from 'features/projects/components/ProjectActionButtons';
 import EditableProjectTitle from '../components/EditableProjectTitle';
 import messageIds from '../l10n/messageIds';

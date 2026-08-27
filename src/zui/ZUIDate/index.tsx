@@ -1,4 +1,4 @@
-import { FormattedDate } from 'react-intl';
+import { FormattedDate } from 'core/i18n/reactIntl';
 
 interface ZUIDateProps {
   datetime: string; // iso datetime string

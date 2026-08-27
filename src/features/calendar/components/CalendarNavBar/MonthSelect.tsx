@@ -1,6 +1,6 @@
-import { useIntl } from 'react-intl';
 import { MenuItem, Select } from '@mui/material';
 
+import { useIntl } from 'core/i18n/reactIntl';
 import range from 'utils/range';
 
 export interface MonthSelectProps {

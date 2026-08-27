@@ -1,7 +1,7 @@
-import { FormattedDate } from 'react-intl';
 import { Schedule } from '@mui/icons-material';
 import { Box, LinearProgress, Typography } from '@mui/material';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import { Msg } from 'core/i18n';
 import { ZetkinJourneyMilestoneStatus } from 'utils/types/zetkin';
 import messageIds from '../l10n/messageIds';

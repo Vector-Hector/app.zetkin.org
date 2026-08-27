@@ -8,8 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { FormattedDate } from 'react-intl';
 
+import { FormattedDate } from 'core/i18n/reactIntl';
 import EmailLayout from 'features/emails/layout/EmailLayout';
 import { PageWithLayout } from 'utils/types';
 import { scaffold } from 'utils/next';

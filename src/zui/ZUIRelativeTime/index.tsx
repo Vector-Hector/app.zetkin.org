@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
-import { FormattedRelativeTime } from 'react-intl';
-import { RelativeTimeFormatSingularUnit } from '@formatjs/ecma402-abstract';
 import { Tooltip } from '@mui/material';
 
+import { FormattedRelativeTime } from 'core/i18n/reactIntl';
 import ZUIDateTime from '../ZUIDateTime';
 
 interface ZUIRelativeTimeProps {
@@ -54,10 +53,14 @@ const ZUIRelativeTime: React.FunctionComponent<ZUIRelativeTimeProps> = ({
 
 function selectUnit(
   seconds: number
-): [number, RelativeTimeFormatSingularUnit | undefined, number | undefined] {
+): [
+  number,
+  Intl.RelativeTimeFormatUnitSingular | undefined,
+  number | undefined,
+] {
   let value = seconds;
   let updateInterval: number | undefined = 60;
-  let unit: RelativeTimeFormatSingularUnit | undefined = undefined;
+  let unit: Intl.RelativeTimeFormatUnitSingular | undefined = undefined;
 
   const yearInSeconds = 365 * 24 * 60 * 60;
   if (Math.abs(value) > 1.5 * yearInSeconds) {
