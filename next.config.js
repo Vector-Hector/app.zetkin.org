@@ -14,14 +14,7 @@ module.exports = {
    */
   allowedDevOrigins: [],
 
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        canvas: 'util',
-      },
-    },
-    serverComponentsExternalPackages: ['mjml', 'mongoose'],
-  },
+  serverExternalPackages: ['mjml', 'mongoose'],
   images: {
     domains: [
       `files.${process.env.ZETKIN_API_DOMAIN}`,
@@ -97,5 +90,10 @@ module.exports = {
         permanent: false,
       },
     ];
+  },
+  turbopack: {
+    resolveAlias: {
+      canvas: 'util',
+    },
   },
 };
