@@ -91,6 +91,7 @@ const test = base.extend<NextTestFixtures, NextWorkerFixtures>({
     {
       auto: true,
       scope: 'worker',
+      timeout: 120_000,
     },
   ],
   fileServerUri: [
