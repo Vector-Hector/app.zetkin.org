@@ -45,7 +45,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   );
 }
 
-const SurveyLayout: FC<Props> = async (props): Promise<ReactElement> => {
+const SurveyLayout: FC<Props> = async (
+  props
+): Promise<ReactElement<unknown>> => {
   const params = await props.params;
 
   const { children } = props;
