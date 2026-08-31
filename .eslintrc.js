@@ -134,5 +134,11 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': ['error'],
       },
     },
+    {
+      files: ['next-env.d.ts'],
+      rules: {
+        '@typescript-eslint/triple-slash-reference': 'off',
+      },
+    },
   ],
 };
