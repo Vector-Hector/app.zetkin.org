@@ -112,8 +112,12 @@ export const scaffold =
       ctx.z.setTokenData(session.tokenData);
     }
 
+    const [userRes, apiSessionRes] = await Promise.all([
+      ctx.z.resource('users', 'me').get(),
+      ctx.z.resource('session').get(),
+    ]);
+
     try {
-      const userRes = await ctx.z.resource('users', 'me').get();
       ctx.user = userRes.data.data as ZetkinUser;
     } catch (error) {
       ctx.user = null;
@@ -123,7 +127,6 @@ export const scaffold =
     let authLevel = 0;
 
     try {
-      const apiSessionRes = await ctx.z.resource('session').get();
       apiSession = apiSessionRes.data.data as ZetkinSession;
       authLevel = apiSession.level;
     } catch (err) {
