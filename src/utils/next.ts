@@ -112,26 +112,34 @@ export const scaffold =
       ctx.z.setTokenData(session.tokenData);
     }
 
-    const [userRes, apiSessionRes] = await Promise.all([
-      ctx.z.resource('users', 'me').get(),
-      ctx.z.resource('session').get(),
+    const fetchUser = async () => {
+      const userRes = await ctx.z.resource('users', 'me').get();
+
+      try {
+        return userRes.data.data as ZetkinUser;
+      } catch {
+        return null;
+      }
+    };
+
+    const fetchApiSession = async () => {
+      const apiSessionRes = await ctx.z.resource('session').get();
+
+      try {
+        return apiSessionRes.data.data as ZetkinSession;
+      } catch {
+        return null;
+      }
+    };
+
+    const [user, apiSession] = await Promise.all([
+      fetchUser(),
+      fetchApiSession(),
     ]);
 
-    try {
-      ctx.user = userRes.data.data as ZetkinUser;
-    } catch (error) {
-      ctx.user = null;
-    }
+    ctx.user = user;
 
-    let apiSession: ZetkinSession | null = null;
-    let authLevel = 0;
-
-    try {
-      apiSession = apiSessionRes.data.data as ZetkinSession;
-      authLevel = apiSession.level;
-    } catch (err) {
-      authLevel = 0;
-    }
+    const authLevel = apiSession?.level ?? 0;
 
     if (ctx.user && apiSession && apiSession.factors) {
       const hasEmailAuth = apiSession.factors.includes('email_password');
