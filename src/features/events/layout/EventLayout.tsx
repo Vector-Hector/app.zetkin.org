@@ -68,7 +68,7 @@ const EventLayout: React.FC<EventLayoutProps> = ({
         baseHref={getEventUrl(eventFuture.data)}
         defaultTab="/"
         subtitle={
-          <Box alignItems="center" display="flex">
+          <Box alignItems="center" display="flex" flexWrap="wrap">
             <Box marginRight={1}>
               <EventStatusChip state={eventState} />
             </Box>
