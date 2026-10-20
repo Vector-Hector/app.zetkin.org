@@ -27,6 +27,8 @@ export async function generateMetadata(): Promise<Metadata> {
     pageTitle = messages.tabs.settings();
   } else if (lastSegment === 'orgs') {
     pageTitle = messages.tabs.orgs();
+  } else if (lastSegment === 'data') {
+    pageTitle = messages.tabs.data();
   }
 
   const baseTags = getSeoTags(

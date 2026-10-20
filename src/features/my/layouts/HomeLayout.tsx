@@ -54,6 +54,11 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
               label: messages.tabs.settings(),
               value: 'settings',
             },
+            {
+              href: '/my/data',
+              label: messages.tabs.data(),
+              value: 'data',
+            },
           ]}
           topLeftComponent={
             <NextLink

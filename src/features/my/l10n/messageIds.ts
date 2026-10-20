@@ -81,6 +81,7 @@ export default makeMessages('feat.home', {
     },
   },
   tabs: {
+    data: m('Your data'),
     feed: m('All events'),
     home: m('My activities'),
     orgs: m('My organizations'),

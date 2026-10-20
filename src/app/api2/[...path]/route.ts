@@ -100,7 +100,10 @@ async function proxy(
         await session.save();
 
         zetkinResponse = await makeZetkinApiRequest();
-        payload = zetkinResponse.json();
+        if (zetkinResponse.status === 204) {
+          return new NextResponse(null, { status: 204 });
+        }
+        payload = await zetkinResponse.json();
       }
     }
   }
