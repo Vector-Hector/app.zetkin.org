@@ -4,6 +4,12 @@ import { Box, Button, Typography, useTheme } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import { useContext, useMemo, useState } from 'react';
 
+import SmartTagDialog from 'features/tags/components/SmartTagDialog';
+import useSelectableTags from 'features/tags/hooks/useSelectableTags';
+import useSmartTags from 'features/tags/hooks/useSmartTags';
+import useSmartTagMutations from 'features/tags/hooks/useSmartTagMutations';
+import { ZetkinSmartTag } from 'features/tags/types';
+import useMembership from 'features/organizations/hooks/useMembership';
 import { groupTags } from 'features/tags/components/TagManager/utils';
 import messageIds from 'features/tags/l10n/messageIds';
 import { PageWithLayout } from 'utils/types';
@@ -17,7 +23,6 @@ import useServerSide from 'core/useServerSide';
 import useTagGroups from 'features/tags/hooks/useTagGroups';
 import useDeleteTagGroup from 'features/tags/hooks/useDeleteTagGroup';
 import useTagMutations from 'features/tags/hooks/useTagMutations';
-import useTags from 'features/tags/hooks/useTags';
 import { ZetkinTag, ZetkinTagGroup } from 'utils/types/zetkin';
 import { ZUIConfirmDialogContext } from 'zui/ZUIConfirmDialogProvider';
 import { Msg, useMessages } from 'core/i18n';
@@ -40,7 +45,11 @@ const TagsPage: PageWithLayout = () => {
   const { orgId } = useNumericRouteParams();
   const messages = useMessages(messageIds);
   const theme = useTheme();
-  const tags = useTags(orgId).data;
+  const tags = useSelectableTags(orgId).data;
+  const smartTags = useSmartTags(orgId).data || [];
+  const { deleteSmartTag } = useSmartTagMutations(orgId);
+  const canEditSmartTags = useMembership(orgId).data?.role === 'admin';
+  const [smartTagToEdit, setSmartTagToEdit] = useState<ZetkinSmartTag>();
   const tagGroups = useTagGroups(orgId).data || [];
   const deleteTag = useDeleteTag(orgId);
   const { updateTag } = useTagMutations(orgId);
@@ -118,7 +127,21 @@ const TagsPage: PageWithLayout = () => {
                 {group.tags.map((tag) => (
                   <TagChip
                     key={tag.id}
-                    onClick={() => setTagToEdit(tag)}
+                    onClick={
+                      tag.id < 0 && !canEditSmartTags
+                        ? undefined
+                        : () => {
+                            if (tag.id < 0) {
+                              setSmartTagToEdit(
+                                smartTags.find(
+                                  (smartTag) => smartTag.id === -tag.id
+                                )
+                              );
+                            } else {
+                              setTagToEdit(tag);
+                            }
+                          }
+                    }
                     tag={tag}
                   />
                 ))}
@@ -126,6 +149,22 @@ const TagsPage: PageWithLayout = () => {
             </Box>
           );
         })}
+        {smartTagToEdit && (
+          <SmartTagDialog
+            onClose={() => setSmartTagToEdit(undefined)}
+            onDelete={() =>
+              showConfirmDialog({
+                onSubmit: async () => {
+                  await deleteSmartTag(smartTagToEdit.id);
+                  setSmartTagToEdit(undefined);
+                },
+                warningText: messages.dialog.deleteWarning(),
+              })
+            }
+            orgId={orgId}
+            tag={smartTagToEdit}
+          />
+        )}
         <TagDialog
           groups={tagGroups}
           onClose={() => setTagToEdit(undefined)}

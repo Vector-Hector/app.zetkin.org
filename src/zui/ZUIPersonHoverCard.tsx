@@ -15,6 +15,7 @@ import { FC, useEffect, useState } from 'react';
 import MailIcon from '@mui/icons-material/Mail';
 import PhoneIcon from '@mui/icons-material/Phone';
 
+import SmartTags from 'features/tags/components/SmartTags';
 import { CopyIcon } from './ZUIInlineCopyToClipBoard';
 import messageIds from 'features/profile/l10n/messageIds';
 import { Msg } from 'core/i18n';
@@ -122,6 +123,7 @@ const HoverCardContent: FC<{ personId: number }> = ({ personId }) => {
             tags={tags}
           />
         )}
+        <SmartTags orgId={orgId} personId={personId} />
         {(['phone', 'alt_phone', 'email'] as Array<keyof ZetkinPerson>)
           .filter((field) => !!person[field])
           .map((field) => {

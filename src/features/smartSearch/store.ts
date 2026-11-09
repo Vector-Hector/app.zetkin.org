@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ZetkinEvent, ZetkinQuery } from 'utils/types/zetkin';
 import { ZetkinSmartSearchFilterStats } from './types';
 import {
+  remoteItemUpdated,
   RemoteItem,
   remoteItem,
   remoteList,
@@ -63,6 +64,9 @@ const smartSearchSlice = createSlice({
       state.queryList = remoteList(action.payload);
       state.queryList.loaded = new Date().toISOString();
     },
+    querySaved: (state, action: PayloadAction<ZetkinQuery>) => {
+      remoteItemUpdated(state.queryList, action.payload);
+    },
     statsLoad: (state, action: PayloadAction<string>) => {
       const key = action.payload;
       if (!state.statsByFilterSpec[key]) {
@@ -89,6 +93,7 @@ export default smartSearchSlice;
 export const {
   eventsByOrgLoad,
   eventsByOrgLoaded,
+  querySaved,
   queriesLoad,
   queriesLoaded,
   statsLoad,

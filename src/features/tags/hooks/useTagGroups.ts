@@ -1,5 +1,5 @@
 import { loadListIfNecessary } from 'core/caching/cacheUtils';
-import { ZetkinTag } from 'utils/types/zetkin';
+import { ZetkinTagGroup } from 'utils/types/zetkin';
 import { tagGroupsLoad, tagGroupsLoaded } from '../store';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
 
@@ -11,6 +11,7 @@ export default function useTagGroups(orgId: number) {
   return loadListIfNecessary(tagGroupsList, dispatch, {
     actionOnLoad: () => tagGroupsLoad(),
     actionOnSuccess: (tagGroups) => tagGroupsLoaded(tagGroups),
-    loader: () => apiClient.get<ZetkinTag[]>(`/api/orgs/${orgId}/tag_groups`),
+    loader: () =>
+      apiClient.get<ZetkinTagGroup[]>(`/api/orgs/${orgId}/tag_groups`),
   });
 }

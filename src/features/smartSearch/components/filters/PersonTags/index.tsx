@@ -1,17 +1,20 @@
 import { Box, Button, MenuItem, Typography } from '@mui/material';
-import { FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 import Fuse from 'fuse.js';
 
 import FilterForm from '../../FilterForm';
+import useSmartTags from 'features/tags/hooks/useSmartTags';
 import StyledItemSelect from 'features/smartSearch/components/inputs/StyledItemSelect';
 import StyledNumberInput from '../../inputs/StyledNumberInput';
 import StyledSelect from '../../inputs/StyledSelect';
 import { useNumericRouteParams } from 'core/hooks';
 import useSmartSearchFilter from 'features/smartSearch/hooks/useSmartSearchFilter';
-import useTags from 'features/tags/hooks/useTags';
+import useSelectableTags from 'features/tags/hooks/useSelectableTags';
 import { ZetkinTag } from 'utils/types/zetkin';
 import {
   CONDITION_OPERATOR,
+  FILTER_TYPE,
+  IN_OPERATOR,
   NewSmartSearchFilter,
   OPERATION,
   PersonTagsFilterConfig,
@@ -29,11 +32,7 @@ interface PersonTagsProps {
   filter:
     | SmartSearchFilterWithId<PersonTagsFilterConfig>
     | NewSmartSearchFilter;
-  onSubmit: (
-    filter:
-      | SmartSearchFilterWithId<PersonTagsFilterConfig>
-      | ZetkinSmartSearchFilter<PersonTagsFilterConfig>
-  ) => void;
+  onSubmit: (filter: SmartSearchFilterWithId | ZetkinSmartSearchFilter) => void;
   onCancel: () => void;
 }
 
@@ -44,7 +43,8 @@ const PersonTags = ({
 }: PersonTagsProps): JSX.Element => {
   const messages = useMessages(localMessageIds);
   const { orgId } = useNumericRouteParams();
-  const { data } = useTags(orgId);
+  const { data } = useSelectableTags(orgId);
+  const smartTags = useSmartTags(orgId).data || [];
   const tags = data || [];
   const tagsSorted = tags.sort((t1, t2) => {
     return t1.title.localeCompare(t2.title);
@@ -56,12 +56,18 @@ const PersonTags = ({
       tags: [],
     });
 
-  const [selected, setSelected] = useState<CONDITION_OPERATOR>(
-    filter.config.condition
-  );
+  const selected = filter.config.condition;
 
-  // preserve the order of the tag array
-  const selectedTags = filter.config.tags.reduce((acc: ZetkinTag[], id) => {
+  const selectedTagIds = filter.config.tags;
+  const selectedSmartTag = smartTags.find((tag) =>
+    selectedTagIds.includes(-tag.id)
+  );
+  const isTagDisabled = (tag: { id: number }) =>
+    selectedTagIds.includes(tag.id) ||
+    (tag.id < 0 && !!filter.config.organizations) ||
+    (selectedTagIds.length > 0 && (tag.id < 0 || !!selectedSmartTag));
+
+  const selectedTags = selectedTagIds.reduce((acc: ZetkinTag[], id) => {
     const tag = tagsSorted.find((tag) => tag.id === id);
     if (tag) {
       return acc.concat(tag);
@@ -69,13 +75,30 @@ const PersonTags = ({
     return acc;
   }, []);
 
-  // only submit if at least one tag has been added
-  const submittable = !!filter.config.tags.length;
+  const submittable =
+    !!selectedTagIds.length &&
+    (selectedTagIds.every((id) => id > 0) || !!selectedSmartTag);
 
-  // event handlers
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit(filter);
+    if (!submittable) {
+      return;
+    }
+    if (selectedSmartTag) {
+      onSubmit({
+        ...filter,
+        config: {
+          operator:
+            filter.config.condition === CONDITION_OPERATOR.NONE
+              ? IN_OPERATOR.NOTIN
+              : IN_OPERATOR.IN,
+          query_id: selectedSmartTag.query_id,
+        },
+        type: FILTER_TYPE.SUB_QUERY,
+      });
+    } else {
+      onSubmit(filter);
+    }
   };
 
   const handleConditionChange = (conditionValue: string) => {
@@ -92,18 +115,24 @@ const PersonTags = ({
         min_matching: undefined,
       });
     }
-    setSelected(conditionValue as CONDITION_OPERATOR);
   };
 
   const handleTagChange = (tags: { id: number; title: string }[]) => {
-    setConfig({ ...filter.config, tags: tags.map((t) => t.id) });
+    setConfig({
+      ...filter.config,
+      condition:
+        tags.some((tag) => tag.id < 0) &&
+        filter.config.condition === CONDITION_OPERATOR.SOME
+          ? CONDITION_OPERATOR.ALL
+          : filter.config.condition,
+      tags: tags.map((tag) => tag.id),
+    });
   };
 
   const handleTagDelete = (tag: ZetkinTag) => {
-    setConfig({
-      ...filter.config,
-      tags: filter.config.tags.filter((t) => t !== tag.id),
-    });
+    handleTagChange(
+      selectedTags.filter((selectedTag) => selectedTag.id !== tag.id)
+    );
   };
 
   const conditionSelect = (
@@ -111,11 +140,21 @@ const PersonTags = ({
       onChange={(e) => handleConditionChange(e.target.value)}
       value={selected}
     >
-      {Object.values(CONDITION_OPERATOR).map((o) => (
-        <MenuItem key={o} value={o}>
-          <Msg id={localMessageIds.condition.conditionSelect[o]} />
-        </MenuItem>
-      ))}
+      {Object.values(CONDITION_OPERATOR)
+        .filter(
+          (condition) =>
+            !selectedSmartTag ||
+            [
+              CONDITION_OPERATOR.ALL,
+              CONDITION_OPERATOR.ANY,
+              CONDITION_OPERATOR.NONE,
+            ].includes(condition)
+        )
+        .map((o) => (
+          <MenuItem key={o} value={o}>
+            <Msg id={localMessageIds.condition.conditionSelect[o]} />
+          </MenuItem>
+        ))}
     </StyledSelect>
   );
 
@@ -139,7 +178,7 @@ const PersonTags = ({
   return (
     <FilterForm
       disableSubmit={!submittable}
-      enableOrgSelect
+      enableOrgSelect={!selectedSmartTag}
       onCancel={onCancel}
       onOrgsChange={(orgs) => {
         setConfig({ ...filter.config, organizations: orgs });
@@ -244,9 +283,7 @@ const PersonTags = ({
                         return tag1Group.localeCompare(tag2Group);
                       });
                     }}
-                    getOptionDisabled={(t) =>
-                      selectedTags.some((selected) => selected.id === t.id)
-                    }
+                    getOptionDisabled={isTagDisabled}
                     groupBy={(option) =>
                       option.group?.title || messages.noGroup()
                     }
@@ -262,17 +299,9 @@ const PersonTags = ({
                         (tagGroup) => tagGroup.title == params.group
                       );
 
-                      const alreadySelectedTagsFromThisGroup =
-                        group?.tags.filter(
-                          (tag) =>
-                            !!filter.config.tags.some(
-                              (tagId) => tagId == tag.id
-                            )
-                        ) || [];
-
-                      const allTagsInGroupAreSelected =
-                        group?.tags.length ==
-                        alreadySelectedTagsFromThisGroup.length;
+                      const allTagsInGroupAreSelected = !group?.tags.some(
+                        (tag) => !isTagDisabled(tag) && tag.id > 0
+                      );
 
                       return (
                         <Box
@@ -303,7 +332,7 @@ const PersonTags = ({
 
                                 const existingTags = tags.filter(
                                   (tag) =>
-                                    !!filter.config.tags.some(
+                                    !!selectedTagIds.some(
                                       (tagId) => tagId == tag.id
                                     )
                                 );
@@ -314,6 +343,8 @@ const PersonTags = ({
                                     ...group.tags
                                       .filter(
                                         (tag) =>
+                                          tag.id > 0 &&
+                                          !isTagDisabled(tag) &&
                                           !existingTags.some(
                                             (t) => t.id == tag.id
                                           )
@@ -349,13 +380,11 @@ const PersonTags = ({
                       );
                     }}
                     renderOption={(params, tag) => {
-                      const alreadySelected = !!selectedTags.find(
-                        (t) => t.id == tag.id
-                      );
+                      const alreadySelected = isTagDisabled(tag);
 
                       const existingTags = tags.filter(
                         (tag) =>
-                          !!filter.config.tags.some((tagId) => tagId == tag.id)
+                          !!selectedTagIds.some((tagId) => tagId == tag.id)
                       );
                       return (
                         <Box
@@ -374,9 +403,7 @@ const PersonTags = ({
                       );
                     }}
                     sx={{ minWidth: '300px' }}
-                    value={tags.filter((t) =>
-                      filter.config.tags.includes(t.id)
-                    )}
+                    value={tags.filter((t) => selectedTagIds.includes(t.id))}
                   />
                 )}
               </Box>

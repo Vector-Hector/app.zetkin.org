@@ -1,9 +1,11 @@
 import { Button } from '@mui/material';
 import { FC, ReactNode, useState } from 'react';
 
+import useMembership from 'features/organizations/hooks/useMembership';
 import messageIds from '../l10n/messageIds';
 import TabbedLayout from 'utils/layout/TabbedLayout';
 import TagDialog from '../components/TagManager/components/TagDialog';
+import useSmartTagMutations from '../hooks/useSmartTagMutations';
 import useCreateTag from '../hooks/useCreateTag';
 import { useNumericRouteParams } from 'core/hooks';
 import useTagGroups from '../hooks/useTagGroups';
@@ -17,7 +19,9 @@ interface TagsLayoutProps {
 const TagsLayout: FC<TagsLayoutProps> = ({ children }) => {
   const { orgId } = useNumericRouteParams();
   const messages = useMessages(messageIds);
+  const canCreateSmartTags = useMembership(orgId).data?.role === 'admin';
   const createTag = useCreateTag(orgId);
+  const { createSmartTag } = useSmartTagMutations(orgId);
   const [pendingTag, setPendingTag] = useState<
     Pick<ZetkinTag, 'title'> | undefined
   >(undefined);
@@ -50,6 +54,11 @@ const TagsLayout: FC<TagsLayoutProps> = ({ children }) => {
             createTag(tag);
           }
         }}
+        onSubmitSmartTag={
+          canCreateSmartTags
+            ? (data, filters) => createSmartTag(data, filters!)
+            : undefined
+        }
         open={!!pendingTag}
         tag={pendingTag}
       />

@@ -3,6 +3,7 @@ import { CircularProgress, Grid } from '@mui/material';
 import Head from 'next/head';
 import { Suspense, useContext } from 'react';
 
+import SmartTags from 'features/tags/components/SmartTags';
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import messageIds from 'features/profile/l10n/messageIds';
 import { PageWithLayout } from 'utils/types';
@@ -118,6 +119,7 @@ const PersonProfilePage: PageWithLayout = () => {
           </ZUIFuture>
         </Grid>
         <Grid size={{ lg: 4, xs: 12 }}>
+          <SmartTags orgId={orgId} personId={personId} />
           <ZUIFuture future={personTagsFuture}>
             {(personTags) => (
               <TagManagerSection

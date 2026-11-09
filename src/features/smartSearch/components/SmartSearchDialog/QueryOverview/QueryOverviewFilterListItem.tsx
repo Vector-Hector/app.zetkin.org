@@ -1,6 +1,7 @@
 import { Divider } from '@mui/material';
 import { FC } from 'react';
 
+import useTagFilter from 'features/smartSearch/hooks/useTagFilter';
 import getFilterComponents from './getFilterComponents';
 import QueryOverviewChip from './QueryOverviewChip';
 import QueryOverviewListItem from './QueryOverviewListItem';
@@ -21,13 +22,14 @@ interface QueryOverviewFilterListItemProps {
 }
 
 const QueryOverviewFilterListItem: FC<QueryOverviewFilterListItemProps> = ({
-  filter,
+  filter: savedFilter,
   filterIndex,
   onDeleteFilter,
   onEditFilter,
   readOnly,
   showDiagram,
 }) => {
+  const filter = useTagFilter(savedFilter);
   const { displayFilter, filterOperatorIcon, filterTypeIcon } =
     getFilterComponents(filter);
   return (
@@ -51,8 +53,8 @@ const QueryOverviewFilterListItem: FC<QueryOverviewFilterListItemProps> = ({
             filterTypeIcon={filterTypeIcon}
           />
         }
-        onClickDelete={() => onDeleteFilter(filter)}
-        onClickEdit={() => onEditFilter(filter)}
+        onClickDelete={() => onDeleteFilter(savedFilter)}
+        onClickEdit={() => onEditFilter(savedFilter)}
         organizations={
           filter.type != FILTER_TYPE.ALL && 'organizations' in filter.config
             ? filter.config.organizations

@@ -2,6 +2,7 @@ import useAutocomplete from '@mui/material/useAutocomplete';
 import { Box, TextField } from '@mui/material';
 import { FC, useContext, useState } from 'react';
 
+import { SubmitSmartTag } from '../../../../types';
 import messageIds from '../../../../l10n/messageIds';
 import TagDialog from 'features/tags/components/TagManager/components/TagDialog';
 import TagSelectList from './TagSelectList';
@@ -22,6 +23,7 @@ interface TagSelectProps {
   groups: ZetkinTagGroup[];
   ignoreValues?: boolean;
   onClose: () => void;
+  onCreateSmartTag?: SubmitSmartTag;
   onCreateTag: (tag: NewTag) => Promise<ZetkinTag>;
   onDeleteTag: (tagId: number) => void;
   onEditTag: (tag: EditTag) => void;
@@ -36,6 +38,7 @@ const TagSelect: FC<TagSelectProps> = ({
   groups,
   ignoreValues = false,
   onClose,
+  onCreateSmartTag,
   onCreateTag,
   onDeleteTag,
   onEditTag,
@@ -169,6 +172,7 @@ const TagSelect: FC<TagSelectProps> = ({
             setInputValue('');
           }
         }}
+        onSubmitSmartTag={onCreateSmartTag}
         open={Boolean(tagToEdit)}
         submitLabel={submitCreateTagLabel}
         tag={tagToEdit}

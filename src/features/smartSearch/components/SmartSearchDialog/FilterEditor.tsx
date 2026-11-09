@@ -1,3 +1,4 @@
+import useTagFilter from 'features/smartSearch/hooks/useTagFilter';
 import AllInSuborg from '../filters/AllInSubOrg';
 import Area from '../filters/Area';
 import CallBlocked from '../filters/CallBlocked';
@@ -43,10 +44,11 @@ interface FilterEditorProps {
 }
 
 const FilterEditor = ({
-  filter,
+  filter: savedFilter,
   onSubmitFilter,
   onCancelSubmitFilter,
 }: FilterEditorProps): JSX.Element => {
+  const filter = useTagFilter(savedFilter);
   return (
     <>
       {filter.type == FILTER_TYPE.ALL && (

@@ -2,7 +2,7 @@ import { Box, useMediaQuery } from '@mui/material';
 
 import { Msg } from 'core/i18n';
 import { useNumericRouteParams } from 'core/hooks';
-import useTags from 'features/tags/hooks/useTags';
+import useSelectableTags from 'features/tags/hooks/useSelectableTags';
 import { ZetkinTag } from 'utils/types/zetkin';
 import {
   CONDITION_OPERATOR,
@@ -25,7 +25,7 @@ const DisplayPersonTags = ({ filter }: DisplayPersonTagProps): JSX.Element => {
   const { config } = filter;
   const op = filter.op || OPERATION.ADD;
   const { condition, tags: tagIds, min_matching } = config;
-  const { data } = useTags(orgId);
+  const { data } = useSelectableTags(orgId);
   const tags = data || [];
   const isDesktop = useMediaQuery('(min-width:600px');
 

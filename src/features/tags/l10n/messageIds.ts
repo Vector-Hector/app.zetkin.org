@@ -21,6 +21,7 @@ export default makeMessages('feat.tags', {
     typeLabel: m('Tag type'),
     types: {
       none: m('Basic (no values)'),
+      smart: m('Smart (membership query)'),
       text: m('Text values'),
     },
     updateTagButton: m('Update'),
@@ -47,6 +48,18 @@ export default makeMessages('feat.tags', {
         '{type, select, text {Enter some text} other {Enter a value}} to go along with the tag.'
       ),
     },
+  },
+  smartTags: {
+    create: m('Create smart tag'),
+    description: m('Description'),
+    edit: m('Edit smart tag'),
+    editQuery: m('Edit membership query'),
+    error: m('Could not load or save smart tags. Please try again.'),
+    membership: m(
+      'Membership is determined by the membership query and cannot be changed manually.'
+    ),
+    select: m('Smart tag'),
+    title: m('Smart tags'),
   },
   tagsPage: {
     createTagButton: m('Create'),

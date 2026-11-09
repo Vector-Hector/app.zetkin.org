@@ -11,6 +11,7 @@ import {
   remoteListLoad,
   remoteListLoaded,
 } from 'utils/storeUtils';
+import { ZetkinSmartTag } from './types';
 import { personsMerged } from 'features/profile/store';
 import {
   ZetkinAppliedTag,
@@ -19,12 +20,14 @@ import {
 } from 'utils/types/zetkin';
 
 export interface TagsStoreSlice {
+  smartTagsByOrgId: Record<number, RemoteList<ZetkinSmartTag>>;
   tagGroupList: RemoteList<ZetkinTagGroup>;
   tagList: RemoteList<ZetkinTag>;
   tagsByPersonId: Record<number, RemoteList<ZetkinAppliedTag>>;
 }
 
 const initialState: TagsStoreSlice = {
+  smartTagsByOrgId: {},
   tagGroupList: remoteList(),
   tagList: remoteList(),
   tagsByPersonId: {},
@@ -53,6 +56,37 @@ const tagsSlice = createSlice({
     ) => {
       const [id, tags] = action.payload;
       state.tagsByPersonId[id] = remoteListLoaded(tags);
+    },
+    smartTagDeleted: (state, action: PayloadAction<[number, number]>) => {
+      const [orgId, tagId] = action.payload;
+      if (state.smartTagsByOrgId[orgId]) {
+        remoteItemDeleted(state.smartTagsByOrgId[orgId], tagId);
+      }
+    },
+    smartTagSaved: (state, action: PayloadAction<ZetkinSmartTag>) => {
+      const tag = action.payload;
+      state.smartTagsByOrgId[tag.organization_id] ||= remoteList();
+      remoteItemUpdated(state.smartTagsByOrgId[tag.organization_id], tag);
+    },
+    smartTagsLoad: (state, action: PayloadAction<number>) => {
+      const orgId = action.payload;
+      state.smartTagsByOrgId[orgId] = remoteListLoad(
+        state.smartTagsByOrgId[orgId]
+      );
+    },
+    smartTagsLoadFailed: (state, action: PayloadAction<[number, unknown]>) => {
+      const [orgId, error] = action.payload;
+      state.smartTagsByOrgId[orgId] = {
+        ...remoteListLoaded<ZetkinSmartTag>([]),
+        error,
+      };
+    },
+    smartTagsLoaded: (
+      state,
+      action: PayloadAction<[number, ZetkinSmartTag[]]>
+    ) => {
+      const [orgId, tags] = action.payload;
+      state.smartTagsByOrgId[orgId] = remoteListLoaded(tags);
     },
     tagAssigned: (state, action: PayloadAction<[number, ZetkinTag]>) => {
       const [personId, tag] = action.payload;
@@ -85,11 +119,19 @@ const tagsSlice = createSlice({
     },
     tagGroupCreated: (state, action: PayloadAction<ZetkinTagGroup>) => {
       const tagGroup = action.payload;
+      state.tagGroupList.isLoading = false;
       remoteItemUpdated(state.tagGroupList, tagGroup);
     },
     tagGroupDeleted: (state, action: PayloadAction<number>) => {
       const tagGroupId = action.payload;
       remoteItemDeleted(state.tagGroupList, tagGroupId);
+      for (const list of Object.values(state.smartTagsByOrgId)) {
+        for (const item of list.items) {
+          if (item.data?.group_id === tagGroupId) {
+            item.data.group_id = null;
+          }
+        }
+      }
     },
     tagGroupUpdate: (state, action: PayloadAction<[number, string[]]>) => {
       const [tagGroupId, mutating] = action.payload;
@@ -159,6 +201,11 @@ const tagsSlice = createSlice({
 
 export default tagsSlice;
 export const {
+  smartTagsLoad,
+  smartTagsLoaded,
+  smartTagsLoadFailed,
+  smartTagSaved,
+  smartTagDeleted,
   personTagsLoad,
   personTagsLoaded,
   tagAssigned,

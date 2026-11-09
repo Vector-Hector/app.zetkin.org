@@ -1,3 +1,4 @@
+import useSmartTags from 'features/tags/hooks/useSmartTags';
 import { loadListIfNecessary } from 'core/caching/cacheUtils';
 import { ZetkinQuery } from '../components/types';
 import { queriesLoad, queriesLoaded } from '../store';
@@ -8,10 +9,23 @@ export default function useSmartSearchQueries(orgId: number) {
   const dispatch = useAppDispatch();
   const list = useAppSelector((state) => state.smartSearch.queryList);
 
-  return loadListIfNecessary(list, dispatch, {
+  const smartTags = useSmartTags(orgId).data || [];
+  const future = loadListIfNecessary(list, dispatch, {
     actionOnLoad: () => queriesLoad(),
     actionOnSuccess: (queries) => queriesLoaded(queries),
     loader: () =>
       apiClient.get<ZetkinQuery[]>(`/api/orgs/${orgId}/people/queries`),
   });
+
+  return {
+    data:
+      future.data?.map((query) => ({
+        ...query,
+        title:
+          smartTags.find((tag) => tag.query_id === query.id)?.title ||
+          query.title,
+      })) || null,
+    error: future.error,
+    isLoading: future.isLoading,
+  };
 }

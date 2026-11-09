@@ -1,5 +1,7 @@
 import { FC, useState } from 'react';
 
+import useMembership from 'features/organizations/hooks/useMembership';
+import useSmartTagMutations from '../../hooks/useSmartTagMutations';
 import GroupToggle from './components/GroupToggle';
 import messageIds from '../../l10n/messageIds';
 import useCreateTag from 'features/tags/hooks/useCreateTag';
@@ -20,6 +22,7 @@ type TagManagerProps = Omit<
   TagManagerControllerProps,
   | 'availableGroups'
   | 'availableTags'
+  | 'onCreateSmartTag'
   | 'onCreateTag'
   | 'onEditTag'
   | 'onDeleteTag'
@@ -41,10 +44,12 @@ const TagManager: FC<TagManagerProps> = ({
   submitCreateTagLabel,
 }) => {
   const { orgId } = useNumericRouteParams();
+  const canCreateSmartTags = useMembership(orgId).data?.role === 'admin';
   const tagsFuture = useTags(orgId);
   const tagGroupsFuture = useTagGroups(orgId);
   const deleteTag = useDeleteTag(orgId);
   const createTag = useCreateTag(orgId);
+  const { createSmartTag } = useSmartTagMutations(orgId);
   const { updateTag } = useTagMutations(orgId);
 
   return (
@@ -63,6 +68,11 @@ const TagManager: FC<TagManagerProps> = ({
             groupTags={groupTags}
             ignoreValues={ignoreValues}
             onAssignTag={onAssignTag}
+            onCreateSmartTag={
+              canCreateSmartTags
+                ? (data, filters) => createSmartTag(data, filters!)
+                : undefined
+            }
             onCreateTag={createTag}
             onDeleteTag={deleteTag}
             onEditTag={async (newValue) => {

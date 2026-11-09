@@ -13,9 +13,10 @@ import { Msg, useMessages } from 'core/i18n';
 
 const TypeSelect: React.FC<{
   disabled?: boolean;
-  onChange: (value: ZetkinTag['value_type']) => void;
-  value: ZetkinTag['value_type'];
-}> = ({ disabled, onChange, value }) => {
+  enableSmartTags?: boolean;
+  onChange: (value: ZetkinTag['value_type'] | 'smart') => void;
+  value: ZetkinTag['value_type'] | 'smart';
+}> = ({ disabled, enableSmartTags, onChange, value }) => {
   const messages = useMessages(messageIds);
 
   return (
@@ -33,7 +34,7 @@ const TypeSelect: React.FC<{
             onChange(
               ev.target.value == 'none'
                 ? null
-                : (ev.target.value as ZetkinTag['value_type'])
+                : (ev.target.value as ZetkinTag['value_type'] | 'smart')
             )
           }
           value={value || 'none'}
@@ -48,6 +49,13 @@ const TypeSelect: React.FC<{
             label={messages.dialog.types.text()}
             value="text"
           />
+          {enableSmartTags && (
+            <FormControlLabel
+              control={<Radio />}
+              label={messages.dialog.types.smart()}
+              value="smart"
+            />
+          )}
         </RadioGroup>
       </FormControl>
     </Box>

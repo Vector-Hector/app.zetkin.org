@@ -2,6 +2,7 @@ import { Add } from '@mui/icons-material';
 import { Box, Button, Popover } from '@mui/material';
 import { FC, useState } from 'react';
 
+import { SubmitSmartTag } from '../../types';
 import messageIds from '../../l10n/messageIds';
 import { Msg } from 'core/i18n';
 import TagSelect from 'features/tags/components/TagManager/components/TagSelect';
@@ -22,6 +23,7 @@ export interface TagManagerControllerProps {
   groupTags?: boolean;
   ignoreValues?: boolean;
   onAssignTag: (tag: ZetkinAppliedTag) => void;
+  onCreateSmartTag?: SubmitSmartTag;
   onCreateTag: (tag: NewTag) => Promise<ZetkinTag>;
   onDeleteTag: (tagId: number) => void;
   onEditTag: (tag: EditTag) => void;
@@ -38,6 +40,7 @@ export const TagManagerController: FC<TagManagerControllerProps> = ({
   groupTags = true,
   ignoreValues = false,
   onAssignTag,
+  onCreateSmartTag,
   onCreateTag,
   onDeleteTag,
   onEditTag,
@@ -72,6 +75,7 @@ export const TagManagerController: FC<TagManagerControllerProps> = ({
             groups={availableGroups}
             ignoreValues={ignoreValues}
             onClose={() => setAddTagButton(null)}
+            onCreateSmartTag={onCreateSmartTag}
             onCreateTag={async (tag) => {
               const newTag = await onCreateTag(tag);
               if (!newTag.value_type) {

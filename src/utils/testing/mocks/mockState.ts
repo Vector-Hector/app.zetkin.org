@@ -180,6 +180,7 @@ export default function mockState(overrides?: RootState) {
       surveysWithElementsList: remoteList(),
     },
     tags: {
+      smartTagsByOrgId: {},
       tagGroupList: remoteList(),
       tagList: remoteList(),
       tagsByPersonId: {},
